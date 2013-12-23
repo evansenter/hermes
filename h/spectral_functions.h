@@ -1,11 +1,7 @@
 #ifndef SPECTRAL_FUNCTIONS_H
 #define SPECTRAL_FUNCTIONS_H
 
-typedef struct {
-  double *values;       
-  double *vectors;
-  double *inverse_vectors;
-} EIGENSYSTEM;
+#include "spectral_data_structures.h"
 
 double* convert_structures_to_transition_matrix(SOLUTION*, int, int);
 EIGENSYSTEM convert_transition_matrix_to_eigenvectors(double*, int);

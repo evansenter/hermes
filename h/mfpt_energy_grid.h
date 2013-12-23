@@ -1,5 +1,7 @@
-#ifndef ENERGY_GRID_MFPT_H
-#define ENERGY_GRID_MFPT_H
+#ifndef MFPT_ENERGY_GRID_H
+#define MFPT_ENERGY_GRID_H
+
+#include "mfpt_data_structures.h"
 
 double** convert_energy_grid_to_transition_matrix(int**, int**, double**, int*, MFPT_PARAMETERS);
 double compute_mfpt(int*, int*, double**, int, MFPT_PARAMETERS);

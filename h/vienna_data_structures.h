@@ -1,7 +1,12 @@
-#ifndef PARAMS_H
-#define PARAMS_H
+#ifndef VIENNA_DATA_STRUCTURES_H
+#define VIENNA_DATA_STRUCTURES_H
 
 #include "energy_const.h"
+  
+typedef struct {
+  float energy;       
+  char *structure;    
+} SOLUTION;
 
 #define   VRNA_GQUAD_MAX_STACK_SIZE     7
 #define   VRNA_GQUAD_MIN_STACK_SIZE     2
@@ -30,12 +35,10 @@ typedef struct{
   int     gquad;        /**<  \brief  Include G-quadruplexes in structure prediction */
 } model_detailsT;
 
-
-
 /**
  *  \brief The datastructure that contains temperature scaled energy parameters.
  */
-typedef struct{
+typedef struct {
   int id;
   int stack[NBPAIRS+1][NBPAIRS+1];
   int hairpin[31];
@@ -75,10 +78,6 @@ typedef struct{
 
   model_detailsT model_details;   /**<  \brief  Model details to be used in the recursions */
 
-}  paramT;
-
-extern "C" void set_model_details(model_detailsT*);
-extern "C" paramT *get_scaled_parameters(double,model_detailsT);
-extern "C" paramT *scale_parameters(void);
-
+} paramT;
+  
 #endif
