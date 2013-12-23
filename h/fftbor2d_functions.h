@@ -1,5 +1,5 @@
-#ifndef PARTITION_H
-#define PARTITION_H
+#ifndef FFTBOR2D_FUNCTIONS_H
+#define FFTBOR2D_FUNCTIONS_H
 
 #include <complex>
 typedef std::complex<double> dcomplex;

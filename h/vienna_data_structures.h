@@ -1,7 +1,7 @@
 #ifndef VIENNA_DATA_STRUCTURES_H
 #define VIENNA_DATA_STRUCTURES_H
 
-#include "energy_const.h"
+#include "energy_par.h"
   
 typedef struct {
   float energy;       
