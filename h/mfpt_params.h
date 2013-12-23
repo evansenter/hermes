@@ -1,5 +1,5 @@
-#ifndef PARAMS_H
-#define PARAMS_H
+#ifndef MFPT_PARAMS_H
+#define MFPT_PARAMS_H
 
 typedef struct {
   int start_state;

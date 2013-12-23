@@ -1,3 +1,6 @@
+#ifndef ENERGY_PAR_H
+#define ENERGY_PAR_H
+
 /* 
    prototypes for energy_par.c
 */
@@ -58,3 +61,5 @@ extern char Triloops[];    /* string containing the special triloops */
 extern int  Triloop_E37[]; /* Bonus energy for special Triloops */  
 
 extern double Tmeasure;       /* temperature of param measurements */
+
+#endif
