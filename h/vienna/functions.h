@@ -1,7 +1,7 @@
 #ifndef VIENNA_FUNCTIONS_H
 #define VIENNA_FUNCTIONS_H
 
-#include "vienna_data_structures.h"
+#include "data_structures.h"
 
 #ifdef __cplusplus
 extern "C" {

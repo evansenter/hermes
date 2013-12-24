@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-#include "spectral_functions.h"
-#include "spectral_params.h"
-#include "spectral_initializers.h"
+#include "../spectral/functions.h"
+#include "../spectral/params.h"
+#include "../spectral/initializers.h"
 
 #ifdef __cplusplus
 }
