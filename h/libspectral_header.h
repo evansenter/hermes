@@ -7,6 +7,7 @@ extern "C" {
 
 #include "spectral_functions.h"
 #include "spectral_params.h"
+#include "spectral_initializers.h"
 
 #ifdef __cplusplus
 }

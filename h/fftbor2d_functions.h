@@ -18,6 +18,7 @@ void   printOutput(double *, int, int, int, int *, int&, double&, char *);
 void   calculateKinetics(int *, int, double *, int, char *);
 void   convert_fftbor2d_energy_grid_to_klp_matrix(int *, double *, int, KLP_MATRIX);
 void   populationProportion(int *, int, double *, int, char *);
+double* convert_fftbor2d_energy_grid_to_transition_rate_matrix(int *, int, double *);
 int    jPairedTo(int, int, int *);
 int    jPairedIn(int, int, int *);
 void   populateRemainingRoots(dcomplex *, dcomplex *, int, int);

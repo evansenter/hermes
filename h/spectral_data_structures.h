@@ -23,6 +23,7 @@ typedef struct {
   double *values;       
   double *vectors;
   double *inverse_vectors;
+  int length;
 } EIGENSYSTEM;
 
 #endif
