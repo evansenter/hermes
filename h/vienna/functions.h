@@ -8,8 +8,8 @@ extern "C" {
 #endif
 
 void set_model_details(model_detailsT*);
-paramT *get_scaled_parameters(double, model_detailsT);
-paramT *scale_parameters(void);
+paramT* get_scaled_parameters(double, model_detailsT);
+paramT* scale_parameters(void);
 float fold_par(char*, char*, paramT*, int, int);
 SOLUTION* subopt_par(char*, char*, paramT*, int, int, int, FILE*);
 

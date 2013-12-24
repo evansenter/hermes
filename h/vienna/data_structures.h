@@ -2,10 +2,10 @@
 #define VIENNA_DATA_STRUCTURES_H
 
 #include "energy_par.h"
-  
+
 typedef struct {
-  float energy;       
-  char *structure;    
+  float energy;
+  char* structure;
 } SOLUTION;
 
 #define   VRNA_GQUAD_MAX_STACK_SIZE     7
@@ -19,7 +19,7 @@ typedef struct {
  *  \brief The data structure that contains the complete model details used throughout the calculations
  *
  */
-typedef struct{
+typedef struct {
   int     dangles;      /**<  \brief  Specifies the dangle model used in any energy evaluation (0,1,2 or 3)
                               \note   Some function do not implement all dangle model but only a subset of
                                       (0,1,2,3). Read the documentaion of the particular recurrences or
@@ -40,25 +40,25 @@ typedef struct{
  */
 typedef struct {
   int id;
-  int stack[NBPAIRS+1][NBPAIRS+1];
+  int stack[NBPAIRS + 1][NBPAIRS + 1];
   int hairpin[31];
-  int bulge[MAXLOOP+1];
-  int internal_loop[MAXLOOP+1];
-  int mismatchExt[NBPAIRS+1][5][5];
-  int mismatchI[NBPAIRS+1][5][5];
-  int mismatch1nI[NBPAIRS+1][5][5];
-  int mismatch23I[NBPAIRS+1][5][5];
-  int mismatchH[NBPAIRS+1][5][5];
-  int mismatchM[NBPAIRS+1][5][5];
-  int dangle5[NBPAIRS+1][5];
-  int dangle3[NBPAIRS+1][5];
-  int int11[NBPAIRS+1][NBPAIRS+1][5][5];
-  int int21[NBPAIRS+1][NBPAIRS+1][5][5][5];
-  int int22[NBPAIRS+1][NBPAIRS+1][5][5][5][5];
+  int bulge[MAXLOOP + 1];
+  int internal_loop[MAXLOOP + 1];
+  int mismatchExt[NBPAIRS + 1][5][5];
+  int mismatchI[NBPAIRS + 1][5][5];
+  int mismatch1nI[NBPAIRS + 1][5][5];
+  int mismatch23I[NBPAIRS + 1][5][5];
+  int mismatchH[NBPAIRS + 1][5][5];
+  int mismatchM[NBPAIRS + 1][5][5];
+  int dangle5[NBPAIRS + 1][5];
+  int dangle3[NBPAIRS + 1][5];
+  int int11[NBPAIRS + 1][NBPAIRS + 1][5][5];
+  int int21[NBPAIRS + 1][NBPAIRS + 1][5][5][5];
+  int int22[NBPAIRS + 1][NBPAIRS + 1][5][5][5][5];
   int ninio[5];
   double  lxc;
   int     MLbase;
-  int     MLintern[NBPAIRS+1];
+  int     MLintern[NBPAIRS + 1];
   int     MLclosing;
   int     TerminalAU;
   int     DuplexInit;
@@ -72,12 +72,12 @@ typedef struct {
   int     MultipleCA;
   int     MultipleCB;
   int     gquad [VRNA_GQUAD_MAX_STACK_SIZE + 1]
-                [3*VRNA_GQUAD_MAX_LINKER_LENGTH + 1];
+  [3 * VRNA_GQUAD_MAX_LINKER_LENGTH + 1];
 
   double  temperature;            /**<  \brief  Temperature used for loop contribution scaling */
 
   model_detailsT model_details;   /**<  \brief  Model details to be used in the recursions */
 
 } paramT;
-  
+
 #endif
