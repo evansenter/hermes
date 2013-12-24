@@ -1,6 +1,7 @@
 #ifndef FFTBOR2D_FUNCTIONS_H
 #define FFTBOR2D_FUNCTIONS_H
 
+#include "mfpt_data_structures.h"
 #include <complex>
 typedef std::complex<double> dcomplex;
 
@@ -14,8 +15,9 @@ double hairpinloop(int, int, int, short, short, char *);
 double interiorloop(int, int, int, int, int, int, short, short, short, short);
 void   solveSystem(double *, dcomplex *, int, int, int, int *, int&, double&, char *);
 void   printOutput(double *, int, int, int, int *, int&, double&, char *);
-void   calculateKinetics(int *, int&, double *, int, char *);
-void   populationProportion(int *, int&, double *, int, char *);
+void   calculateKinetics(int *, int, double *, int, char *);
+void   convert_fftbor2d_energy_grid_to_klp_matrix(int *, double *, int, KLP_MATRIX);
+void   populationProportion(int *, int, double *, int, char *);
 int    jPairedTo(int, int, int *);
 int    jPairedIn(int, int, int *);
 void   populateRemainingRoots(dcomplex *, dcomplex *, int, int);

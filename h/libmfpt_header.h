@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "mfpt_energy_grid.h"
+#include "mfpt_initializers.h"
 #include "mfpt_params.h"
 
 #ifdef __cplusplus

@@ -16,4 +16,11 @@ typedef struct {
   double distributed_epsilon;
 } MFPT_PARAMETERS;
 
+typedef struct {
+  int* k;
+  int* l;
+  double* p;
+  int length;
+} KLP_MATRIX;
+
 #endif

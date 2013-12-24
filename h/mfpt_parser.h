@@ -4,6 +4,6 @@
 #include "mfpt_data_structures.h"
 
 int count_lines(char*);
-void populate_arrays(char*, int*, int*, double*, MFPT_PARAMETERS);
+void populate_arrays(char*, KLP_MATRIX, MFPT_PARAMETERS);
 
 #endif
