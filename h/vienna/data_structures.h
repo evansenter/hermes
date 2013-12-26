@@ -73,11 +73,11 @@ typedef struct {
   int     MultipleCB;
   int     gquad [VRNA_GQUAD_MAX_STACK_SIZE + 1]
   [3 * VRNA_GQUAD_MAX_LINKER_LENGTH + 1];
-
+  
   double  temperature;            /**<  \brief  Temperature used for loop contribution scaling */
-
+  
   model_detailsT model_details;   /**<  \brief  Model details to be used in the recursions */
-
+  
 } paramT;
 
 #endif
