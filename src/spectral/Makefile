@@ -1,7 +1,7 @@
 # Makefile for RNAspectral
 
-CCFLAGS          = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER)
-LDFLAGS          = -L . -L $(LIB)/ -L /usr/local/include -lm -lgomp -llapack -lgslcblas -lgsl -lmfpt -o
+CCFLAGS          = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) -I ~/local/include
+LDFLAGS          = -L . -L $(LIB)/ -L ~/lib -L ~/local/lib -L /usr/local/include -lm -lgomp -llapack -lgslcblas -lgsl -lmfpt -lRNA -o
 BINDIR           = ~/bin
 LIBDIR           = ~/lib
 CC               = gcc
@@ -28,7 +28,7 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 endif
 	
 RNAspectral.out: $(CODE)/rna_spectral.o $(CODE)/spectral_params.o $(CODE)/spectral_functions.o $(CODE)/spectral_initializers.o $(LIB)/libmfpt.a 
-	$(CC) $(CODE)/rna_spectral.o $(CODE)/spectral_params.o $(CODE)/spectral_functions.o $(CODE)/spectral_initializers.o -lRNA $(LDFLAGS) RNAspectral.out
+	$(CC) $(CODE)/rna_spectral.o $(CODE)/spectral_params.o $(CODE)/spectral_functions.o $(CODE)/spectral_initializers.o $(LDFLAGS) RNAspectral.out
 	ar cr $(LIB)/libspectral.a $(CODE)/spectral_functions.o $(CODE)/spectral_params.o $(CODE)/spectral_initializers.o
 	
 $(CODE)/rna_spectral.o: $(CODE)/rna_spectral.c $(SHARED_HEADER)/vienna/data_structures.h $(HEADER)/functions.h $(HEADER)/params.h $(HEADER)/constants.h $(HEADER)/initializers.h
