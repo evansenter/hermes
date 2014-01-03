@@ -1,6 +1,9 @@
 # Base Makefile
 
 all: src/mfpt/RNAmfpt src/spectral/RNAspectral src/fftbor2d/FFTbor2D mashup/population_from_energy_grid/RNApopulation mashup/mfpt_from_energy_grid/FFTmfpt
+
+install: all
+	cp RNAmfpt RNAspectral FFTbor2D RNApopulation FFTmfpt ~/bin
 	
 src/mfpt/RNAmfpt:
 	cd src/mfpt; make
