@@ -1,27 +1,27 @@
 # Base Makefile
 
-all: src/mfpt/RNAmfpt src/spectral/RNAspectral src/fftbor2d/FFTbor2D mashup/population_from_energy_grid/RNApopulation mashup/mfpt_from_energy_grid/FFTmfpt
+all: RNAmfpt RNAspectral FFTbor2D RNApopulation FFTmfpt
 
 install: all
 	cp RNAmfpt RNAspectral FFTbor2D RNApopulation FFTmfpt ~/bin
 	
-src/mfpt/RNAmfpt:
+RNAmfpt:
 	cd src/mfpt; make
 	cp src/mfpt/RNAmfpt.out RNAmfpt
 	
-src/spectral/RNAspectral:
+RNAspectral:
 	cd src/spectral; make
 	cp src/spectral/RNAspectral.out RNAspectral
 	
-src/fftbor2d/FFTbor2D:
+FFTbor2D:
 	cd src/fftbor2d; make
 	cp src/fftbor2d/FFTbor2D.out FFTbor2D
 
-mashup/population_from_energy_grid/RNApopulation:
+RNApopulation:
 	cd mashup/population_from_energy_grid; make
 	cp mashup/population_from_energy_grid/RNApopulation.out RNApopulation
 	
-mashup/mfpt_from_energy_grid/FFTmfpt:
+FFTmfpt:
 	cd mashup/mfpt_from_energy_grid; make
 	cp mashup/mfpt_from_energy_grid/FFTmfpt.out FFTmfpt
 	
