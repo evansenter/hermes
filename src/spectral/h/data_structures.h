@@ -16,7 +16,7 @@ typedef struct {
   double end_time;
   double step_size;
   short lonely_bp;
-  short energy_cap;
+  double energy_cap;
   short eigen_only;
   short benchmark;
 } SPECTRAL_PARAMS;
