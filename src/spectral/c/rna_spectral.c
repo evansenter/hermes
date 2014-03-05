@@ -60,6 +60,7 @@ int main(int argc, char** argv) {
     printf("sequence:\t%s\n", sequence);
     printf("start:\t\t%s\t%+.2f kcal/mol\t(%d)\n", parameters.start_structure, all_structures[parameters.start_index].energy, parameters.start_index);
     printf("stop:\t\t%s\t%+.2f kcal/mol\t(%d)\n", parameters.end_structure, all_structures[parameters.end_index].energy, parameters.end_index);
+    printf("mfe energy:\t%+.2f\n", mfe_energy);
     printf("energy cap:\t%+.2f kcal/mol above MFE\n", energy_cap / 100.);
     printf("num str:\t%d\n\n", num_structures);
 

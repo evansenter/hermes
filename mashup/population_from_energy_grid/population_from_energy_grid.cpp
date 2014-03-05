@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
   spectral_params.end_index       = mfpt_params.end_state;
   spectral_params.start_time      = -12;
   spectral_params.end_time        = 12;
-  spectral_params.step_size       = 1;
+  spectral_params.step_size       = .1;
 
   if (fftbor2d_params.verbose) {
     debug_mfpt_parameters(mfpt_params);
