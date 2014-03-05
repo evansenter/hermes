@@ -44,7 +44,6 @@ int main(int argc, char** argv) {
     debug_mfpt_parameters(mfpt_params);
     debug_spectral_parameters(spectral_params);
     print_klp_matrix(klp_matrix);
-    print_transition_matrix(klp_matrix, transition_matrix);
   }
 
   population_proportion_from_row_ordered_transition_matrix(spectral_params, transition_matrix, klp_matrix.length);
