@@ -26,30 +26,29 @@ endif
 ifeq "$(GCC_GTEQ_4.9.0)" "1"
 	CCFLAGS += -fdiagnostics-color=always
 endif
-	
-RNAspectral.out: $(CODE)/rna_spectral.o $(CODE)/spectral_params.o $(CODE)/spectral_functions.o $(CODE)/spectral_initializers.o $(LIB)/libmfpt.a 
+
+RNAspectral.out: $(CODE)/rna_spectral.o $(CODE)/spectral_params.o $(CODE)/spectral_functions.o $(CODE)/spectral_initializers.o $(LIB)/libmfpt.a
 	$(CC) $(CODE)/rna_spectral.o $(CODE)/spectral_params.o $(CODE)/spectral_functions.o $(CODE)/spectral_initializers.o $(LDFLAGS) RNAspectral.out
 	ar cr $(LIB)/libspectral.a $(CODE)/spectral_functions.o $(CODE)/spectral_params.o $(CODE)/spectral_initializers.o
-	
+
 $(CODE)/rna_spectral.o: $(CODE)/rna_spectral.c $(SHARED_HEADER)/vienna/data_structures.h $(HEADER)/functions.h $(HEADER)/params.h $(HEADER)/constants.h $(HEADER)/initializers.h
 	$(CC) $(CCFLAGS) $(CODE)/rna_spectral.c -o $(CODE)/rna_spectral.o
-	
+
 $(CODE)/spectral_functions.o: $(CODE)/spectral_functions.c $(HEADER)/functions.h $(HEADER)/params.h $(HEADER)/data_structures.h $(HEADER)/initializers.h $(SHARED_HEADER)/shared/libmfpt_header.h
 	$(CC) $(CCFLAGS) $(CODE)/spectral_functions.c -o $(CODE)/spectral_functions.o
-	
+
 $(CODE)/spectral_params.o: $(CODE)/spectral_params.c $(HEADER)/params.h $(HEADER)/data_structures.h
 	$(CC) $(CCFLAGS) $(CODE)/spectral_params.c -o $(CODE)/spectral_params.o
-  
+
 $(CODE)/spectral_initializers.o: $(CODE)/spectral_initializers.c $(HEADER)/initializers.h $(HEADER)/functions.h $(SHARED_HEADER)/shared/libmfpt_header.h
 	$(CC) $(CCFLAGS) $(CODE)/spectral_initializers.c -o $(CODE)/spectral_initializers.o
-  
+
 $(LIB)/libmfpt.a:
 	cd ../mfpt; make
 
 clean:
 	rm -f $(CODE)/*.o $(LIB)/libspectral.a RNAspectral.out
-	
+
 install: RNAspectral.out
 	cp RNAspectral.out $(BINDIR)/RNAspectral
 	cp $(LIB)/libspectral.a $(LIBDIR)
-		

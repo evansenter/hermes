@@ -207,6 +207,9 @@ void debug_spectral_parameters(const SPECTRAL_PARAMS parameters) {
 }
 
 void spectral_usage() {
+  SPECTRAL_PARAMS parameters;
+  parameters = init_spectral_params();
   fprintf(stderr, "RNAspectral [options] -s [sequence]\n");
+  debug_spectral_parameters(parameters);
   abort();
 }

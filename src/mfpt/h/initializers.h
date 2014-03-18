@@ -12,6 +12,6 @@ void print_klp_matrix(KLP_MATRIX);
 double* init_transition_matrix(int);
 double* transpose_matrix(double*, int);
 void free_transition_matrix(double*);
-void print_transition_matrix(KLP_MATRIX, double*);
+void print_transition_matrix(KLP_MATRIX, double*, MFPT_PARAMS);
 
 #endif

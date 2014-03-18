@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "shared/libmulti_param_header.h"
 #include "shared/libfftbor2d_header.h"
 #include "shared/libmfpt_header.h"
 #include "shared/libspectral_header.h"
@@ -9,12 +10,18 @@ KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA);
 void convert_klp_matrix_to_use_epsilon(KLP_MATRIX*, MFPT_PARAMS*, double);
 
 int main(int argc, char** argv) {
+  PARAM_CONTAINER* params;
   FFTBOR2D_PARAMS fftbor2d_params;
   FFTBOR2D_DATA fftbor2d_data;
   KLP_MATRIX klp_matrix;
   MFPT_PARAMS mfpt_params;
   SPECTRAL_PARAMS spectral_params;
   double* transition_matrix;
+
+  char *subparams[] = { "fftbor2d", "mfpt", "spectral" };
+  params            = split_args(argc, argv, subparams, 3);
+
+  print_multi_params(params, subparams, 3);
 
   fftbor2d_params = parse_fftbor2d_args(argc, argv);
   fftbor2d_data   = fftbor2d_from_params(fftbor2d_params);
