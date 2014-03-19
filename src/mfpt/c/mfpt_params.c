@@ -215,6 +215,12 @@ int mfpt_error_handling(MFPT_PARAMS parameters) {
     error++;
   }
 
+  // The radial probability stuff wasn't working last I checked, so let's disable this for now.
+  if (parameters.radial_probability) {
+    fprintf(stderr, "Error: Radial probability (-q) wasn't working the last time I checked, so I've disabled it for now.\n");
+    error++;
+  }
+
   // Can't populate the zero entries in k/l/p matrix with both of these techniques.
   if (parameters.epsilon > 0 && parameters.radial_probability) {
     fprintf(stderr, "Error: -o and -q are mutually exclusive!\n");

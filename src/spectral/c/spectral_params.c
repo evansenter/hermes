@@ -12,7 +12,6 @@ SPECTRAL_PARAMS init_spectral_params() {
   SPECTRAL_PARAMS parameters = {
     .verbose          = 0,
     .sequence         = NULL,
-    .energy_grid_file = NULL,
     .start_structure  = NULL,
     .end_structure    = NULL,
     .start_index      = -1,
@@ -34,7 +33,7 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
   SPECTRAL_PARAMS parameters;
   parameters = init_spectral_params();
 
-  while ((c = getopt(argc, argv, "OoGgBbVvS:s:K:k:L:l:E:e:I:i:J:j:P:p:T:t:C:c:")) != -1) {
+  while ((c = getopt(argc, argv, "OoGgBbVvS:s:K:k:L:l:I:i:J:j:P:p:T:t:C:c:")) != -1) {
     switch (c) {
       case 'O':
       case 'o':
@@ -69,11 +68,6 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
       case 'L':
       case 'l':
         parameters.end_structure = strdup(optarg);
-        break;
-
-      case 'E':
-      case 'e':
-        parameters.energy_grid_file = strdup(optarg);
         break;
 
       case 'I':
@@ -169,8 +163,13 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
 int spectral_error_handling(const SPECTRAL_PARAMS parameters) {
   int error = 0;
 
-  if (parameters.energy_grid_file != NULL) {
-    fprintf(stderr, "Error: energy_grid_file not yet implemented.\n");
+  if (parameters.sequence != NULL && parameters.start_structure != NULL && strlen(parameters.sequence) != strlen(parameters.start_structure)) {
+    fprintf(stderr, "Error: the starting structure is not the same length as the provided sequence.\n");
+    error++;
+  }
+
+  if (parameters.sequence != NULL && parameters.end_structure != NULL && strlen(parameters.sequence) != strlen(parameters.end_structure)) {
+    fprintf(stderr, "Error: the ending structure is not the same length as the provided sequence.\n");
     error++;
   }
 
@@ -178,8 +177,6 @@ int spectral_error_handling(const SPECTRAL_PARAMS parameters) {
     fprintf(stderr, "Error: the energy_cap must be a positive number (in kcal/mol) for the energy range above the MFE to sample structures from.\n");
     error++;
   }
-
-  // Also need error handling for the size of the structures, if provided.
 
   if (error) {
     fprintf(stderr, "\n");
@@ -194,7 +191,6 @@ void debug_spectral_parameters(const SPECTRAL_PARAMS parameters) {
   printf("(l) end_structure\t\t%s\n",           parameters.end_structure == NULL ? "mfe" : parameters.end_structure);
   printf("    start_index\t\t\t%d\n",           parameters.start_index);
   printf("    end_index\t\t\t%d\n",             parameters.end_index);
-  printf("(e) energy_grid_file (NYI)\t%s\n",    parameters.energy_grid_file == NULL ? "none" : parameters.energy_grid_file);
   printf("(t) temperature\t\t\t%.1f\n",         parameters.temperature);
   printf("(i) start_time\t\t\t%.2e\n",          parameters.start_time);
   printf("(j) end_time\t\t\t%.2e\n",            parameters.end_time);
@@ -203,13 +199,21 @@ void debug_spectral_parameters(const SPECTRAL_PARAMS parameters) {
   printf("(c) energy_cap\t\t\t%.1f kcal/mol\n", parameters.energy_cap ? parameters.energy_cap : 10000);
   printf("(g) eigen_only\t\t\t%s\n",            parameters.eigen_only ? "Yes" : "No");
   printf("(b) benchmark\t\t\t%s\n",             parameters.benchmark ? "Yes" : "No");
-  printf("(t) temperature\t\t\t%.1f\n",         parameters.temperature);
 }
 
 void spectral_usage() {
-  SPECTRAL_PARAMS parameters;
-  parameters = init_spectral_params();
-  fprintf(stderr, "RNAspectral [options] -s [sequence]\n");
-  debug_spectral_parameters(parameters);
+  fprintf(stderr, "RNAspectral [options] -s [sequence]\n\n");
+  fprintf(stderr, "Options include the following:\n");
+  fprintf(stderr, "-S/s\tsequence (required), the sequence of interest for computing population proportions.\n");
+  fprintf(stderr, "-K/k\tstarting structure,  the structure for which the probability at time 0 is equal to 1. If not provided, the empty structure is used.\n");
+  fprintf(stderr, "-L/l\tending structure,    the structure of interest for . If not provided, the empty structure is used.\n");
+  fprintf(stderr, "-T/t\ttemperature,         the temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
+  fprintf(stderr, "-I/i\tstart time,          the natrual log of the starting time for computing population proportion.\n");
+  fprintf(stderr, "-J/j\tend time,            the natrual log of the ending time for computing population proportion.\n");
+  fprintf(stderr, "-P/p\tstep size,           the natrual log of the step size for computing population proportion (start_time < start_time + step_size <= end_time).\n");
+  fprintf(stderr, "-O/o\tlonely basepairs,    the default is disabled. When enabled, RNAsubopt will sample structures containing lonely basepairs .\n");
+  fprintf(stderr, "-C/c\tenergy cap,          the default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
+  fprintf(stderr, "-G/g\teigenvalues only,    the default is disabled. When enabled, RNAspectral will only generate the eigenvalues for the transition rate matrix.\n");
+  fprintf(stderr, "-B/b\tbenchmarking,        the default is disabled. When enabled, RNAspectral will print benchmarking times for internal function calls.\n");
   abort();
 }
