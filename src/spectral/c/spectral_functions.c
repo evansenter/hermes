@@ -4,6 +4,7 @@
 #include <math.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_eigen.h>
+#include <tpl.h>
 #include "shared/libmfpt_header.h"
 #include "constants.h"
 #include "initializers.h"
@@ -148,6 +149,60 @@ void find_key_structure_indices_in_structure_list(SPECTRAL_PARAMS* parameters, c
   }
 }
 
+void serialize_eigensystem(const EIGENSYSTEM eigensystem, const SPECTRAL_PARAMS parameters) {
+  tpl_node* tpl;
+  int i;
+  double value, vector, inverse_vector;
+  tpl = tpl_map("iA(f)A(f)A(f)", &eigensystem.length, &value, &vector, &inverse_vector);
+  tpl_pack(tpl, 0);
+
+  for (i = 0; i < eigensystem.length * eigensystem.length; ++i) {
+    if (i < eigensystem.length) {
+      value = eigensystem.values[i];
+      tpl_pack(tpl, 1);
+    }
+
+    vector         = eigensystem.vectors[i];
+    inverse_vector = eigensystem.inverse_vectors[i];
+
+    tpl_pack(tpl, 2);
+    tpl_pack(tpl, 3);
+  }
+
+  tpl_dump(tpl, TPL_FILE, parameters.filename);
+  tpl_free(tpl);
+}
+
+EIGENSYSTEM deserialize_eigensystem(const SPECTRAL_PARAMS parameters) {
+  tpl_node* tpl;
+  int i, length;
+  double value, vector, inverse_vector;
+  EIGENSYSTEM eigensystem;
+
+  tpl = tpl_map("iA(f)A(f)A(f)", &length, &value, &vector, &inverse_vector);
+  tpl_load(tpl, TPL_FILE, parameters.filename);
+  tpl_unpack(tpl, 0);
+
+  eigensystem = init_eigensystem(length);
+
+  for (i = 0; i < eigensystem.length * eigensystem.length; ++i) {
+    if (i < eigensystem.length) {
+      tpl_unpack(tpl, 1);
+      eigensystem.values[i] = value;
+    }
+
+    tpl_unpack(tpl, 2);
+    tpl_unpack(tpl, 3);
+
+    eigensystem.vectors[i]         = vector;
+    eigensystem.inverse_vectors[i] = inverse_vector;
+  }
+
+  tpl_free(tpl);
+
+  return eigensystem;
+}
+
 void print_population_proportion(const SPECTRAL_PARAMS parameters, const EIGENSYSTEM eigensystem) {
   double step_counter;
 
@@ -179,11 +234,19 @@ void print_matrix(char* title, double* matrix, int length) {
 
   for (i = 0; i < length; ++i) {
     for (j = 0; j < length; ++j) {
-      printf("%+.4f\t", ROW_ORDER(matrix, i, j, length));
+      printf("%+.2e ", ROW_ORDER(matrix, i, j, length));
     }
 
     printf("\n");
   }
 
   printf("\n");
+}
+
+void print_eigenvalues(const EIGENSYSTEM eigensystem) {
+  int i;
+
+  for (i = 0; i < eigensystem.length; ++i) {
+    printf("%+.8f\n", eigensystem.values[i]);
+  }
 }

@@ -9,6 +9,8 @@ EIGENSYSTEM convert_transition_matrix_to_eigenvectors(double*, int);
 void invert_matrix(EIGENSYSTEM*);
 double probability_at_time(const EIGENSYSTEM, double, int, int);
 void find_key_structure_indices_in_structure_list(SPECTRAL_PARAMS*, const SOLUTION*, int, char*, char*);
+void serialize_eigensystem(const EIGENSYSTEM, const SPECTRAL_PARAMS);
+EIGENSYSTEM deserialize_eigensystem(const SPECTRAL_PARAMS);
 void print_population_proportion(const SPECTRAL_PARAMS, const EIGENSYSTEM);
 void print_array(char*, double*, int);
 void print_matrix(char*, double*, int);

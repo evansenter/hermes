@@ -304,13 +304,14 @@ void fftbor2d_usage() {
   fprintf(stderr, "\tsecondary structure (1)\n");
   fprintf(stderr, "\tsecondary structure (2)\n\n");
   fprintf(stderr, "Options include the following:\n");
-  fprintf(stderr, "-B/b\tbenchmark,     the default is off. If on, benchmarking data will print alongside the normal results.\n");
-  fprintf(stderr, "-E/e\tenergyfile,    the default is rna_turner2004.par in this current directory. Must be the name of a file with all energy parameters (in the same format as used in Vienna RNA). Energy file lookup first checks the current directory, and then iterates through the PATH shell variable until a matching file is found. If no file is found, the default ViennaRNA parameters are used and a warning is presented to the user. If the -E switch is explicitly provided, that file is used in lieu of searching for the rna_turner2004.par file.\n");
-  fprintf(stderr, "-T/t\ttemperature,   the default is 37 degrees Celsius (unless an energyfile with parameters for a different temperature is used.\n");
-  fprintf(stderr, "-P/p\tprecision,     the default is %d, indicates the precision (base 2) of the probabilities Z_k / Z to be returned (0-%d, 0 disables precision handling).\n", (int)ceil(log(pow(10., 8)) / log(2.)), std::numeric_limits<double>::digits);
-  fprintf(stderr, "-M/m\tmatrix format, the default is disabled, presents output in a matrix format instead of a column format.\n");
-  fprintf(stderr, "-S/s\tsimple output, the default is disabled, presents output in column format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z), -RTln(Z_{k,l})).\n");
-  fprintf(stderr, "-V/v\tverbose, the default is disabled, presents some debug information at runtime.\n");
-  fprintf(stderr, "Note: the output formatting flags (M/m, S/s) are mutually exclusive. If more than one is provided, *only* the last flag will be honored.\n");
+  fprintf(stderr, "-B/b\t(b)enchmark,     the default is off. If on, benchmarking data will print alongside the normal results.\n");
+  fprintf(stderr, "-C/c\t(C)SV output,    the default is disabled, presents output in CSV format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z).\n");
+  fprintf(stderr, "-E/e\t(e)nergyfile,    the default is rna_turner2004.par in this current directory. Must be the name of a file with all energy parameters (in the same format as used in Vienna RNA). Energy file lookup first checks the current directory, and then iterates through the PATH shell variable until a matching file is found. If no file is found, the default ViennaRNA parameters are used and a warning is presented to the user. If the -E switch is explicitly provided, that file is used in lieu of searching for the rna_turner2004.par file.\n");
+  fprintf(stderr, "-M/m\t(m)atrix format, the default is disabled, presents output in a matrix format instead of a column format.\n");
+  fprintf(stderr, "-P/p\t(p)recision,     the default is %d, indicates the precision (base 2) of the probabilities Z_k / Z to be returned (0-%d, 0 disables precision handling).\n", (int)ceil(log(pow(10., 8)) / log(2.)), std::numeric_limits<double>::digits);
+  fprintf(stderr, "-S/s\t(s)imple output, the default is disabled, presents output in column format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z), -RTln(Z_{k,l})).\n");
+  fprintf(stderr, "-T/t\t(t)emperature,   the default is 37 degrees Celsius (unless an energyfile with parameters for a different temperature is used.\n");
+  fprintf(stderr, "-V/v\t(v)erbose, the default is disabled, presents some debug information at runtime.\n\n");
+  fprintf(stderr, "Note: the output formatting flags (C/c, M/m, S/s) are mutually exclusive. If more than one is provided, *only* the last flag will be honored.\n");
   abort();
 }

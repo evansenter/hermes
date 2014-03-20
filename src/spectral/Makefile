@@ -1,7 +1,7 @@
 # Makefile for RNAspectral
 
 CCFLAGS          = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) -I ~/local/include
-LDFLAGS          = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lm -lgomp -llapack -lgslcblas -lgsl -lmfpt -lRNA -o
+LDFLAGS          = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lm -lgomp -llapack -lgslcblas -lgsl -ltpl -lmfpt -lRNA -o
 BINDIR           = ~/bin
 LIBDIR           = ~/lib
 CC               = gcc

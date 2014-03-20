@@ -8,8 +8,10 @@ typedef struct {
   char* sequence;
   char* start_structure;
   char* end_structure;
+  char* filename;
   int start_index;
   int end_index;
+  int serialize;
   double temperature;
   double start_time;
   double end_time;
@@ -26,5 +28,8 @@ typedef struct {
   double* inverse_vectors;
   int length;
 } EIGENSYSTEM;
+
+#define SERIALIZING(params) (params.serialize == 1)
+#define DESERIALIZING(params) (params.serialize == -1)
 
 #endif

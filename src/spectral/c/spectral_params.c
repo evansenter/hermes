@@ -14,8 +14,10 @@ SPECTRAL_PARAMS init_spectral_params() {
     .sequence         = NULL,
     .start_structure  = NULL,
     .end_structure    = NULL,
+    .filename         = NULL,
     .start_index      = -1,
     .end_index        = -1,
+    .serialize        = 0,
     .temperature      = 37.,
     .start_time       = -11,
     .end_time         = 0,
@@ -33,7 +35,7 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
   SPECTRAL_PARAMS parameters;
   parameters = init_spectral_params();
 
-  while ((c = getopt(argc, argv, "OoGgBbVvS:s:K:k:L:l:I:i:J:j:P:p:T:t:C:c:")) != -1) {
+  while ((c = getopt(argc, argv, "OoGgBbVvA:a:Z:z:S:s:K:k:L:l:I:i:J:j:P:p:T:t:C:c:R:r:F:f:")) != -1) {
     switch (c) {
       case 'O':
       case 'o':
@@ -68,6 +70,22 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
       case 'L':
       case 'l':
         parameters.end_structure = strdup(optarg);
+        break;
+
+      case 'A':
+      case 'a':
+        if (!sscanf(optarg, "%d", &parameters.start_index)) {
+          spectral_usage();
+        }
+
+        break;
+
+      case 'Z':
+      case 'z':
+        if (!sscanf(optarg, "%d", &parameters.end_index)) {
+          spectral_usage();
+        }
+
         break;
 
       case 'I':
@@ -111,8 +129,27 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
 
         break;
 
+      case 'R':
+      case 'r':
+        if (!sscanf(optarg, "%d", &parameters.serialize)) {
+          spectral_usage();
+        } else if ((int)abs(parameters.serialize) != 1) {
+          spectral_usage();
+        }
+
+        break;
+
+      case 'F':
+      case 'f':
+        parameters.filename = strdup(optarg);
+        break;
+
       case '?':
         switch (optopt) {
+          case 'A':
+          case 'a':
+          case 'Z':
+          case 'z':
           case 'S':
           case 's':
           case 'K':
@@ -131,6 +168,10 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
           case 't':
           case 'C':
           case 'c':
+          case 'R':
+          case 'r':
+          case 'F':
+          case 'f':
             fprintf(stderr, "Option -%c requires an argument.\n", optopt);
             break;
 
@@ -178,6 +219,33 @@ int spectral_error_handling(const SPECTRAL_PARAMS parameters) {
     error++;
   }
 
+  if (parameters.serialize == -1 && (parameters.start_index < 0 || parameters.end_index < 0)) {
+    fprintf(stderr, "Error: if you're deserializing, the start and end indices (-a, -z) in the serialized transition matrix must be provided.\n");
+    error++;
+  }
+
+  if (parameters.serialize == 1 && parameters.eigen_only) {
+    fprintf(stderr, "Error: you can't serialize to a file (-r) and compute only the eigenvalues (-g).\n");
+    error++;
+  }
+
+  if ((parameters.serialize && parameters.filename == NULL) || (!parameters.serialize && parameters.filename != NULL)) {
+    fprintf(stderr, "Error: can't serialize (-r) without a filename provided (-f).\n");
+    error++;
+  }
+
+  if (parameters.filename && parameters.serialize) {
+    if (parameters.serialize == 1 && access(parameters.filename, F_OK) != -1) {
+      fprintf(stderr, "Error: File %s exists, cowering out.\n", parameters.filename);
+      error++;
+    }
+
+    if (parameters.serialize == -1 && access(parameters.filename, R_OK) == -1) {
+      fprintf(stderr, "Error: can't read from file %s.\n", parameters.filename);
+      error++;
+    }
+  }
+
   if (error) {
     fprintf(stderr, "\n");
   }
@@ -187,10 +255,12 @@ int spectral_error_handling(const SPECTRAL_PARAMS parameters) {
 
 void debug_spectral_parameters(const SPECTRAL_PARAMS parameters) {
   printf("(s) sequence\t\t\t%s\n",              parameters.sequence);
-  printf("(k) start_structure\t\t%s\n",         parameters.start_structure == NULL ? "empty" : parameters.start_structure);
-  printf("(l) end_structure\t\t%s\n",           parameters.end_structure == NULL ? "mfe" : parameters.end_structure);
-  printf("    start_index\t\t\t%d\n",           parameters.start_index);
-  printf("    end_index\t\t\t%d\n",             parameters.end_index);
+  printf("(k) start_structure\t\t%s\n",         parameters.start_structure == NULL && parameters.start_index < 0 ? "empty" : parameters.start_structure);
+  printf("(l) end_structure\t\t%s\n",           parameters.end_structure == NULL && parameters.end_index < 0 ? "mfe" : parameters.end_structure);
+  printf("(f) filename\t\t\t%s\n",              parameters.filename == NULL ? "none" : parameters.filename);
+  printf("(a) start_index\t\t\t%d\n",           parameters.start_index);
+  printf("(z) end_index\t\t\t%d\n",             parameters.end_index);
+  printf("(r) serialize\t\t\t%d\n",             parameters.serialize);
   printf("(t) temperature\t\t\t%.1f\n",         parameters.temperature);
   printf("(i) start_time\t\t\t%.2e\n",          parameters.start_time);
   printf("(j) end_time\t\t\t%.2e\n",            parameters.end_time);
@@ -204,16 +274,19 @@ void debug_spectral_parameters(const SPECTRAL_PARAMS parameters) {
 void spectral_usage() {
   fprintf(stderr, "RNAspectral [options] -s [sequence]\n\n");
   fprintf(stderr, "Options include the following:\n");
-  fprintf(stderr, "-S/s\tsequence (required), the sequence of interest for computing population proportions.\n");
-  fprintf(stderr, "-K/k\tstarting structure,  the structure for which the probability at time 0 is equal to 1. If not provided, the empty structure is used.\n");
-  fprintf(stderr, "-L/l\tending structure,    the structure of interest for . If not provided, the empty structure is used.\n");
-  fprintf(stderr, "-T/t\ttemperature,         the temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
-  fprintf(stderr, "-I/i\tstart time,          the natrual log of the starting time for computing population proportion.\n");
-  fprintf(stderr, "-J/j\tend time,            the natrual log of the ending time for computing population proportion.\n");
-  fprintf(stderr, "-P/p\tstep size,           the natrual log of the step size for computing population proportion (start_time < start_time + step_size <= end_time).\n");
-  fprintf(stderr, "-O/o\tlonely basepairs,    the default is disabled. When enabled, RNAsubopt will sample structures containing lonely basepairs .\n");
-  fprintf(stderr, "-C/c\tenergy cap,          the default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
-  fprintf(stderr, "-G/g\teigenvalues only,    the default is disabled. When enabled, RNAspectral will only generate the eigenvalues for the transition rate matrix.\n");
-  fprintf(stderr, "-B/b\tbenchmarking,        the default is disabled. When enabled, RNAspectral will print benchmarking times for internal function calls.\n");
+  fprintf(stderr, "-A/a\tstart state,           default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the starting structure (see options for -k).\n");
+  fprintf(stderr, "-B/b\t(b)enchmarking,        default is disabled. When enabled, RNAspectral will print benchmarking times for internal function calls.\n");
+  fprintf(stderr, "-C/c\tenergy (c)ap,          default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
+  fprintf(stderr, "-G/g\tei(g)envalues only,    default is disabled. When enabled, RNAspectral will only generate the eigenvalues for the transition rate matrix.\n");
+  fprintf(stderr, "-I/i\tstart time,            natrual log of the starting time for computing population proportion.\n");
+  fprintf(stderr, "-J/j\tend time,              natrual log of the ending time for computing population proportion.\n");
+  fprintf(stderr, "-K/k\tstarting structure,    structure for which the probability at time 0 is equal to 1. If not provided, the empty structure is used.\n");
+  fprintf(stderr, "-L/l\tending structure,      structure of interest for . If not provided, the empty structure is used.\n");
+  fprintf(stderr, "-O/o\tl(o)nely basepairs,    default is disabled. When enabled, RNAsubopt will sample structures containing lonely basepairs.\n");
+  fprintf(stderr, "-P/p\tste(p) size,           natrual log of the step size for computing population proportion (start_time < start_time + step_size <= end_time).\n");
+  fprintf(stderr, "-R/r\tse(r)ialize,           default is disabled. If passed with the value '1', then the eigensystem and its inversion will be serialized to the file specified by the -f flag. If passed with the value '-1', the file specified by the -f flag will be deserialized and used for computing the data of interest.\n");
+  fprintf(stderr, "-S/s\t(s)equence (required), sequence of interest for computing population proportions.\n");
+  fprintf(stderr, "-T/t\t(t)emperature,         temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
+  fprintf(stderr, "-Z/z\tend state,             default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the ending structure (see options for -l).\n");
   abort();
 }
