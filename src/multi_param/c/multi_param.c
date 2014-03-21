@@ -14,8 +14,9 @@ PARAM_CONTAINER* split_args(int argc, char** argv, char** subparam_order, int su
 
   param_container = malloc(subparam_count * sizeof(PARAM_CONTAINER));
   for (i = 0; i < subparam_count; ++i) {
-    param_container[i].argv = malloc(argc * sizeof(char*));
-    param_container[i].argc = 0;
+    param_container[i].argv    = malloc(argc * sizeof(char*));
+    param_container[i].argv[0] = strdup(subparam_order[i]);
+    param_container[i].argc    = 1;
   }
 
   for (i = 1; i < argc; ++i) {
@@ -47,9 +48,13 @@ void match_for_subparam(char** subparam_order, char* subparam, int subparam_coun
   while (token != NULL) {
     for (i = 0; i < subparam_count; ++i) {
       if (!strcmp(subparam_order[i], token)) {
-        token = strtok(NULL, "-");
-        match->argv  = strdup(token);
-        match->index = i;
+        char* token_with_prefix;
+        token             = strtok(NULL, "-");
+        token_with_prefix = malloc(strlen(token) + 2);
+        strcpy(token_with_prefix, "-");
+        strcat(token_with_prefix, token);
+        match->argv       = token_with_prefix;
+        match->index      = i;
 
         #ifdef DEBUG
           printf("Found location for %s at index %d\n", match->argv, match->index);
@@ -74,10 +79,10 @@ void print_multi_params(PARAM_CONTAINER* params, char** subparam_order, int subp
 
   for (i = 0; i < subparam_count; ++i) {
     if (params[i].argc > 0) {
-      printf("Params for %s:\n\t", subparam_order[i]);
+      printf("Params for %s:\n", subparam_order[i]);
 
       for (j = 0; j < params[i].argc; ++j) {
-        printf("%s ", params[i].argv[j]);
+        printf("\t%s\n", params[i].argv[j]);
       }
 
       printf("\n");

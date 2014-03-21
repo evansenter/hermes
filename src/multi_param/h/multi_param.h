@@ -2,8 +2,8 @@
 #define MULTI_PARAM_H
 
 typedef struct {
-  char** argv;
   int argc;
+  char** argv;
 } PARAM_CONTAINER;
 
 typedef struct {
