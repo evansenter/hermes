@@ -30,51 +30,49 @@ SPECTRAL_PARAMS init_spectral_params() {
   return parameters;
 }
 
-SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
+void parse_spectral_args(SPECTRAL_PARAMS* parameters, int argc, char** argv) {
   int c;
-  SPECTRAL_PARAMS parameters;
-  parameters = init_spectral_params();
 
   while ((c = getopt(argc, argv, "OoGgBbVvA:a:Z:z:S:s:K:k:L:l:I:i:J:j:P:p:T:t:C:c:R:r:F:f:")) != -1) {
     switch (c) {
       case 'O':
       case 'o':
-        parameters.lonely_bp = 1;
+        parameters->lonely_bp = 1;
         break;
 
       case 'G':
       case 'g':
-        parameters.eigen_only = 1;
+        parameters->eigen_only = 1;
         break;
 
       case 'B':
       case 'b':
-        parameters.benchmark = 1;
+        parameters->benchmark = 1;
         break;
 
       case 'V':
       case 'v':
-        parameters.verbose = 1;
+        parameters->verbose = 1;
         break;
 
       case 'S':
       case 's':
-        parameters.sequence = strdup(optarg);
+        parameters->sequence = strdup(optarg);
         break;
 
       case 'K':
       case 'k':
-        parameters.start_structure = strdup(optarg);
+        parameters->start_structure = strdup(optarg);
         break;
 
       case 'L':
       case 'l':
-        parameters.end_structure = strdup(optarg);
+        parameters->end_structure = strdup(optarg);
         break;
 
       case 'A':
       case 'a':
-        if (!sscanf(optarg, "%d", &parameters.start_index)) {
+        if (!sscanf(optarg, "%d", &parameters->start_index)) {
           spectral_usage();
         }
 
@@ -82,7 +80,7 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
 
       case 'Z':
       case 'z':
-        if (!sscanf(optarg, "%d", &parameters.end_index)) {
+        if (!sscanf(optarg, "%d", &parameters->end_index)) {
           spectral_usage();
         }
 
@@ -90,7 +88,7 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
 
       case 'I':
       case 'i':
-        if (!sscanf(optarg, "%lf", &parameters.start_time)) {
+        if (!sscanf(optarg, "%lf", &parameters->start_time)) {
           spectral_usage();
         }
 
@@ -98,7 +96,7 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
 
       case 'J':
       case 'j':
-        if (!sscanf(optarg, "%lf", &parameters.end_time)) {
+        if (!sscanf(optarg, "%lf", &parameters->end_time)) {
           spectral_usage();
         }
 
@@ -106,7 +104,7 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
 
       case 'P':
       case 'p':
-        if (!sscanf(optarg, "%lf", &parameters.step_size)) {
+        if (!sscanf(optarg, "%lf", &parameters->step_size)) {
           spectral_usage();
         }
 
@@ -114,16 +112,16 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
 
       case 'T':
       case 't':
-        if (!sscanf(optarg, "%lf", &parameters.temperature)) {
+        if (!sscanf(optarg, "%lf", &parameters->temperature)) {
           spectral_usage();
         }
 
-        temperature = parameters.temperature;
+        temperature = parameters->temperature;
         break;
 
       case 'C':
       case 'c':
-        if (!sscanf(optarg, "%lf", &parameters.energy_cap)) {
+        if (!sscanf(optarg, "%lf", &parameters->energy_cap)) {
           spectral_usage();
         }
 
@@ -131,9 +129,9 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
 
       case 'R':
       case 'r':
-        if (!sscanf(optarg, "%d", &parameters.serialize)) {
+        if (!sscanf(optarg, "%d", &parameters->serialize)) {
           spectral_usage();
-        } else if ((int)abs(parameters.serialize) != 1) {
+        } else if ((int)abs(parameters->serialize) != 1) {
           spectral_usage();
         }
 
@@ -141,7 +139,7 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
 
       case 'F':
       case 'f':
-        parameters.filename = strdup(optarg);
+        parameters->filename = strdup(optarg);
         break;
 
       case '?':
@@ -190,15 +188,13 @@ SPECTRAL_PARAMS parse_spectral_args(int argc, char** argv) {
     }
   }
 
-  if (parameters.verbose) {
-    debug_spectral_parameters(parameters);
+  if (parameters->verbose) {
+    debug_spectral_parameters(*parameters);
   }
 
-  if (spectral_error_handling(parameters)) {
+  if (spectral_error_handling(*parameters)) {
     spectral_usage();
   }
-
-  return parameters;
 }
 
 int spectral_error_handling(const SPECTRAL_PARAMS parameters) {

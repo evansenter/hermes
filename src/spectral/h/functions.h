@@ -14,5 +14,6 @@ EIGENSYSTEM deserialize_eigensystem(const SPECTRAL_PARAMS);
 void print_population_proportion(const SPECTRAL_PARAMS, const EIGENSYSTEM);
 void print_array(char*, double*, int);
 void print_matrix(char*, double*, int);
+void print_eigenvalues(const EIGENSYSTEM);
 
 #endif
