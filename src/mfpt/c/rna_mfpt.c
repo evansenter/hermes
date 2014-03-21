@@ -11,16 +11,17 @@ int main(int argc, char** argv) {
   double* transition_matrix;
   MFPT_PARAMS parameters;
   KLP_MATRIX klp_matrix;
-  parameters = parse_mfpt_args(argc, argv);
-  line_count = count_lines(argv[argc - 1]);
+  parameters = init_mfpt_params();
+  parse_mfpt_args(&parameters, argc, argv);
+  line_count = count_lines(parameters.input_file);
 
   if (!line_count) {
-    fprintf(stderr, "%s appears to have no data.\n", argv[argc - 1]);
-    return 0;
+    fprintf(stderr, "Error: %s appears to have no data.\n", parameters.input_file);
+    abort();
   }
 
   klp_matrix = init_klp_matrix(line_count);
-  populate_arrays(argv[argc - 1], klp_matrix, parameters);
+  populate_arrays(&klp_matrix, parameters);
   #ifdef SUPER_HEAVY_DEBUG
   print_klp_matrix(klp_matrix);
   #endif

@@ -1,4 +1,4 @@
 rna_mfpt
 ========
 
-./RNAmfpt.out -xhv ./example.csv
+./RNAmfpt.out -xhv -i ./example.csv

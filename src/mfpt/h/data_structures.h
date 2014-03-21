@@ -2,6 +2,7 @@
 #define MFPT_DATA_STRUCTURES_H
 
 typedef struct {
+  char* input_file;
   int start_state;
   int end_state;
   int max_dist;

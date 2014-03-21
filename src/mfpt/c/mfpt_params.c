@@ -8,6 +8,7 @@
 
 MFPT_PARAMS init_mfpt_params() {
   MFPT_PARAMS parameters = {
+    .input_file              = NULL,
     .start_state             = -1,
     .end_state               = -1,
     .max_dist                = 0,
@@ -27,68 +28,71 @@ MFPT_PARAMS init_mfpt_params() {
   return parameters;
 }
 
-MFPT_PARAMS parse_mfpt_args(int argc, char** argv) {
+void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
   int c;
-  MFPT_PARAMS parameters;
-  parameters = init_mfpt_params();
 
-  while ((c = getopt(argc, argv, "EeTtPpXxHhRrFfQqLlVvA:a:Z:z:N:n:D:d:O:o:")) != -1) {
+  while ((c = getopt(argc, argv, "EeTtPpXxHhRrFfQqLlVvI:i:A:a:Z:z:N:n:D:d:O:o:")) != -1) {
     switch (c) {
       case 'E':
       case 'e':
-        parameters.energy_based = 1;
+        parameters->energy_based = 1;
         break;
 
       case 'T':
       case 't':
-        parameters.transition_matrix_input = 1;
+        parameters->transition_matrix_input = 1;
         break;
 
       case 'P':
       case 'p':
-        parameters.pseudoinverse = 1;
+        parameters->pseudoinverse = 1;
         break;
 
       case 'X':
       case 'x':
-        parameters.single_bp_moves_only = 1;
+        parameters->single_bp_moves_only = 1;
         break;
 
       case 'H':
       case 'h':
-        parameters.hastings = 1;
+        parameters->hastings = 1;
         break;
 
       case 'R':
       case 'r':
-        parameters.rate_matrix = 1;
+        parameters->rate_matrix = 1;
         break;
 
       case 'F':
       case 'f':
-        parameters.fully_connected = 1;
+        parameters->fully_connected = 1;
         break;
 
       case 'Q':
       case 'q':
-        parameters.radial_probability = 1;
+        parameters->radial_probability = 1;
         break;
 
       case 'L':
       case 'l':
-        parameters.all_mfpt = 1;
+        parameters->all_mfpt = 1;
         break;
 
       case 'V':
       case 'v':
-        parameters.verbose = 1;
+        parameters->verbose = 1;
+        break;
+
+      case 'I':
+      case 'i':
+        parameters->input_file = strdup(optarg);
         break;
 
       case 'A':
       case 'a':
-        if (!sscanf(optarg, "%d", &parameters.start_state)) {
+        if (!sscanf(optarg, "%d", &parameters->start_state)) {
           mfpt_usage();
-        } else if (parameters.start_state < 0) {
+        } else if (parameters->start_state < 0) {
           mfpt_usage();
         }
 
@@ -96,9 +100,9 @@ MFPT_PARAMS parse_mfpt_args(int argc, char** argv) {
 
       case 'Z':
       case 'z':
-        if (!sscanf(optarg, "%d", &parameters.end_state)) {
+        if (!sscanf(optarg, "%d", &parameters->end_state)) {
           mfpt_usage();
-        } else if (parameters.end_state < 0) {
+        } else if (parameters->end_state < 0) {
           mfpt_usage();
         }
 
@@ -106,18 +110,18 @@ MFPT_PARAMS parse_mfpt_args(int argc, char** argv) {
 
       case 'N':
       case 'n':
-        if (!sscanf(optarg, "%d", &parameters.max_dist)) {
+        if (!sscanf(optarg, "%d", &parameters->max_dist)) {
           mfpt_usage();
-        } else if (parameters.max_dist <= 0) {
+        } else if (parameters->max_dist <= 0) {
           mfpt_usage();
         }
         break;
 
       case 'D':
       case 'd':
-        if (!sscanf(optarg, "%d", &parameters.bp_dist)) {
+        if (!sscanf(optarg, "%d", &parameters->bp_dist)) {
           mfpt_usage();
-        } else if (parameters.bp_dist <= 0) {
+        } else if (parameters->bp_dist <= 0) {
           mfpt_usage();
         }
 
@@ -125,9 +129,9 @@ MFPT_PARAMS parse_mfpt_args(int argc, char** argv) {
 
       case 'O':
       case 'o':
-        if (!sscanf(optarg, "%lf", &parameters.epsilon)) {
+        if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
           mfpt_usage();
-        } else if (parameters.epsilon <= 1e-16) {
+        } else if (parameters->epsilon <= 1e-16) {
           mfpt_usage();
         }
 
@@ -135,6 +139,8 @@ MFPT_PARAMS parse_mfpt_args(int argc, char** argv) {
 
       case '?':
         switch (optopt) {
+          case 'I':
+          case 'i':
           case 'A':
           case 'a':
           case 'Z':
@@ -161,63 +167,72 @@ MFPT_PARAMS parse_mfpt_args(int argc, char** argv) {
     }
   }
 
-  if (optind + 1 != argc) {
+  if (parameters->input_file == NULL) {
+    if (optind + 1 == argc) {
+      parameters->input_file = strdup(argv[optind]);
+    } else {
+      mfpt_usage();
+    }
+
+  }
+
+  if (parameters->verbose) {
+    debug_mfpt_parameters(*parameters);
+  }
+
+  if (mfpt_error_handling(*parameters)) {
     mfpt_usage();
   }
-
-  if (parameters.verbose) {
-    debug_mfpt_parameters(parameters);
-  }
-
-  if (mfpt_error_handling(parameters)) {
-    mfpt_usage();
-  }
-
-  return parameters;
 }
 
 int mfpt_error_handling(MFPT_PARAMS parameters) {
   int error = 0;
 
+  // Input CSV is readable check.
+  if (access(parameters.input_file, R_OK) == -1) {
+    fprintf(stderr, "Error: can't read from file %s.\n", parameters.input_file);
+    error++;
+  }
+
   // Type of run check.
   if (parameters.transition_matrix_input + parameters.single_bp_moves_only + parameters.fully_connected != 1) {
-    fprintf(stderr, "Error: Exactly one of -t, -x or -f must be provided!\n");
+    fprintf(stderr, "Error: exactly one of -t, -x or -f must be provided!\n");
     error++;
   }
 
   // Transition matrix input requirements.
   if (parameters.transition_matrix_input && !(parameters.start_state >= 0 && parameters.end_state >= 0)) {
-    fprintf(stderr, "Error: If the -t flag is provided, -a and -z must be explicitly set!\n");
+    fprintf(stderr, "Error: if the -t flag is provided, -a and -z must be explicitly set!\n");
     error++;
   }
 
   // Transition matrix input restrictions.
   if (parameters.transition_matrix_input && (parameters.hastings || parameters.energy_based)) {
-    fprintf(stderr, "Error: If the -t flag is provided, -h and -e are not permitted!\n");
+    fprintf(stderr, "Error: if the -t flag is provided, -h and -e are not permitted!\n");
     error++;
   }
 
   // Fully connected graph restrictions.
   if (parameters.fully_connected && (parameters.hastings || parameters.energy_based)) {
-    fprintf(stderr, "Error: If the -f flag is provided, -h and -e are not permitted (or -a and -z without -d)!\n");
+    fprintf(stderr, "Error: if the -f flag is provided, -h and -e are not permitted (or -a and -z without -d)!\n");
     error++;
   }
 
   // Extending k/l/p restrictions.
   if (parameters.max_dist && parameters.energy_based) {
-    fprintf(stderr, "Error: If the -n flag is provided, -e is not permitted!\n");
+    fprintf(stderr, "Error: if the -n flag is provided, -e is not permitted!\n");
     error++;
   }
 
   // If we're extending k/l/p we need to know how the user wants the zero-positions filled.
   if (parameters.max_dist && !(parameters.epsilon || parameters.radial_probability)) {
-    fprintf(stderr, "Error: If using the full grid (bounded by -n), either -o or -q needs to be specified for populating 0-probability positions!\n");
+    fprintf(stderr, "Error: if using the full grid (bounded by -n), either -o or -q needs to be specified for populating 0-probability positions!\n");
     error++;
   }
 
   // The radial probability stuff wasn't working last I checked, so let's disable this for now.
   if (parameters.radial_probability) {
-    fprintf(stderr, "Error: Radial probability (-q) wasn't working the last time I checked, so I've disabled it for now.\n");
+    fprintf(stderr, "Error: radial probability (-q) wasn't working the last time I checked, so I've disabled it for now.\n");
     error++;
   }
 
@@ -229,7 +244,7 @@ int mfpt_error_handling(MFPT_PARAMS parameters) {
 
   // MFPT will be 0.
   if (parameters.start_state == parameters.end_state && parameters.start_state >= 0) {
-    fprintf(stderr, "Error: If the -a and -z flags are identical the MFPT is 0!\n");
+    fprintf(stderr, "Error: if the -a and -z flags are identical the MFPT is 0!\n");
     error++;
   }
 
@@ -243,6 +258,7 @@ int mfpt_error_handling(MFPT_PARAMS parameters) {
 void debug_mfpt_parameters(MFPT_PARAMS parameters) {
   char* buffer = calloc(128, sizeof(char));
 
+  printf("(i) input_file\t\t\t%s\n",          parameters.input_file);
   printf("(e) energy_based\t\t%s\n",          parameters.energy_based            ? "Yes" : "No");
   printf("(t) transition_matrix_input\t%s\n", parameters.transition_matrix_input ? "Yes" : "No");
   printf("(p) pseudoinverse\t\t%s\n",         parameters.pseudoinverse           ? "Yes" : "No");
@@ -281,6 +297,7 @@ void mfpt_usage() {
   fprintf(stderr, "k_n,l_n,p_n\n\n");
   fprintf(stderr, "Options include the following:\n");
   fprintf(stderr, "-A/a\tstart state,                default is -1 (inferred from input data as the first row in the CSV whose entry in the first column is 0). If provided, should indicate the 0-indexed line in the input CSV file representing the start state.\n");
+  fprintf(stderr, "-C/c\t(C)SV input file,           this option is made available to abstain from providing the input CSV as the last command line argument.\n");
   fprintf(stderr, "-D/d\tstart/end (d)istance,       default is disabled. When provided, indicates the base pair distance between the starting / ending structures. This flag is used in conjunction with the -n flag, and is needed in cases when the base pair distance between the two structures can't be inferred from the input grid.\n");
   fprintf(stderr, "-E/e\t(e)nergy-based transitions, default is disabled. If this flag is provided, the transition from state a to b will be calculated as (min(1, exp(-(E_b - E_a) / RT) / n) rather than (min(1, p_b / p_a) / n).\n");
   fprintf(stderr, "-F/f\t(f)ully connected,          if the graph is fully connected we permit transitions between arbitrary positions in the 2D grid.\n");
