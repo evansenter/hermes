@@ -1,3 +1,8 @@
+// Need to setup the Makefile properly so that it's watching the appropriate files. Might be time to move on to autoconf or something.
+// Incorporate the serialize code into the RNApopulation code.
+// Port over multi_param to FFTmfpt.
+// See about having top level params in multi_param / cleaning up the data structures.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,12 +26,14 @@ int main(int argc, char** argv) {
   char *subparams[] = { "fftbor2d", "mfpt", "spectral" };
   params            = split_args(argc, argv, subparams, 3);
 
-  print_multi_params(params, subparams, 3);
+  fftbor2d_params = init_fftbor2d_params();
+  parse_fftbor2d_args(fftbor2d_params, params[0].argc, params[0].argv);
+  fftbor2d_data = fftbor2d_from_params(fftbor2d_params);
 
-  fftbor2d_params = parse_fftbor2d_args(argc, argv);
-  fftbor2d_data   = fftbor2d_from_params(fftbor2d_params);
+  mfpt_params     = init_mfpt_params();
+  spectral_params = init_spectral_params();
 
-  mfpt_params = init_mfpt_params();
+  mfpt_params.input                = 0;
   mfpt_params.rate_matrix          = 1;
   mfpt_params.single_bp_moves_only = 1;
   mfpt_params.hastings             = 1;
@@ -34,24 +41,21 @@ int main(int argc, char** argv) {
   mfpt_params.max_dist             = fftbor2d_data.row_length;
   mfpt_params.bp_dist              = fftbor2d_data.bp_dist;
 
+  parse_mfpt_args(&mfpt_params, params[1].argc, params[1].argv);
+
   klp_matrix        = convert_fftbor2d_output_to_klp_matrix(fftbor2d_data);
   transition_matrix = convert_klp_matrix_to_transition_matrix(&klp_matrix, &mfpt_params);
 
-  spectral_params = init_spectral_params();
   spectral_params.sequence        = fftbor2d_params.sequence;
   spectral_params.start_structure = fftbor2d_params.structure_1;
   spectral_params.end_structure   = fftbor2d_params.structure_2;
   spectral_params.start_index     = mfpt_params.start_state;
   spectral_params.end_index       = mfpt_params.end_state;
-  spectral_params.start_time      = -12;
-  spectral_params.end_time        = 12;
-  spectral_params.step_size       = .1;
 
-  if (fftbor2d_params.verbose) {
-    debug_mfpt_parameters(mfpt_params);
-    debug_spectral_parameters(spectral_params);
-    print_klp_matrix(klp_matrix);
-  }
+  parse_spectral_args(&spectral_params, params[2].argc, params[2].argv);
+
+  // debug_mfpt_parameters(mfpt_params);
+  // debug_spectral_parameters(spectral_params);
 
   population_proportion_from_row_ordered_transition_matrix(spectral_params, transition_matrix, klp_matrix.length);
 

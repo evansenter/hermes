@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -160,6 +160,8 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv) {
   if (fftbor2d_error_handling(parameters)) {
     fftbor2d_usage();
   }
+
+  optind = 1;
 }
 
 void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARAMS& parameters) {

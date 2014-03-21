@@ -1,6 +1,6 @@
 # Base Makefile
 
-all: RNAmfpt RNAspectral FFTbor2D RNApopulation FFTmfpt
+all: RNAmfpt RNAspectral FFTbor2D MultiParam RNApopulation FFTmfpt
 
 install: all
 	cp RNAmfpt RNAspectral FFTbor2D RNApopulation FFTmfpt ~/bin
@@ -17,6 +17,9 @@ FFTbor2D:
 	cd src/fftbor2d; make
 	cp src/fftbor2d/FFTbor2D.out FFTbor2D
 
+MultiParam:
+	cd src/multi_param; make
+
 RNApopulation:
 	cd mashup/population_from_energy_grid; make
 	cp mashup/population_from_energy_grid/RNApopulation.out RNApopulation
@@ -29,6 +32,7 @@ clean:
 	cd src/mfpt; make clean
 	cd src/spectral; make clean
 	cd src/fftbor2d; make clean
+	cd src/multi_param; make clean
 	cd mashup/population_from_energy_grid; make clean
 	cd mashup/mfpt_from_energy_grid; make clean
 	rm RNAmfpt RNAspectral FFTbor2D RNApopulation FFTmfpt

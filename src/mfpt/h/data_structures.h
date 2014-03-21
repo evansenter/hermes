@@ -17,6 +17,7 @@ typedef struct {
   short radial_probability;
   short rate_matrix;
   short all_mfpt;
+  short input;
   short verbose;
 } MFPT_PARAMS;
 

@@ -23,6 +23,7 @@ MFPT_PARAMS init_mfpt_params() {
     .radial_probability      = 0,
     .rate_matrix             = 0,
     .all_mfpt                = 0,
+    .input                   = 1,
     .verbose                 = 0
   };
   return parameters;
@@ -31,7 +32,7 @@ MFPT_PARAMS init_mfpt_params() {
 void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
   int c;
 
-  while ((c = getopt(argc, argv, "EeTtPpXxHhRrFfQqLlVvI:i:A:a:Z:z:N:n:D:d:O:o:")) != -1) {
+  while ((c = getopt(argc, argv, "EeTtPpXxHhRrFfQqLlVvIiC:c:A:a:Z:z:N:n:D:d:O:o:")) != -1) {
     switch (c) {
       case 'E':
       case 'e':
@@ -78,13 +79,18 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
         parameters->all_mfpt = 1;
         break;
 
+      case 'I':
+      case 'i':
+        parameters->input = 0;
+        break;
+
       case 'V':
       case 'v':
         parameters->verbose = 1;
         break;
 
-      case 'I':
-      case 'i':
+      case 'C':
+      case 'c':
         parameters->input_file = strdup(optarg);
         break;
 
@@ -139,8 +145,8 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
 
       case '?':
         switch (optopt) {
-          case 'I':
-          case 'i':
+          case 'C':
+          case 'c':
           case 'A':
           case 'a':
           case 'Z':
@@ -170,10 +176,7 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
   if (parameters->input_file == NULL) {
     if (optind + 1 == argc) {
       parameters->input_file = strdup(argv[optind]);
-    } else {
-      mfpt_usage();
     }
-
   }
 
   if (parameters->verbose) {
@@ -183,15 +186,25 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
   if (mfpt_error_handling(*parameters)) {
     mfpt_usage();
   }
+
+  optind = 1;
 }
 
-int mfpt_error_handling(MFPT_PARAMS parameters) {
+int mfpt_error_handling(const MFPT_PARAMS parameters) {
   int error = 0;
 
-  // Input CSV is readable check.
-  if (access(parameters.input_file, R_OK) == -1) {
-    fprintf(stderr, "Error: can't read from file %s.\n", parameters.input_file);
-    error++;
+  if (parameters.input) {
+    // Input CSV exists.
+    if (parameters.input_file == NULL) {
+      fprintf(stderr, "Error: file not provided. Please provide one as the last argument or with the -c flag.\n");
+      error++;
+    }
+
+    // Input CSV is readable check.
+    if (access(parameters.input_file, R_OK) == -1) {
+      fprintf(stderr, "Error: can't read from file %s.\n", parameters.input_file);
+      error++;
+    }
   }
 
   // Type of run check.
@@ -255,10 +268,10 @@ int mfpt_error_handling(MFPT_PARAMS parameters) {
   return error;
 }
 
-void debug_mfpt_parameters(MFPT_PARAMS parameters) {
+void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   char* buffer = calloc(128, sizeof(char));
 
-  printf("(i) input_file\t\t\t%s\n",          parameters.input_file);
+  printf("(c) input_file\t\t\t%s\n",          parameters.input_file);
   printf("(e) energy_based\t\t%s\n",          parameters.energy_based            ? "Yes" : "No");
   printf("(t) transition_matrix_input\t%s\n", parameters.transition_matrix_input ? "Yes" : "No");
   printf("(p) pseudoinverse\t\t%s\n",         parameters.pseudoinverse           ? "Yes" : "No");
@@ -302,7 +315,8 @@ void mfpt_usage() {
   fprintf(stderr, "-E/e\t(e)nergy-based transitions, default is disabled. If this flag is provided, the transition from state a to b will be calculated as (min(1, exp(-(E_b - E_a) / RT) / n) rather than (min(1, p_b / p_a) / n).\n");
   fprintf(stderr, "-F/f\t(f)ully connected,          if the graph is fully connected we permit transitions between arbitrary positions in the 2D grid.\n");
   fprintf(stderr, "-H/h\t(H)astings adjustment,      default is disabled. If this flag is provided, the input must be in the form of an energy grid, and only diagonally adjacent moves are permitted (in the all-to-all transition case, N(X) / N(Y) == 1). Calculating N(X) and N(Y) will respect grid boundaries and the triangle equality, and the basepair distance between the two structures for kinetics is inferred from the energy grid.\n");
-  fprintf(stderr, "-L/l\tPrint a(l)l MFPT,           if this flag is provided, the program will print the MFPT for every non-end state to hit the end state, and then print the same beginning -> end MFPT that is printed without this flag. Indices for the MFPT correspond to 0-ordered indices in the transition probability matrix.\n");
+  fprintf(stderr, "-I/i\tno (i)nput,                 this option is for short circuiting mfpt_error_handling when using libmfpt.a and generating parameters objects.\n");
+  fprintf(stderr, "-L/l\tprint a(l)l MFPT,           if this flag is provided, the program will print the MFPT for every non-end state to hit the end state, and then print the same beginning -> end MFPT that is printed without this flag. Indices for the MFPT correspond to 0-ordered indices in the transition probability matrix.\n");
   fprintf(stderr, "-N/n\tsequence le(n)gth,          default is disabled. This flag represents the sequence length of the sequence on which kinetics is being performed. It is used to ensure that the graph is fully connected.\n");
   fprintf(stderr, "-O/o\tepsil(o)n,                  if the graph is going to be populated with all possible moves (via the -n flag), this will inflate all 0-probability positions.\n");
   fprintf(stderr, "-P/p\t(p)seudoinverse,            default is disabled. If this flag is provided, the Moore-Penrose pseudoinverse is computed for the transition probability matrix, rather than the true inverse.\n");

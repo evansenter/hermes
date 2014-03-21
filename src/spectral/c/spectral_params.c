@@ -195,6 +195,8 @@ void parse_spectral_args(SPECTRAL_PARAMS* parameters, int argc, char** argv) {
   if (spectral_error_handling(*parameters)) {
     spectral_usage();
   }
+
+  optind = 1;
 }
 
 int spectral_error_handling(const SPECTRAL_PARAMS parameters) {
@@ -232,7 +234,7 @@ int spectral_error_handling(const SPECTRAL_PARAMS parameters) {
 
   if (parameters.filename && parameters.serialize) {
     if (parameters.serialize == 1 && access(parameters.filename, F_OK) != -1) {
-      fprintf(stderr, "Error: File %s exists, cowering out.\n", parameters.filename);
+      fprintf(stderr, "Error: file %s exists, cowering out.\n", parameters.filename);
       error++;
     }
 
