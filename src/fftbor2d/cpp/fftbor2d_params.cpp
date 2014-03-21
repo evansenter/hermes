@@ -39,12 +39,10 @@ void free_fftbor2d_params(FFTBOR2D_PARAMS parameters) {
   free(parameters.energy_file);
 }
 
-FFTBOR2D_PARAMS parse_fftbor2d_args(int argc, char** argv) {
+void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv) {
   int c;
-  FFTBOR2D_PARAMS parameters;
-  parameters = init_fftbor2d_params();
 
-  while ((c = getopt(argc, argv, "VvBbMmSsCcT:t:E:e:P:p:")) != -1) {
+  while ((c = getopt(argc, argv, "VvBbMmSsCcT:t:E:e:I:i:J:j:K:k:P:p:")) != -1) {
     switch (c) {
       case 'V':
       case 'v':
@@ -94,6 +92,23 @@ FFTBOR2D_PARAMS parse_fftbor2d_args(int argc, char** argv) {
         parameters.energy_file = strdup(optarg);
         break;
 
+
+      case 'I':
+      case 'i':
+        parameters.sequence   = strdup(optarg);
+        parameters.seq_length = strlen(parameters.sequence);
+        break;
+
+      case 'J':
+      case 'j':
+        parameters.structure_1 = strdup(optarg);
+        break;
+
+      case 'K':
+      case 'k':
+        parameters.structure_2 = strdup(optarg);
+        break;
+
       case '?':
         switch (optopt) {
           case 'T':
@@ -102,6 +117,12 @@ FFTBOR2D_PARAMS parse_fftbor2d_args(int argc, char** argv) {
           case 'p':
           case 'E':
           case 'e':
+          case 'I':
+          case 'i':
+          case 'J':
+          case 'j':
+          case 'K':
+          case 'k':
             fprintf(stderr, "Option -%c requires an argument.\n", optopt);
             break;
 
@@ -120,10 +141,12 @@ FFTBOR2D_PARAMS parse_fftbor2d_args(int argc, char** argv) {
     }
   }
 
-  if (optind == argc) {
-    fftbor2d_usage();
-  } else {
-    parse_fftbor2d_sequence_data(argc, argv, optind, parameters);
+  if (parameters.sequence == NULL || parameters.structure_1 == NULL || parameters.structure_2 == NULL) {
+    if (optind == argc) {
+      fftbor2d_usage();
+    } else {
+      parse_fftbor2d_sequence_data(argc, argv, optind, parameters);
+    }
   }
 
   if (parameters.energy_file == NULL) {
@@ -137,8 +160,6 @@ FFTBOR2D_PARAMS parse_fftbor2d_args(int argc, char** argv) {
   if (fftbor2d_error_handling(parameters)) {
     fftbor2d_usage();
   }
-
-  return parameters;
 }
 
 void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARAMS& parameters) {
@@ -149,7 +170,7 @@ void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARA
 
   if (file == NULL) {
     /* Input is not a file */
-    /* argv[argp] should be the sequence and argv[argp + 1], argv[argp + 2] should be the structures */
+    /* argv[argp] should be sequence and argv[argp + 1], argv[argp + 2] should be structures */
     if (argc <= argp + 2) {
       fftbor2d_usage();
     }
@@ -164,7 +185,7 @@ void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARA
   } else {
     /* Input is a file */
     if (fgets(line, sizeof(line), file) == NULL) {
-      fprintf(stderr, "There was an error reading the file\n");
+      fprintf(stderr, "There was an error reading file\n");
       exit(0);
     }
 
@@ -178,8 +199,8 @@ void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARA
       fftbor2d_usage();
     }
 
-    // This was a tricky bug to catch, fgets (perhaps obviously) reads a line in, including the \n character,
-    // which is different from the terminating character \0, making the data.seq_length off by one.
+    // This was a tricky bug to catch, fgets (perhaps obviously) reads a line in, including \n character,
+    // which is different from terminating character \0, making data.seq_length off by one.
     while (line[char_index] != '\0' && char_index < MAX_LENGTH) {
       if (line[char_index] == '\n') {
         line[char_index] = '\0';
@@ -195,14 +216,14 @@ void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARA
     sscanf(line, "%s", parameters.sequence);
 
     if (fgets(line, sizeof(line), file) == NULL) {
-      fprintf(stderr, "There was an error reading the file\n");
+      fprintf(stderr, "There was an error reading file\n");
       exit(0);
     }
 
     sscanf(line, "%s", parameters.structure_1);
 
     if (fgets(line, sizeof(line), file) == NULL) {
-      fprintf(stderr, "There was an error reading the file\n");
+      fprintf(stderr, "There was an error reading file\n");
       exit(0);
     }
 
@@ -214,7 +235,7 @@ void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARA
   parameters.structure_1[parameters.seq_length] = '\0';
   parameters.structure_2[parameters.seq_length] = '\0';
 
-  /* Convert RNA sequence to uppercase and make sure there are no Ts in the sequence (replace by U). */
+  /* Convert RNA sequence to uppercase and make sure there are no Ts in sequence (replace by U). */
   for (i = 0; i < parameters.seq_length; ++i) {
     parameters.sequence[i] = toupper(parameters.sequence[i]);
 
@@ -283,9 +304,9 @@ int fftbor2d_error_handling(const FFTBOR2D_PARAMS parameters) {
 }
 
 void debug_fftbor2d_parameters(const FFTBOR2D_PARAMS parameters) {
-  printf("    sequence\t\t\t%s\n",      parameters.sequence    == NULL ? "*missing*" : parameters.sequence);
-  printf("    structure_1\t\t\t%s\n",   parameters.structure_1 == NULL ? "*missing*" : parameters.structure_1);
-  printf("    structure_2\t\t\t%s\n",   parameters.structure_2 == NULL ? "*missing*" : parameters.structure_2);
+  printf("(i) sequence\t\t\t%s\n",      parameters.sequence);
+  printf("(j) structure_1\t\t\t%s\n",   parameters.structure_1);
+  printf("(k) structure_2\t\t\t%s\n",   parameters.structure_2);
   printf("    seq_length\t\t\t%d\n",    parameters.seq_length);
   printf("    max_threads\t\t\t%d\n",   parameters.max_threads);
   printf("    format\t\t\t%c\n",        parameters.format);
@@ -298,20 +319,20 @@ void debug_fftbor2d_parameters(const FFTBOR2D_PARAMS parameters) {
 void fftbor2d_usage() {
   fprintf(stderr, "FFTbor2D [options] sequence structure_1 structure_2\n\n");
   fprintf(stderr, "FFTbor2D [options] filename\n");
-  fprintf(stderr, "where filename is a file of the format:\n");
+  fprintf(stderr, "where filename is a file of format:\n");
   fprintf(stderr, "\t>comment (optional line)\n");
   fprintf(stderr, "\tsequence (max length: %d)\n", MAX_LENGTH);
   fprintf(stderr, "\tsecondary structure (1)\n");
   fprintf(stderr, "\tsecondary structure (2)\n\n");
-  fprintf(stderr, "Options include the following:\n");
-  fprintf(stderr, "-B/b\t(b)enchmark,     the default is off. If on, benchmarking data will print alongside the normal results.\n");
-  fprintf(stderr, "-C/c\t(C)SV output,    the default is disabled, presents output in CSV format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z).\n");
-  fprintf(stderr, "-E/e\t(e)nergyfile,    the default is rna_turner2004.par in this current directory. Must be the name of a file with all energy parameters (in the same format as used in Vienna RNA). Energy file lookup first checks the current directory, and then iterates through the PATH shell variable until a matching file is found. If no file is found, the default ViennaRNA parameters are used and a warning is presented to the user. If the -E switch is explicitly provided, that file is used in lieu of searching for the rna_turner2004.par file.\n");
-  fprintf(stderr, "-M/m\t(m)atrix format, the default is disabled, presents output in a matrix format instead of a column format.\n");
-  fprintf(stderr, "-P/p\t(p)recision,     the default is %d, indicates the precision (base 2) of the probabilities Z_k / Z to be returned (0-%d, 0 disables precision handling).\n", (int)ceil(log(pow(10., 8)) / log(2.)), std::numeric_limits<double>::digits);
-  fprintf(stderr, "-S/s\t(s)imple output, the default is disabled, presents output in column format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z), -RTln(Z_{k,l})).\n");
-  fprintf(stderr, "-T/t\t(t)emperature,   the default is 37 degrees Celsius (unless an energyfile with parameters for a different temperature is used.\n");
-  fprintf(stderr, "-V/v\t(v)erbose, the default is disabled, presents some debug information at runtime.\n\n");
-  fprintf(stderr, "Note: the output formatting flags (C/c, M/m, S/s) are mutually exclusive. If more than one is provided, *only* the last flag will be honored.\n");
+  fprintf(stderr, "Options include following:\n");
+  fprintf(stderr, "-B/b\t(b)enchmark,     default is off. If on, benchmarking data will print alongside normal results.\n");
+  fprintf(stderr, "-C/c\t(C)SV output,    default is disabled, presents output in CSV format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z).\n");
+  fprintf(stderr, "-E/e\t(e)nergyfile,    default is rna_turner2004.par in this current directory. Must be name of a file with all energy parameters (in same format as used in Vienna RNA). Energy file lookup first checks current directory, and then iterates through PATH shell variable until a matching file is found. If no file is found, default ViennaRNA parameters are used and a warning is presented to user. If -E switch is explicitly provided, that file is used in lieu of searching for rna_turner2004.par file.\n");
+  fprintf(stderr, "-M/m\t(m)atrix format, default is disabled, presents output in a matrix format instead of a column format.\n");
+  fprintf(stderr, "-P/p\t(p)recision,     default is %d, indicates precision (base 2) of probabilities Z_k / Z to be returned (0-%d, 0 disables precision handling).\n", (int)ceil(log(pow(10., 8)) / log(2.)), std::numeric_limits<double>::digits);
+  fprintf(stderr, "-S/s\t(s)imple output, default is disabled, presents output in column format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z), -RTln(Z_{k,l})).\n");
+  fprintf(stderr, "-T/t\t(t)emperature,   default is 37 degrees Celsius (unless an energyfile with parameters for a different temperature is used.\n");
+  fprintf(stderr, "-V/v\t(v)erbose,       default is disabled, presents some debug information at runtime.\n\n");
+  fprintf(stderr, "Note: output formatting flags (C/c, M/m, S/s) are mutually exclusive. If more than one is provided, *only* last flag will be honored.\n");
   abort();
 }
