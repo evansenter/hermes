@@ -20,7 +20,6 @@ MFPT_PARAMS init_mfpt_params() {
     .fully_connected         = 0,
     .single_bp_moves_only    = 0,
     .hastings                = 0,
-    .radial_probability      = 0,
     .rate_matrix             = 0,
     .all_mfpt                = 0,
     .input                   = 1,
@@ -32,7 +31,7 @@ MFPT_PARAMS init_mfpt_params() {
 void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
   int c;
 
-  while ((c = getopt(argc, argv, "EeTtPpXxHhRrFfQqLlVvIiC:c:A:a:Z:z:N:n:D:d:O:o:")) != -1) {
+  while ((c = getopt(argc, argv, "EeTtPpXxHhRrFfLlVvIiC:c:A:a:Z:z:N:n:D:d:O:o:")) != -1) {
     switch (c) {
       case 'E':
       case 'e':
@@ -67,11 +66,6 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
       case 'F':
       case 'f':
         parameters->fully_connected = 1;
-        break;
-
-      case 'Q':
-      case 'q':
-        parameters->radial_probability = 1;
         break;
 
       case 'L':
@@ -238,25 +232,14 @@ int mfpt_error_handling(const MFPT_PARAMS parameters) {
   }
 
   // If we're extending k/l/p we need to know how the user wants the zero-positions filled.
-  if (parameters.max_dist && !(parameters.epsilon || parameters.radial_probability)) {
-    fprintf(stderr, "Error: if using the full grid (bounded by -n), either -o or -q needs to be specified for populating 0-probability positions!\n");
+  if (parameters.max_dist && !parameters.epsilon) {
+    fprintf(stderr, "Error: if using the full grid (bounded by -n), -o needs to be specified for populating 0-probability positions!\n");
     error++;
   }
 
   // If we're willing the zero-positions, we need to know the bounding size.
-  if ((parameters.epsilon || parameters.radial_probability) && !parameters.max_dist) {
-    fprintf(stderr, "Error: if using either -o or -q, the full grid (bounded by -n) needs to be specified for populating 0-probability positions!\n");
-    error++;
-  }
-
-  if (parameters.radial_probability && parameters.energy_based) {
-    fprintf(stderr, "Error: radial probability (-q) isn't compatible with an energy based input.\n");
-    error++;
-  }
-
-  // Can't populate the zero entries in k/l/p matrix with both of these techniques.
-  if (parameters.epsilon > 0 && parameters.radial_probability) {
-    fprintf(stderr, "Error: -o and -q are mutually exclusive!\n");
+  if (parameters.epsilon && !parameters.max_dist) {
+    fprintf(stderr, "Error: if using -o, the full grid (bounded by -n) needs to be specified for populating 0-probability positions!\n");
     error++;
   }
 
@@ -283,7 +266,6 @@ void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   printf("(x) single_bp_moves_only\t%s\n",    parameters.single_bp_moves_only    ? "Yes" : "No");
   printf("(f) fully_connected\t\t%s\n",       parameters.fully_connected         ? "Yes" : "No");
   printf("(h) hastings\t\t\t%s\n",            parameters.hastings                ? "Yes" : "No");
-  printf("(q) radial_probability\t\t%s\n",    parameters.radial_probability      ? "Yes" : "No");
   printf("(r) rate_matrix\t\t\t%s\n",         parameters.rate_matrix             ? "Yes" : "No");
 
   memset(buffer, ' ', 128 * sizeof(char));
@@ -325,7 +307,6 @@ void mfpt_usage() {
   fprintf(stderr, "-N/n\tsequence le(n)gth,          default is disabled. This flag represents the sequence length of the sequence on which kinetics is being performed. It is used to ensure that the graph is fully connected.\n");
   fprintf(stderr, "-O/o\tepsil(o)n,                  if the graph is going to be populated with all possible moves (via the -n flag), this will inflate all 0-probability positions.\n");
   fprintf(stderr, "-P/p\t(p)seudoinverse,            default is disabled. If this flag is provided, the Moore-Penrose pseudoinverse is computed for the transition probability matrix, rather than the true inverse.\n");
-  fprintf(stderr, "-Q/q\tradial probability,         if the graph is going to be populated with all possible moves (via the -n flag), this will adjust all transition probabilities from 0-probability positions.\n");
   fprintf(stderr, "-R/r\t(r)ate matrix,              default is disabled. If this flag is provided, the transition rate matrix is computed rather than the transition probability matrix.\n");
   fprintf(stderr, "-T/t\t(t)ransition matrix input,  default is disabled. If this flag is provided, the input is expected to be a transition probability matrix, rather than a 2D energy grid. In this case, the first two columns in the CSV file are row-order indices into the transition probability matrix, and the third (final) column is the transition probability of that cell.\n");
   fprintf(stderr, "-V/v\tverbose, default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n");

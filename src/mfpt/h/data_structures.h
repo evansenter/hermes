@@ -14,7 +14,6 @@ typedef struct {
   short fully_connected;
   short single_bp_moves_only;
   short hastings;
-  short radial_probability;
   short rate_matrix;
   short all_mfpt;
   short input;
