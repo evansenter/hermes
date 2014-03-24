@@ -243,9 +243,14 @@ int mfpt_error_handling(const MFPT_PARAMS parameters) {
     error++;
   }
 
-  // The radial probability stuff wasn't working last I checked, so let's disable this for now.
-  if (parameters.radial_probability) {
-    fprintf(stderr, "Error: radial probability (-q) wasn't working the last time I checked, so I've disabled it for now.\n");
+  // If we're willing the zero-positions, we need to know the bounding size.
+  if ((parameters.epsilon || parameters.radial_probability) && !parameters.max_dist) {
+    fprintf(stderr, "Error: if using either -o or -q, the full grid (bounded by -n) needs to be specified for populating 0-probability positions!\n");
+    error++;
+  }
+
+  if (parameters.radial_probability && parameters.energy_based) {
+    fprintf(stderr, "Error: radial probability (-q) isn't compatible with an energy based input.\n");
     error++;
   }
 

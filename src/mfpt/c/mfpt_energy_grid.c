@@ -424,9 +424,23 @@ double* populate_transition_matrix_from_stationary_matrix(const KLP_MATRIX klp_m
   return transition_matrix;
 }
 
+// Note: I'm ripping this code out because we decided it wasn't really worth having in, but a couple thoughts before I do. The underlying
+// search implemented in radial probability is correct, but what it's being used for is not. The point of performing a radial probability
+// search is to connect a *non-zero* position to another non-zero position when the non-zero position is an island (that is, there is no
+// position connected to it). To do so, one expands the search from island _i_ incrementally by distance d until the first collection of
+// non-zero positions are encountered, where d is minimized. The collection of k non-zero positions (we will call them m_1, m_2, ..., m_k)
+// are then normalized p_1 = MIN(1, p(m_1) / p(_i_)) and transition probabilities are defined as p_1 / sum(k) { |i| p_i }. Thus we are
+// computing values for the transition probability matrix, *not* stationary probabilities. This means that the problem of having a
+// 0-probability starting position is not addressed, nor is the problem of connecting the underlying graph. The usage of this function
+// is thus both incomplete (namely the probabilities aren't normalized) and incorrect, in that in its present form it's being used to
+// compute pseudo-probabilities for 0-probability positions.
 double radial_probability(const KLP_MATRIX klp_matrix, int klp_index, int row_size) {
   int distance, i, j, k, x, y, a, b, found_klp_index, found_nonzero_probability = 0;
   double probability_sum = 0;
+
+  // x, y is the zero-probability position we're expanding our search from.
+  // i, j is the offset positions for searching at the current distance (outermost loop extends distance).
+  // a, b is the tentative non-zero position at the current distance from x, y
 
   x = klp_matrix.k[klp_index];
   y = klp_matrix.l[klp_index];
@@ -434,14 +448,23 @@ double radial_probability(const KLP_MATRIX klp_matrix, int klp_index, int row_si
   for (distance = 1; distance < row_size && !found_nonzero_probability; ++distance) {
     for (i = 0; i <= distance; ++i) {
       for (j = 0; j <= distance; ++j) {
-        // If the position is on the perimeter...
+        // i, j basically constructs a square of size 2 * distance + 1 (so for distance 2 and row position x, (x - 2)..(x + 2)).
+        // The conditional statement below ensures that the only i, j positions actually considered are on the perimeter of the grid.
+        // We do this because the distance variable is incrementally increased, so if the distance == 2, that means that we couldn't
+        // find any non-zero positions at distance == 1 and there's no reason to consider those places (which are non-perimeter
+        // grid positions).
+        //
+        // This conditional basically says the following: at least one of i, j has to be equal to 0 or distance (this keeps us
+        // on the perimeter).
         if (!(i > 0 && i < distance && j > 0 && j < distance)) {
+          // This is just clever indexing. If you're at row position x and considering distance 2, this maps the iteration
+          // 0 <= i <= distance (i = [0, 1, 2]) to [x - 2, x, x + 2].
           a = x + i * 2 - distance;
           b = y + j * 2 - distance;
 
           // Look for the position in the stationary probability data structure (assumes klp_matrix is populated with exactly all possible positions)
-          found_klp_index = -1;
-          for (k = 0; k < klp_matrix.length && found_klp_index < 0; ++k) {
+          found_klp_index = 0;
+          for (k = 0; k < klp_matrix.length && !found_klp_index; ++k) {
             if (klp_matrix.k[k] == a && klp_matrix.l[k] == b) {
               found_klp_index = 1;
 
