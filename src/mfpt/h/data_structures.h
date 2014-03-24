@@ -27,6 +27,6 @@ typedef struct {
   int length;
 } KLP_MATRIX;
 
-typedef double (*transition_probability)(const KLP_MATRIX, const double*, int, int, short);
+typedef double(*transition_probability)(const KLP_MATRIX, const double*, int, int, short);
 
 #endif

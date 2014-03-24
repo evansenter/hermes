@@ -41,14 +41,14 @@ int main(int argc, char** argv) {
 KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA fftbor2d_data) {
   int i;
   KLP_MATRIX klp_matrix;
-
+  
   klp_matrix = init_klp_matrix(fftbor2d_data.non_zero_count);
-
+  
   for (i = 0; i < klp_matrix.length; ++i) {
     klp_matrix.k[i] = fftbor2d_data.non_zero_indices[i] / fftbor2d_data.row_length;
     klp_matrix.l[i] = fftbor2d_data.non_zero_indices[i] % fftbor2d_data.row_length;
     klp_matrix.p[i] = fftbor2d_data.probabilities[fftbor2d_data.non_zero_indices[i]];
   }
-
+  
   return klp_matrix;
 }

@@ -30,64 +30,64 @@ MFPT_PARAMS init_mfpt_params() {
 
 void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
   int c;
-
+  
   while ((c = getopt(argc, argv, "EeTtPpXxHhRrFfLlVvIiC:c:A:a:Z:z:N:n:D:d:O:o:")) != -1) {
     switch (c) {
       case 'E':
       case 'e':
         parameters->energy_based = 1;
         break;
-
+        
       case 'T':
       case 't':
         parameters->transition_matrix_input = 1;
         break;
-
+        
       case 'P':
       case 'p':
         parameters->pseudoinverse = 1;
         break;
-
+        
       case 'X':
       case 'x':
         parameters->single_bp_moves_only = 1;
         break;
-
+        
       case 'H':
       case 'h':
         parameters->hastings = 1;
         break;
-
+        
       case 'R':
       case 'r':
         parameters->rate_matrix = 1;
         break;
-
+        
       case 'F':
       case 'f':
         parameters->fully_connected = 1;
         break;
-
+        
       case 'L':
       case 'l':
         parameters->all_mfpt = 1;
         break;
-
+        
       case 'I':
       case 'i':
         parameters->input = 0;
         break;
-
+        
       case 'V':
       case 'v':
         parameters->verbose = 1;
         break;
-
+        
       case 'C':
       case 'c':
         parameters->input_file = strdup(optarg);
         break;
-
+        
       case 'A':
       case 'a':
         if (!sscanf(optarg, "%d", &parameters->start_state)) {
@@ -95,9 +95,9 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
         } else if (parameters->start_state < 0) {
           mfpt_usage();
         }
-
+        
         break;
-
+        
       case 'Z':
       case 'z':
         if (!sscanf(optarg, "%d", &parameters->end_state)) {
@@ -105,9 +105,9 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
         } else if (parameters->end_state < 0) {
           mfpt_usage();
         }
-
+        
         break;
-
+        
       case 'N':
       case 'n':
         if (!sscanf(optarg, "%d", &parameters->max_dist)) {
@@ -115,8 +115,9 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
         } else if (parameters->max_dist <= 0) {
           mfpt_usage();
         }
+        
         break;
-
+        
       case 'D':
       case 'd':
         if (!sscanf(optarg, "%d", &parameters->bp_dist)) {
@@ -124,9 +125,9 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
         } else if (parameters->bp_dist <= 0) {
           mfpt_usage();
         }
-
+        
         break;
-
+        
       case 'O':
       case 'o':
         if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
@@ -134,9 +135,9 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
         } else if (parameters->epsilon <= 1e-16) {
           mfpt_usage();
         }
-
+        
         break;
-
+        
       case '?':
         switch (optopt) {
           case 'C':
@@ -151,7 +152,7 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
           case 'd':
             fprintf(stderr, "Option -%c requires an argument.\n", optopt);
             break;
-
+            
           default:
             if (isprint(optopt)) {
               fprintf(stderr, "Unknown option `-%c'.\n", optopt);
@@ -159,106 +160,106 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
               fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
             }
         }
-
+        
         mfpt_usage();
-
+        
       default:
         mfpt_usage();
     }
   }
-
+  
   if (parameters->input_file == NULL) {
     if (optind + 1 == argc) {
       parameters->input_file = strdup(argv[optind]);
     }
   }
-
+  
   if (parameters->verbose) {
     debug_mfpt_parameters(*parameters);
   }
-
+  
   if (mfpt_error_handling(*parameters)) {
     mfpt_usage();
   }
-
+  
   optind = 1;
 }
 
 int mfpt_error_handling(const MFPT_PARAMS parameters) {
   int error = 0;
-
+  
   if (parameters.input) {
     // Input CSV exists.
     if (parameters.input_file == NULL) {
       fprintf(stderr, "Error: file not provided. Please provide one as the last argument or with the -c flag.\n");
       error++;
     }
-
+    
     // Input CSV is readable check.
     if (access(parameters.input_file, R_OK) == -1) {
       fprintf(stderr, "Error: can't read from file %s.\n", parameters.input_file);
       error++;
     }
   }
-
+  
   // Type of run check.
   if (parameters.transition_matrix_input + parameters.single_bp_moves_only + parameters.fully_connected != 1) {
     fprintf(stderr, "Error: exactly one of -t, -x or -f must be provided!\n");
     error++;
   }
-
+  
   // Transition matrix input requirements.
   if (parameters.transition_matrix_input && !(parameters.start_state >= 0 && parameters.end_state >= 0)) {
     fprintf(stderr, "Error: if the -t flag is provided, -a and -z must be explicitly set!\n");
     error++;
   }
-
+  
   // Transition matrix input restrictions.
   if (parameters.transition_matrix_input && (parameters.hastings || parameters.energy_based)) {
     fprintf(stderr, "Error: if the -t flag is provided, -h and -e are not permitted!\n");
     error++;
   }
-
+  
   // Fully connected graph restrictions.
   if (parameters.fully_connected && (parameters.hastings || parameters.energy_based)) {
     fprintf(stderr, "Error: if the -f flag is provided, -h and -e are not permitted (or -a and -z without -d)!\n");
     error++;
   }
-
+  
   // Extending k/l/p restrictions.
   if (parameters.max_dist && parameters.energy_based) {
     fprintf(stderr, "Error: if the -n flag is provided, -e is not permitted!\n");
     error++;
   }
-
+  
   // If we're extending k/l/p we need to know how the user wants the zero-positions filled.
   if (parameters.max_dist && !parameters.epsilon) {
     fprintf(stderr, "Error: if using the full grid (bounded by -n), -o needs to be specified for populating 0-probability positions!\n");
     error++;
   }
-
+  
   // If we're willing the zero-positions, we need to know the bounding size.
   if (parameters.epsilon && !parameters.max_dist) {
     fprintf(stderr, "Error: if using -o, the full grid (bounded by -n) needs to be specified for populating 0-probability positions!\n");
     error++;
   }
-
+  
   // MFPT will be 0.
   if (parameters.start_state == parameters.end_state && parameters.start_state >= 0) {
     fprintf(stderr, "Error: if the -a and -z flags are identical the MFPT is 0!\n");
     error++;
   }
-
+  
   if (error) {
     fprintf(stderr, "\n");
   }
-
+  
   return error;
 }
 
 void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   char* buffer = calloc(128, sizeof(char));
-
+  
   printf("(c) input_file\t\t\t%s\n",          parameters.input_file);
   printf("(e) energy_based\t\t%s\n",          parameters.energy_based            ? "Yes" : "No");
   printf("(t) transition_matrix_input\t%s\n", parameters.transition_matrix_input ? "Yes" : "No");
@@ -267,23 +268,23 @@ void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   printf("(f) fully_connected\t\t%s\n",       parameters.fully_connected         ? "Yes" : "No");
   printf("(h) hastings\t\t\t%s\n",            parameters.hastings                ? "Yes" : "No");
   printf("(r) rate_matrix\t\t\t%s\n",         parameters.rate_matrix             ? "Yes" : "No");
-
+  
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%d", parameters.max_dist);
   printf("(n) max_dist\t\t\t%s\n", parameters.max_dist ? buffer : "N/A");
-
+  
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%d", parameters.bp_dist);
   printf("(d) bp_dist\t\t\t%s\n", parameters.bp_dist ? buffer : "N/A");
-
+  
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%d", parameters.start_state);
   printf("(a) start_state\t\t\t%s\n", parameters.start_state >= 0 ? buffer : "N/A");
-
+  
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%d", parameters.end_state);
   printf("(z) end_state\t\t\t%s\n", parameters.end_state >= 0 ? buffer : "N/A");
-
+  
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%.2e", parameters.epsilon);
   printf("(o) epsilon\t\t\t%s\n", parameters.epsilon >= 0 ? buffer : "N/A");
