@@ -61,40 +61,42 @@ void match_for_subparam(char** subparam_order, char* subparam, int subparam_coun
   int i;
   char* token;
   char* token_with_prefix;
-  token = strtok(subparam, "-");
 
-  while (token != NULL) {
-    if (!strcmp("all", token)) {
-      token             = strtok(NULL, "-");
-      token_with_prefix = malloc(strlen(token) + 2);
-      strcpy(token_with_prefix, "-");
-      strcat(token_with_prefix, token);
-      match->argv       = token_with_prefix;
-      match->index      = ALL_SUBARG;
+  if (!strncmp(subparam, "--", 2)) {
+    token = strtok(subparam, "-");
+    while (token != NULL) {
+      if (!strcmp("all", token)) {
+        token             = strtok(NULL, "-");
+        token_with_prefix = malloc(strlen(token) + 2);
+        strcpy(token_with_prefix, "-");
+        strcat(token_with_prefix, token);
+        match->argv       = token_with_prefix;
+        match->index      = ALL_SUBARG;
 
-#ifdef DEBUG
-      printf("Found global flag for %s\n", match->argv);
-#endif
-      return;
-    } else {
-      for (i = 0; i < subparam_count; ++i) {
-        if (!strcmp(subparam_order[i], token)) {
-          token             = strtok(NULL, "-");
-          token_with_prefix = malloc(strlen(token) + 2);
-          strcpy(token_with_prefix, "-");
-          strcat(token_with_prefix, token);
-          match->argv       = token_with_prefix;
-          match->index      = i;
+  #ifdef DEBUG
+        printf("Found global flag for %s\n", match->argv);
+  #endif
+        return;
+      } else {
+        for (i = 0; i < subparam_count; ++i) {
+          if (!strcmp(subparam_order[i], token)) {
+            token             = strtok(NULL, "-");
+            token_with_prefix = malloc(strlen(token) + 2);
+            strcpy(token_with_prefix, "-");
+            strcat(token_with_prefix, token);
+            match->argv       = token_with_prefix;
+            match->index      = i;
 
-#ifdef DEBUG
-          printf("Found location for %s at index %d\n", match->argv, match->index);
-#endif
-          return;
+  #ifdef DEBUG
+            printf("Found location for %s at index %d\n", match->argv, match->index);
+  #endif
+            return;
+          }
         }
       }
-    }
 
-    token = strtok(NULL, "-");
+      token = strtok(NULL, "-");
+    }
   }
 
 #ifdef DEBUG
