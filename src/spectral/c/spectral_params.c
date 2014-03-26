@@ -25,6 +25,7 @@ SPECTRAL_PARAMS init_spectral_params() {
     .lonely_bp        = 0,
     .energy_cap       = 0,
     .eigen_only       = 0,
+    .input            = 1,
     .benchmark        = 0
   };
   return parameters;
@@ -32,101 +33,101 @@ SPECTRAL_PARAMS init_spectral_params() {
 
 void parse_spectral_args(SPECTRAL_PARAMS* parameters, int argc, char** argv) {
   int c;
-  
+
   while ((c = getopt(argc, argv, "OoGgBbVvA:a:Z:z:S:s:K:k:L:l:I:i:J:j:P:p:T:t:C:c:R:r:F:f:")) != -1) {
     switch (c) {
       case 'O':
       case 'o':
         parameters->lonely_bp = 1;
         break;
-        
+
       case 'G':
       case 'g':
         parameters->eigen_only = 1;
         break;
-        
+
       case 'B':
       case 'b':
         parameters->benchmark = 1;
         break;
-        
+
       case 'V':
       case 'v':
         parameters->verbose = 1;
         break;
-        
+
       case 'S':
       case 's':
         parameters->sequence = strdup(optarg);
         break;
-        
+
       case 'K':
       case 'k':
         parameters->start_structure = strdup(optarg);
         break;
-        
+
       case 'L':
       case 'l':
         parameters->end_structure = strdup(optarg);
         break;
-        
+
       case 'A':
       case 'a':
         if (!sscanf(optarg, "%d", &parameters->start_index)) {
           spectral_usage();
         }
-        
+
         break;
-        
+
       case 'Z':
       case 'z':
         if (!sscanf(optarg, "%d", &parameters->end_index)) {
           spectral_usage();
         }
-        
+
         break;
-        
+
       case 'I':
       case 'i':
         if (!sscanf(optarg, "%lf", &parameters->start_time)) {
           spectral_usage();
         }
-        
+
         break;
-        
+
       case 'J':
       case 'j':
         if (!sscanf(optarg, "%lf", &parameters->end_time)) {
           spectral_usage();
         }
-        
+
         break;
-        
+
       case 'P':
       case 'p':
         if (!sscanf(optarg, "%lf", &parameters->step_size)) {
           spectral_usage();
         }
-        
+
         break;
-        
+
       case 'T':
       case 't':
         if (!sscanf(optarg, "%lf", &parameters->temperature)) {
           spectral_usage();
         }
-        
+
         temperature = parameters->temperature;
         break;
-        
+
       case 'C':
       case 'c':
         if (!sscanf(optarg, "%lf", &parameters->energy_cap)) {
           spectral_usage();
         }
-        
+
         break;
-        
+
       case 'R':
       case 'r':
         if (!sscanf(optarg, "%d", &parameters->serialize)) {
@@ -134,14 +135,14 @@ void parse_spectral_args(SPECTRAL_PARAMS* parameters, int argc, char** argv) {
         } else if ((int)abs(parameters->serialize) != 1) {
           spectral_usage();
         }
-        
+
         break;
-        
+
       case 'F':
       case 'f':
         parameters->filename = strdup(optarg);
         break;
-        
+
       case '?':
         switch (optopt) {
           case 'A':
@@ -172,7 +173,7 @@ void parse_spectral_args(SPECTRAL_PARAMS* parameters, int argc, char** argv) {
           case 'f':
             fprintf(stderr, "Option -%c requires an argument.\n", optopt);
             break;
-            
+
           default:
             if (isprint(optopt)) {
               fprintf(stderr, "Unknown option `-%c'.\n", optopt);
@@ -180,74 +181,76 @@ void parse_spectral_args(SPECTRAL_PARAMS* parameters, int argc, char** argv) {
               fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
             }
         }
-        
+
         spectral_usage();
-        
+
       default:
         spectral_usage();
     }
   }
-  
+
   if (parameters->verbose) {
     debug_spectral_parameters(*parameters);
   }
-  
+
   if (spectral_error_handling(*parameters)) {
     spectral_usage();
   }
-  
+
   optind = 1;
 }
 
 int spectral_error_handling(const SPECTRAL_PARAMS parameters) {
   int error = 0;
-  
-  if (parameters.sequence != NULL && parameters.start_structure != NULL && strlen(parameters.sequence) != strlen(parameters.start_structure)) {
-    fprintf(stderr, "Error: the starting structure is not the same length as the provided sequence.\n");
-    error++;
+
+  if (parameters.input) {
+    if (parameters.sequence != NULL && parameters.start_structure != NULL && strlen(parameters.sequence) != strlen(parameters.start_structure)) {
+      fprintf(stderr, "Error: the starting structure is not the same length as the provided sequence.\n");
+      error++;
+    }
+
+    if (parameters.sequence != NULL && parameters.end_structure != NULL && strlen(parameters.sequence) != strlen(parameters.end_structure)) {
+      fprintf(stderr, "Error: the ending structure is not the same length as the provided sequence.\n");
+      error++;
+    }
   }
-  
-  if (parameters.sequence != NULL && parameters.end_structure != NULL && strlen(parameters.sequence) != strlen(parameters.end_structure)) {
-    fprintf(stderr, "Error: the ending structure is not the same length as the provided sequence.\n");
-    error++;
-  }
-  
+
   if (parameters.energy_cap < 0) {
     fprintf(stderr, "Error: the energy_cap must be a positive number (in kcal/mol) for the energy range above the MFE to sample structures from.\n");
     error++;
   }
-  
+
   if (parameters.serialize == -1 && (parameters.start_index < 0 || parameters.end_index < 0)) {
     fprintf(stderr, "Error: if you're deserializing, the start and end indices (-a, -z) in the serialized transition matrix must be provided.\n");
     error++;
   }
-  
+
   if (parameters.serialize == 1 && parameters.eigen_only) {
     fprintf(stderr, "Error: you can't serialize to a file (-r) and compute only the eigenvalues (-g).\n");
     error++;
   }
-  
+
   if ((parameters.serialize && parameters.filename == NULL) || (!parameters.serialize && parameters.filename != NULL)) {
     fprintf(stderr, "Error: can't serialize (-r) without a filename provided (-f).\n");
     error++;
   }
-  
+
   if (parameters.filename && parameters.serialize) {
     if (parameters.serialize == 1 && access(parameters.filename, F_OK) != -1) {
       fprintf(stderr, "Error: file %s exists, cowering out.\n", parameters.filename);
       error++;
     }
-    
+
     if (parameters.serialize == -1 && access(parameters.filename, R_OK) == -1) {
       fprintf(stderr, "Error: can't read from file %s.\n", parameters.filename);
       error++;
     }
   }
-  
+
   if (error) {
     fprintf(stderr, "\n");
   }
-  
+
   return error;
 }
 

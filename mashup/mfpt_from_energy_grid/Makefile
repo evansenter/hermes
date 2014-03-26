@@ -1,5 +1,5 @@
-CCFLAGS          = -c -std=c++11 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER)
-LDFLAGS          = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lfftw3 -lgomp -llapack -lgslcblas -lgsl -lfftbor2d -lmfpt -lRNA -o
+CCFLAGS          = -c -std=c++11 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wno-write-strings -Wa,-q -I $(HEADER) -I $(SHARED_HEADER)
+LDFLAGS          = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lfftw3 -lgomp -llapack -lgslcblas -lgsl -lfftbor2d -lmfpt -lmulti_param -lRNA -o
 BINDIR           = ~/bin
 LIBDIR           = ~/lib
 CC               = g++
@@ -27,7 +27,7 @@ endif
 
 FFTmfpt.out: $(CODE)/mfpt_from_energy_grid.o
 	$(CC) $(CODE)/mfpt_from_energy_grid.o $(LDFLAGS) FFTmfpt.out
-	
+
 $(CODE)/mfpt_from_energy_grid.o: $(CODE)/mfpt_from_energy_grid.cpp $(SHARED_HEADER)/shared/libfftbor2d_header.h $(SHARED_HEADER)/shared/libmfpt_header.h
 	$(CC) $(CCFLAGS) $(CODE)/mfpt_from_energy_grid.cpp -o $(CODE)/mfpt_from_energy_grid.o
 

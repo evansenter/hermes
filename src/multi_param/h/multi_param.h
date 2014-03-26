@@ -12,6 +12,8 @@ typedef struct {
 } SUBARG_MATCH;
 
 // #define DEBUG 1
+#define NO_MATCH -1
+#define ALL_SUBARG -2
 
 PARAM_CONTAINER* split_args(int, char**, char**, int);
 void match_for_subparam(char**, char*, int, SUBARG_MATCH*);

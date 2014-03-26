@@ -19,6 +19,7 @@ typedef struct {
   short lonely_bp;
   double energy_cap;
   short eigen_only;
+  short input;
   short benchmark;
 } SPECTRAL_PARAMS;
 
