@@ -16,9 +16,4 @@
 *.exe
 *.out
 *.app
-
-RNAmfpt
-RNAspectral
-FFTbor2D
-RNApopulation
-FFTmfpt
+bin/*

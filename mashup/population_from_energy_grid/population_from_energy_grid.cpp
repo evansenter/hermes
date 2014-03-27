@@ -28,8 +28,6 @@ int main(int argc, char** argv) {
   mfpt_params                      = init_mfpt_params();
   mfpt_params.input                = 0;
   mfpt_params.rate_matrix          = 1;
-  mfpt_params.single_bp_moves_only = 1;
-  mfpt_params.hastings             = 1;
   mfpt_params.epsilon              = 1e-8;
   mfpt_params.max_dist             = fftbor2d_data.row_length;
   mfpt_params.bp_dist              = fftbor2d_data.bp_dist;
@@ -40,7 +38,7 @@ int main(int argc, char** argv) {
   transition_matrix = convert_klp_matrix_to_transition_matrix(&klp_matrix, &mfpt_params);
 
   spectral_params             = init_spectral_params();
-  spectral_params.input       = 1;
+  spectral_params.input       = 0;
   spectral_params.start_index = mfpt_params.start_state;
   spectral_params.end_index   = mfpt_params.end_state;
 

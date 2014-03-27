@@ -255,10 +255,11 @@ int spectral_error_handling(const SPECTRAL_PARAMS parameters) {
 }
 
 void debug_spectral_parameters(const SPECTRAL_PARAMS parameters) {
+  printf("RNAspectral parameters\n");
   printf("(s) sequence\t\t\t%s\n",              parameters.sequence);
   printf("(k) start_structure\t\t%s\n",         parameters.start_structure == NULL && parameters.start_index < 0 ? "empty" : parameters.start_structure);
   printf("(l) end_structure\t\t%s\n",           parameters.end_structure == NULL && parameters.end_index < 0 ? "mfe" : parameters.end_structure);
-  printf("(f) filename\t\t\t%s\n",              parameters.filename == NULL ? "none" : parameters.filename);
+  printf("(f) filename\t\t\t%s\n",              parameters.filename);
   printf("(a) start_index\t\t\t%d\n",           parameters.start_index);
   printf("(z) end_index\t\t\t%d\n",             parameters.end_index);
   printf("(r) serialize\t\t\t%d\n",             parameters.serialize);
@@ -270,6 +271,8 @@ void debug_spectral_parameters(const SPECTRAL_PARAMS parameters) {
   printf("(c) energy_cap\t\t\t%.1f kcal/mol\n", parameters.energy_cap ? parameters.energy_cap : 10000);
   printf("(g) eigen_only\t\t\t%s\n",            parameters.eigen_only ? "Yes" : "No");
   printf("(b) benchmark\t\t\t%s\n",             parameters.benchmark ? "Yes" : "No");
+
+  printf("\n");
 }
 
 void spectral_usage() {

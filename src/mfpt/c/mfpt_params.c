@@ -8,22 +8,20 @@
 
 MFPT_PARAMS init_mfpt_params() {
   MFPT_PARAMS parameters = {
-    .input_file              = NULL,
-    .start_state             = -1,
-    .end_state               = -1,
-    .max_dist                = 0,
-    .bp_dist                 = 0,
-    .epsilon                 = 0.,
-    .energy_based            = 0,
-    .transition_matrix_input = 0,
-    .pseudoinverse           = 0,
-    .fully_connected         = 0,
-    .single_bp_moves_only    = 0,
-    .hastings                = 0,
-    .rate_matrix             = 0,
-    .all_mfpt                = 0,
-    .input                   = 1,
-    .verbose                 = 0
+    .input_file    = NULL,
+    .start_state   = -1,
+    .end_state     = -1,
+    .max_dist      = 0,
+    .bp_dist       = 0,
+    .run_type      = DIAG_MOVES_ONLY_FLAG,
+    .epsilon       = 0.,
+    .energy_based  = 0,
+    .pseudoinverse = 0,
+    .hastings      = 0,
+    .rate_matrix   = 0,
+    .all_mfpt      = 0,
+    .input         = 1,
+    .verbose       = 0
   };
   return parameters;
 }
@@ -40,7 +38,7 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
 
       case 'T':
       case 't':
-        parameters->transition_matrix_input = 1;
+        parameters->run_type = TRANSITION_INPUT_FLAG;
         break;
 
       case 'P':
@@ -50,7 +48,7 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
 
       case 'X':
       case 'x':
-        parameters->single_bp_moves_only = 1;
+        parameters->run_type = DIAG_MOVES_ONLY_FLAG;
         break;
 
       case 'H':
@@ -65,7 +63,7 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
 
       case 'F':
       case 'f':
-        parameters->fully_connected = 1;
+        parameters->run_type = FULLY_CONNECTED_FLAG;
         break;
 
       case 'L':
@@ -198,25 +196,25 @@ int mfpt_error_handling(const MFPT_PARAMS parameters) {
   }
 
   // Type of run check.
-  if (parameters.transition_matrix_input + parameters.single_bp_moves_only + parameters.fully_connected != 1) {
+  if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) + RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG) + RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) != 1) {
     fprintf(stderr, "Error: exactly one of -t, -x or -f must be provided!\n");
     error++;
   }
 
   // Transition matrix input requirements.
-  if (parameters.transition_matrix_input && !(parameters.start_state >= 0 && parameters.end_state >= 0)) {
+  if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) && !(parameters.start_state >= 0 && parameters.end_state >= 0)) {
     fprintf(stderr, "Error: if the -t flag is provided, -a and -z must be explicitly set!\n");
     error++;
   }
 
   // Transition matrix input restrictions.
-  if (parameters.transition_matrix_input && (parameters.hastings || parameters.energy_based)) {
+  if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) && (parameters.hastings || parameters.energy_based)) {
     fprintf(stderr, "Error: if the -t flag is provided, -h and -e are not permitted!\n");
     error++;
   }
 
   // Fully connected graph restrictions.
-  if (parameters.fully_connected && (parameters.hastings || parameters.energy_based)) {
+  if (RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) && (parameters.hastings || parameters.energy_based)) {
     fprintf(stderr, "Error: if the -f flag is provided, -h and -e are not permitted (or -a and -z without -d)!\n");
     error++;
   }
@@ -255,14 +253,15 @@ int mfpt_error_handling(const MFPT_PARAMS parameters) {
 void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   char* buffer = calloc(128, sizeof(char));
 
+  printf("RNAmfpt parameters\n");
   printf("(c) input_file\t\t\t%s\n",          parameters.input_file);
-  printf("(e) energy_based\t\t%s\n",          parameters.energy_based            ? "Yes" : "No");
-  printf("(t) transition_matrix_input\t%s\n", parameters.transition_matrix_input ? "Yes" : "No");
-  printf("(p) pseudoinverse\t\t%s\n",         parameters.pseudoinverse           ? "Yes" : "No");
-  printf("(x) single_bp_moves_only\t%s\n",    parameters.single_bp_moves_only    ? "Yes" : "No");
-  printf("(f) fully_connected\t\t%s\n",       parameters.fully_connected         ? "Yes" : "No");
-  printf("(h) hastings\t\t\t%s\n",            parameters.hastings                ? "Yes" : "No");
-  printf("(r) rate_matrix\t\t\t%s\n",         parameters.rate_matrix             ? "Yes" : "No");
+  printf("(e) energy_based\t\t%s\n",          parameters.energy_based                     ? "Yes" : "No");
+  printf("(t) transition_matrix_input\t%s\n", RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) ? "Yes" : "No");
+  printf("(p) pseudoinverse\t\t%s\n",         parameters.pseudoinverse                    ? "Yes" : "No");
+  printf("(x) single_bp_moves_only\t%s\n",    RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG)  ? "Yes" : "No");
+  printf("(f) fully_connected\t\t%s\n",       RUN_TYPE(parameters, FULLY_CONNECTED_FLAG)  ? "Yes" : "No");
+  printf("(h) hastings\t\t\t%s\n",            parameters.hastings                         ? "Yes" : "No");
+  printf("(r) rate_matrix\t\t\t%s\n",         parameters.rate_matrix                      ? "Yes" : "No");
 
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%d", parameters.max_dist);
@@ -283,6 +282,8 @@ void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%.2e", parameters.epsilon);
   printf("(o) epsilon\t\t\t%s\n", parameters.epsilon >= 0 ? buffer : "N/A");
+
+  printf("\n");
 }
 
 void mfpt_usage() {
@@ -305,7 +306,7 @@ void mfpt_usage() {
   fprintf(stderr, "-R/r\t(r)ate matrix,              default is disabled. If this flag is provided, the transition rate matrix is computed rather than the transition probability matrix.\n");
   fprintf(stderr, "-T/t\t(t)ransition matrix input,  default is disabled. If this flag is provided, the input is expected to be a transition probability matrix, rather than a 2D energy grid. In this case, the first two columns in the CSV file are row-order indices into the transition probability matrix, and the third (final) column is the transition probability of that cell.\n");
   fprintf(stderr, "-V/v\tverbose, default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n");
-  fprintf(stderr, "-X/x\tsingle basepair moves,      default is disabled. If this flag is provided, the input must be in the form of an energy grid, and only diagonally adjacent moves are permitted. This option makes the assumption that the input is *not* a transition probability matrix already, and the input energy grid already satisfies the triangle inequality / parity condition.\n");
+  fprintf(stderr, "-X/x\tsingle basepair moves,      default is enabled. If this flag is provided, the input must be in the form of an energy grid, and only diagonally adjacent moves are permitted. This option makes the assumption that the input is *not* a transition probability matrix already, and the input energy grid already satisfies the triangle inequality / parity condition.\n");
   fprintf(stderr, "-Z/z\tend state,                  default is -1 (inferred from input data as the first row in the CSV whose entry in the second column is 0). If provided, should indicate the 0-indexed line in the input CSV file representing the end state.\n\n");
   fprintf(stderr, "\nProgram returns -1 (resp. -2) if the start state (resp. end state) probability is 0. -3 is returned if the distance between the two input structures could not be inferred from the input data (usually also means that one of the states has a 0-probability). Otherwise returns the MFPT as predicted by matrix inversion.\n");
   abort();
