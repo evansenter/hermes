@@ -5,7 +5,7 @@
 #include <complex>
 typedef std::complex<double> dcomplex;
 
-typedef struct {
+typedef struct { // Variables are sorted by the order they get instantiated, do not change (structs suck in C++).
   char* sequence;
   char* structure_1;
   char* structure_2;
@@ -18,7 +18,13 @@ typedef struct {
   short verbose;
 } FFTBOR2D_PARAMS;
 
-typedef struct { // Variables are sorted by the order they get instantiated.
+#define BASIC_FLAG 'B'
+#define SIMPLE_FLAG 'S'
+#define MATRIX_FLAG 'M'
+#define CSV_FLAG 'C'
+#define FORMAT(parameters, flag) (parameters.format == flag)
+
+typedef struct { // Variables are sorted by the order they get instantiated, do not change.
   char*     sequence;
   char*     structure_1;
   char*     structure_2;
@@ -52,7 +58,7 @@ typedef struct { // Variables are sorted by the order they get instantiated.
   double*** EM1;
 } FFTBOR2D_DATA;
 
-typedef struct { // Variables are sorted by the order they get instantiated.
+typedef struct { // Variables are sorted by the order they get instantiated, do not change.
   dcomplex** Z;
   dcomplex** ZB;
   dcomplex** ZM;
