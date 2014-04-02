@@ -76,7 +76,7 @@ double* convert_klp_matrix_to_transition_matrix(KLP_MATRIX* klp_matrix, MFPT_PAR
 }
 
 double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const double* transition_probabilities) {
-  int i, j, x, y, start_pointer, inversion_matrix_row_length = klp_matrix->length - 1;
+  int i, j, x, y, start_pointer, inversion_matrix_row_length = klp_matrix->row_length - 1;
   double mfpt_from_start;
 
   if (parameters.start_state < 0 || parameters.end_state < 0) {
@@ -101,14 +101,14 @@ double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const 
   double* mfpt             = calloc(inversion_matrix_row_length, sizeof(double));
   double* inversion_matrix = malloc((int)pow((double)inversion_matrix_row_length, 2.) * sizeof(double));
 
-  for (i = 0; i < klp_matrix->length; ++i) {
-    for (j = 0; j < klp_matrix->length; ++j) {
+  for (i = 0; i < klp_matrix->row_length; ++i) {
+    for (j = 0; j < klp_matrix->row_length; ++j) {
       if (i != parameters.end_state && j != parameters.end_state) {
         x = (i > parameters.end_state ? i - 1 : i);
         y = (j > parameters.end_state ? j - 1 : j);
         // Be VERY careful changing anything here. We throw out anything at base pair distance 0 (end_index) from the second structure (the target of the MFPT calculation) and maximally distant from the first structure. Because of this, there's a chunk of indices that need to get shifted to the left by one, to keep the array tight (this is what x, y are doing). Hence, x and y are used for indexing into inversion_matrix and i, j are used for indexing into transition_probabilities.
         inversion_matrix[x * inversion_matrix_row_length + y] = \
-            (i == j ? 1 - ROW_ORDER(transition_probabilities, i, j, klp_matrix->length) : -ROW_ORDER(transition_probabilities, i, j, klp_matrix->length));
+            (i == j ? 1 - ROW_ORDER(transition_probabilities, i, j, klp_matrix->row_length) : -ROW_ORDER(transition_probabilities, i, j, klp_matrix->row_length));
       }
     }
   }
@@ -330,7 +330,8 @@ void extend_klp_matrix_to_all_possible_positions(KLP_MATRIX* klp_matrix, const M
     }
   }
 
-  klp_matrix->length = valid_positions;
+  klp_matrix->length     = valid_positions;
+  klp_matrix->row_length = valid_positions;
 }
 
 void populate_remaining_probabilities_in_klp_matrix(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters) {
@@ -390,25 +391,25 @@ double* populate_transition_matrix_from_stationary_matrix(const KLP_MATRIX klp_m
   double row_sum;
   double* transition_matrix;
 
-  transition_matrix = init_transition_matrix(klp_matrix.length);
+  transition_matrix = init_transition_matrix(klp_matrix.row_length);
 
-  for (i = 0; i < klp_matrix.length; ++i) {
+  for (i = 0; i < klp_matrix.row_length; ++i) {
     row_sum = 0.;
 
-    for (j = 0; j < klp_matrix.length; ++j) {
+    for (j = 0; j < klp_matrix.row_length; ++j) {
       if (i != j) {
         if (RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) || (RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG) && ONE_BP_MOVE(i, j))) {
           if (NONZERO_TO_NONZERO_PROB(i, j)) {
-            ROW_ORDER(transition_matrix, i, j, klp_matrix.length) = \
+            ROW_ORDER(transition_matrix, i, j, klp_matrix.row_length) = \
                 probability_function(klp_matrix, number_of_adjacent_moves, i, j, parameters.rate_matrix);
           }
         }
 
-        row_sum += ROW_ORDER(transition_matrix, i, j, klp_matrix.length);
+        row_sum += ROW_ORDER(transition_matrix, i, j, klp_matrix.row_length);
       }
     }
 
-    ROW_ORDER(transition_matrix, i, i, klp_matrix.length) = parameters.rate_matrix ? -row_sum : 1 - row_sum;
+    ROW_ORDER(transition_matrix, i, i, klp_matrix.row_length) = parameters.rate_matrix ? -row_sum : 1 - row_sum;
   }
 
   return transition_matrix;

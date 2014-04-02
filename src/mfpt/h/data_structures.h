@@ -10,10 +10,7 @@ typedef struct {
   char run_type;
   double epsilon;
   short energy_based;
-  // short transition_matrix_input;
   short pseudoinverse;
-  // short fully_connected;
-  // short single_bp_moves_only;
   short hastings;
   short rate_matrix;
   short all_mfpt;
@@ -31,6 +28,7 @@ typedef struct {
   int* l;
   double* p;
   int length;
+  int row_length;
 } KLP_MATRIX;
 
 typedef double(*transition_probability)(const KLP_MATRIX, const double*, int, int, short);

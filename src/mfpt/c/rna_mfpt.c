@@ -7,43 +7,21 @@
 #include "constants.h"
 
 int main(int argc, char** argv) {
-  int i, line_count, row_length;
   double mfpt;
   double* transition_matrix;
   MFPT_PARAMS parameters;
   KLP_MATRIX klp_matrix;
   parameters = init_mfpt_params();
   parse_mfpt_args(&parameters, argc, argv);
-  line_count = count_lines(parameters.input_file);
 
-  if (!line_count) {
-    fprintf(stderr, "Error: %s appears to have no data.\n", parameters.input_file);
-    abort();
-  }
-
-  klp_matrix = init_klp_matrix(line_count);
-  populate_arrays(&klp_matrix, parameters);
+  klp_matrix = klp_matrix_from_file(parameters);
 #ifdef SUPER_HEAVY_DEBUG
   print_klp_matrix(klp_matrix);
 #endif
 
   // We already have a transition matrix, this is the easy case. Just need to find MFPT.
   if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG)) {
-    // We need to infer the dimensions of the transition matrix.
-    row_length = 0;
-
-    for (i = 0; i < line_count; ++i) {
-      row_length = klp_matrix.k[i] > row_length ? klp_matrix.k[i] : row_length;
-      row_length = klp_matrix.l[i] > row_length ? klp_matrix.l[i] : row_length;
-    }
-
-    // The transition matrix is 0-ordered, so we looked for the highest k, l position above and then we add one for the row length.
-    klp_matrix.length = ++row_length;
-    transition_matrix = init_transition_matrix(klp_matrix.length);
-
-    for (i = 0; i < line_count; ++i) {
-      ROW_ORDER(transition_matrix, klp_matrix.k[i], klp_matrix.l[i], klp_matrix.length) = klp_matrix.p[i];
-    }
+    transition_matrix = transition_matrix_from_klp_matrix(&klp_matrix);
 
     // We have an energy grid, this requires converting the energy grid into a transition matrix data structure before finding MFPT.
   } else {
