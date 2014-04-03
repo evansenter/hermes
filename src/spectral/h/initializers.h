@@ -5,5 +5,6 @@
 
 EIGENSYSTEM init_eigensystem(int);
 void free_eigensystem(EIGENSYSTEM);
+void print_eigensystem(const EIGENSYSTEM);
 
 #endif

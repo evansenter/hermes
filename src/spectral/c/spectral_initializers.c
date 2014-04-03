@@ -5,8 +5,8 @@
 EIGENSYSTEM init_eigensystem(int length) {
   EIGENSYSTEM eigensystem = {
     .values          = calloc(length, sizeof(double)),
-    .vectors         = init_transition_matrix(length),
-    .inverse_vectors = init_transition_matrix(length),
+    .vectors         = calloc(length * length, sizeof(double*)),
+    .inverse_vectors = calloc(length * length, sizeof(double*)),
     .length          = length
   };
   return eigensystem;

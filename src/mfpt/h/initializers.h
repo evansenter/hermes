@@ -3,9 +3,6 @@
 
 #include "data_structures.h"
 
-#define ROW_ORDER(m, i, j) ((m.matrix)[((i) * (m.row_length)) + (j)])
-#define COL_ORDER(m, i, j) ((m.matrix)[((j) * (m.row_length)) + (i)])
-
 KLP_MATRIX init_klp_matrix(int);
 void free_klp_matrix(KLP_MATRIX);
 void print_klp_matrix(const KLP_MATRIX);

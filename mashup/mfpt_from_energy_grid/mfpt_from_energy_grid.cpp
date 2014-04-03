@@ -6,7 +6,6 @@
 #include "shared/libmfpt_header.h"
 
 KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA);
-void convert_klp_matrix_to_use_epsilon(KLP_MATRIX*, MFPT_PARAMS*, double);
 
 int main(int argc, char** argv) {
   PARAM_CONTAINER* params;
@@ -14,7 +13,7 @@ int main(int argc, char** argv) {
   FFTBOR2D_DATA fftbor2d_data;
   KLP_MATRIX klp_matrix;
   MFPT_PARAMS mfpt_params;
-  double* transition_matrix;
+  TRANSITION_MATRIX transition_matrix;
   double mfpt;
 
   char* subparams[] = { "fftbor2d", "mfpt" };
@@ -34,7 +33,7 @@ int main(int argc, char** argv) {
 
   klp_matrix        = convert_fftbor2d_output_to_klp_matrix(fftbor2d_data);
   transition_matrix = convert_klp_matrix_to_transition_matrix(&klp_matrix, &mfpt_params);
-  mfpt              = compute_mfpt(&klp_matrix, mfpt_params, transition_matrix);
+  mfpt              = compute_mfpt(transition_matrix, mfpt_params);
 
   printf("%f\n", mfpt);
 

@@ -10,32 +10,32 @@
 #include "initializers.h"
 #include "functions.h"
 
-void population_proportion_from_row_ordered_transition_matrix(const SPECTRAL_PARAMS parameters, double* row_transition_matrix, int length) {
-  double* column_transition_matrix;
+void population_proportion_from_row_ordered_transition_matrix(const SPECTRAL_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
+  TRANSITION_MATRIX column_transition_matrix;
   EIGENSYSTEM eigensystem;
 
-  column_transition_matrix = transpose_matrix(row_transition_matrix, length);
-  eigensystem              = convert_transition_matrix_to_eigenvectors(column_transition_matrix, length);
+  column_transition_matrix = transpose_matrix(row_transition_matrix);
+  eigensystem              = convert_transition_matrix_to_eigenvectors(column_transition_matrix);
   invert_matrix(&eigensystem);
   print_population_proportion(parameters, eigensystem);
 }
 
-double* convert_structures_to_transition_matrix(const SOLUTION* all_structures, int num_structures) {
+TRANSITION_MATRIX convert_structures_to_transition_matrix(const SOLUTION* all_structures, int num_structures) {
   int i, j;
   double col_sum;
-  double* transition_matrix = init_transition_matrix(num_structures);
+  TRANSITION_MATRIX transition_matrix = init_transition_matrix(num_structures, 'R');
 
   for (i = 0; i < num_structures; ++i) {
     col_sum = 0;
 
     for (j = 0; j < num_structures; ++j) {
       if (i != j) {
-        COL_ORDER(transition_matrix, i, j, num_structures) = \
+        T_COL_ORDER(transition_matrix, i, j) = \
             MIN(1, exp(-((double)all_structures[j].energy - (double)all_structures[i].energy) / RT));
 
-        col_sum += COL_ORDER(transition_matrix, i, j, num_structures);
+        col_sum += T_COL_ORDER(transition_matrix, i, j);
 #ifdef INSANE_DEBUG
-        printf("%d\t%d\t%.4e\n", i, j, COL_ORDER(transition_matrix, i, j, num_structures));
+        printf("%d\t%d\t%.4e\n", i, j, T_COL_ORDER(transition_matrix, i, j));
 #endif
       }
     }
@@ -43,17 +43,17 @@ double* convert_structures_to_transition_matrix(const SOLUTION* all_structures, 
 #ifdef INSANE_DEBUG
     printf("%d col_sum:\t%.4e\n\n", i, col_sum);
 #endif
-    COL_ORDER(transition_matrix, i, i, num_structures) = -col_sum;
+    T_COL_ORDER(transition_matrix, i, i) = -col_sum;
   }
 
   return transition_matrix;
 }
 
-EIGENSYSTEM convert_transition_matrix_to_eigenvectors(double* transition_matrix, int num_structures) {
+EIGENSYSTEM convert_transition_matrix_to_eigenvectors(TRANSITION_MATRIX transition_matrix) {
   int i, j;
   EIGENSYSTEM eigensystem;
-  eigensystem                             = init_eigensystem(num_structures);
-  gsl_matrix_view matrix_view             = gsl_matrix_view_array(transition_matrix, eigensystem.length, eigensystem.length);
+  eigensystem                             = init_eigensystem(transition_matrix.row_length);
+  gsl_matrix_view matrix_view             = gsl_matrix_view_array(transition_matrix.matrix, eigensystem.length, eigensystem.length);
   gsl_vector_complex* eigenvalues         = gsl_vector_complex_alloc(eigensystem.length);
   gsl_matrix_complex* eigenvectors        = gsl_matrix_complex_alloc(eigensystem.length, eigensystem.length);
   gsl_eigen_nonsymmv_workspace* workspace = gsl_eigen_nonsymmv_alloc(eigensystem.length);
@@ -66,7 +66,7 @@ EIGENSYSTEM convert_transition_matrix_to_eigenvectors(double* transition_matrix,
     gsl_vector_complex_view eigenvector = gsl_matrix_complex_column(eigenvectors, i);
 
     for (j = 0; j < eigensystem.length; ++j) {
-      COL_ORDER(eigensystem.vectors, i, j, eigensystem.length) = GSL_REAL(gsl_vector_complex_get(&eigenvector.vector, j));
+      E_COL_ORDER(eigensystem.vectors, i, j, eigensystem.length) = GSL_REAL(gsl_vector_complex_get(&eigenvector.vector, j));
     }
   }
 
@@ -84,7 +84,7 @@ void invert_matrix(EIGENSYSTEM* eigensystem) {
 
   for (i = 0; i < eigensystem->length; ++i) {
     for (j = 0; j < eigensystem->length; ++j) {
-      gsl_matrix_set(matrix_to_invert, i, j, ROW_ORDER(eigensystem->vectors, i, j, eigensystem->length));
+      gsl_matrix_set(matrix_to_invert, i, j, E_ROW_ORDER(eigensystem->vectors, i, j, eigensystem->length));
     }
   }
 
@@ -93,7 +93,7 @@ void invert_matrix(EIGENSYSTEM* eigensystem) {
 
   for (i = 0; i < eigensystem->length; ++i) {
     for (j = 0; j < eigensystem->length; ++j) {
-      ROW_ORDER(eigensystem->inverse_vectors, i, j, eigensystem->length) = gsl_matrix_get(inversion_matrix, i, j);
+      E_ROW_ORDER(eigensystem->inverse_vectors, i, j, eigensystem->length) = gsl_matrix_get(inversion_matrix, i, j);
     }
   }
 
@@ -109,8 +109,8 @@ double probability_at_time(const EIGENSYSTEM eigensystem, double timepoint, int 
 
   for (i = 0; i < eigensystem.length; ++i) {
     cumulative_probability +=
-      ROW_ORDER(eigensystem.vectors, target_index, i, eigensystem.length) *
-      ROW_ORDER(eigensystem.inverse_vectors, i, start_index, eigensystem.length) *
+      E_ROW_ORDER(eigensystem.vectors, target_index, i, eigensystem.length) *
+      E_ROW_ORDER(eigensystem.inverse_vectors, i, start_index, eigensystem.length) *
       exp(eigensystem.values[i] * timepoint);
   }
 
@@ -234,7 +234,7 @@ void print_matrix(char* title, double* matrix, int length) {
 
   for (i = 0; i < length; ++i) {
     for (j = 0; j < length; ++j) {
-      printf("%+.2e ", ROW_ORDER(matrix, i, j, length));
+      printf("%+.2e ", E_ROW_ORDER(matrix, i, j, length));
     }
 
     printf("\n");

@@ -32,5 +32,7 @@ typedef struct {
 
 #define SERIALIZING(params) (params.serialize == 1)
 #define DESERIALIZING(params) (params.serialize == -1)
+#define E_ROW_ORDER(m, i, j, n) ((m)[((i) * (n)) + (j)])
+#define E_COL_ORDER(m, i, j, n) ((m)[((j) * (n)) + (i)])
 
 #endif

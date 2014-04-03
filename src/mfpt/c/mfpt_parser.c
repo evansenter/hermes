@@ -37,7 +37,7 @@ TRANSITION_MATRIX transition_matrix_from_klp_matrix(KLP_MATRIX* klp_matrix, cons
   transition_matrix = init_transition_matrix(row_length + 1, MATRIX_TYPE(parameters));
 
   for (i = 0; i < klp_matrix->length; ++i) {
-    ROW_ORDER(transition_matrix, klp_matrix->k[i], klp_matrix->l[i]) = klp_matrix->p[i];
+    T_ROW_ORDER(transition_matrix, klp_matrix->k[i], klp_matrix->l[i]) = klp_matrix->p[i];
   }
 
   return transition_matrix;

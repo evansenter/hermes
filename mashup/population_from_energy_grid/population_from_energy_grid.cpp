@@ -7,7 +7,6 @@
 #include "shared/libspectral_header.h"
 
 KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA);
-void convert_klp_matrix_to_use_epsilon(KLP_MATRIX*, MFPT_PARAMS*, double);
 
 int main(int argc, char** argv) {
   PARAM_CONTAINER* params;
@@ -16,7 +15,7 @@ int main(int argc, char** argv) {
   KLP_MATRIX klp_matrix;
   MFPT_PARAMS mfpt_params;
   SPECTRAL_PARAMS spectral_params;
-  double* transition_matrix;
+  TRANSITION_MATRIX transition_matrix;
 
   char* subparams[] = { "fftbor2d", "mfpt", "spectral" };
   params            = split_args(argc, argv, subparams, 3);
@@ -25,12 +24,12 @@ int main(int argc, char** argv) {
   parse_fftbor2d_args(fftbor2d_params, params[0].argc, params[0].argv);
   fftbor2d_data = fftbor2d_from_params(fftbor2d_params);
 
-  mfpt_params                      = init_mfpt_params();
-  mfpt_params.input                = 0;
-  mfpt_params.rate_matrix          = 1;
-  mfpt_params.epsilon              = 1e-8;
-  mfpt_params.max_dist             = fftbor2d_data.row_length;
-  mfpt_params.bp_dist              = fftbor2d_data.bp_dist;
+  mfpt_params             = init_mfpt_params();
+  mfpt_params.input       = 0;
+  mfpt_params.rate_matrix = 1;
+  mfpt_params.epsilon     = 1e-8;
+  mfpt_params.max_dist    = fftbor2d_data.row_length;
+  mfpt_params.bp_dist     = fftbor2d_data.bp_dist;
 
   parse_mfpt_args(&mfpt_params, params[1].argc, params[1].argv);
 
@@ -44,7 +43,7 @@ int main(int argc, char** argv) {
 
   parse_spectral_args(&spectral_params, params[2].argc, params[2].argv);
 
-  population_proportion_from_row_ordered_transition_matrix(spectral_params, transition_matrix, klp_matrix.length);
+  population_proportion_from_row_ordered_transition_matrix(spectral_params, transition_matrix);
 
   return 0;
 }
