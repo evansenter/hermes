@@ -22,6 +22,7 @@ typedef struct {
 #define DIAG_MOVES_ONLY_FLAG 'X'
 #define FULLY_CONNECTED_FLAG 'F'
 #define RUN_TYPE(parameters, flag) (parameters.run_type == flag)
+#define MATRIX_TYPE(parameters) (parameters.rate_matrix ? 'R' : 'P')
 
 typedef struct {
   int* k;

@@ -99,7 +99,7 @@ double compute_mfpt(const TRANSITION_MATRIX transition_matrix, const MFPT_PARAMS
 
   // If start_index > end_index, we need to shift to the left by one because the end_index row / column is being removed.
   start_pointer    = parameters.start_state - (parameters.start_state > parameters.end_state ? 1 : 0);
-  inversion_matrix = init_transition_matrix(transition_matrix.row_length - 1, 'P');
+  inversion_matrix = init_transition_matrix(transition_matrix.row_length - 1, transition_matrix.type);
   mfpt             = calloc(inversion_matrix.row_length, sizeof(double));
 
   for (i = 0; i < transition_matrix.row_length; ++i) {
@@ -420,7 +420,7 @@ TRANSITION_MATRIX populate_transition_matrix_from_stationary_matrix(const KLP_MA
   double row_sum;
   TRANSITION_MATRIX transition_matrix;
 
-  transition_matrix = init_transition_matrix(klp_matrix.length, parameters.rate_matrix ? 'R' : 'P');
+  transition_matrix = init_transition_matrix(klp_matrix.length, MATRIX_TYPE(parameters));
 
   for (i = 0; i < transition_matrix.row_length; ++i) {
     row_sum = 0.;
