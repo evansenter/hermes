@@ -16,7 +16,7 @@ int dgels_(char* t, int* m, int* n, int* nrhs, double* a, int* lda, double* b, i
 #endif
 
 TRANSITION_MATRIX convert_klp_matrix_to_transition_matrix(KLP_MATRIX*, MFPT_PARAMS*);
-double compute_mfpt(KLP_MATRIX*, const MFPT_PARAMS, const TRANSITION_MATRIX);
+double compute_mfpt(const TRANSITION_MATRIX, const MFPT_PARAMS);
 TRANSITION_MATRIX inverse(TRANSITION_MATRIX);
 TRANSITION_MATRIX pseudoinverse(TRANSITION_MATRIX);
 int find_start_and_end_positions_in_klp_matrix(KLP_MATRIX*, MFPT_PARAMS*);

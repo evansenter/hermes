@@ -28,7 +28,6 @@ typedef struct {
   int* l;
   double* p;
   int length;
-  int row_length;
 } KLP_MATRIX;
 
 typedef struct {

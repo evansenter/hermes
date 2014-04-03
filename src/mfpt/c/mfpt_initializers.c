@@ -7,8 +7,7 @@ KLP_MATRIX init_klp_matrix(int length) {
     .k          = (int*)malloc(length * sizeof(int)),
     .l          = (int*)malloc(length * sizeof(int)),
     .p          = (double*)malloc(length * sizeof(double)),
-    .length     = length,
-    .row_length = length
+    .length     = length
   };
   return klp_matrix;
 }
@@ -19,7 +18,7 @@ void free_klp_matrix(KLP_MATRIX klp_matrix) {
   free(klp_matrix.p);
 }
 
-void print_klp_matrix(KLP_MATRIX klp_matrix) {
+void print_klp_matrix(const KLP_MATRIX klp_matrix) {
   int i;
   printf("\nk/l/p matrix (index, k, l, p):\n");
 
@@ -63,19 +62,19 @@ void free_transition_matrix(TRANSITION_MATRIX transition_matrix) {
   free(transition_matrix.matrix);
 }
 
-void print_transition_matrix(KLP_MATRIX klp_matrix, double* transition_matrix, MFPT_PARAMS parameters) {
+void print_transition_matrix(const KLP_MATRIX klp_matrix, const TRANSITION_MATRIX transition_matrix, const MFPT_PARAMS parameters) {
   int i, j;
   printf("Transition matrix:\n");
   printf("(from)\t(to)\tp(to | from)\n");
 
-  for (i = 0; i < klp_matrix.row_length; ++i) {
-    for (j = 0; j < klp_matrix.row_length; ++j) {
+  for (i = 0; i < klp_matrix.length; ++i) {
+    for (j = 0; j < klp_matrix.length; ++j) {
       if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG)) {
         printf(
           "%d\t=>\t%d\t%.8f\n",
           i,
           j,
-          ROW_ORDER(transition_matrix, i, j, klp_matrix.row_length)
+          ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length)
         );
       } else {
         printf(
@@ -84,7 +83,7 @@ void print_transition_matrix(KLP_MATRIX klp_matrix, double* transition_matrix, M
           klp_matrix.l[i],
           klp_matrix.k[j],
           klp_matrix.l[j],
-          ROW_ORDER(transition_matrix, i, j, klp_matrix.row_length)
+          ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length)
         );
       }
     }

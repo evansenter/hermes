@@ -75,7 +75,7 @@ TRANSITION_MATRIX convert_klp_matrix_to_transition_matrix(KLP_MATRIX* klp_matrix
   return populate_transition_matrix_from_stationary_matrix(*klp_matrix, *parameters, number_of_adjacent_moves, probability_function);
 }
 
-double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const TRANSITION_MATRIX transition_matrix) {
+double compute_mfpt(const TRANSITION_MATRIX transition_matrix, const MFPT_PARAMS parameters) {
   int i, j, x, y, start_pointer;
   double mfpt_from_start;
   TRANSITION_MATRIX inversion_matrix;
@@ -102,8 +102,8 @@ double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const 
   inversion_matrix = init_transition_matrix(transition_matrix.row_length - 1, 'P');
   mfpt             = calloc(inversion_matrix.row_length, sizeof(double));
 
-  for (i = 0; i < klp_matrix->row_length; ++i) {
-    for (j = 0; j < klp_matrix->row_length; ++j) {
+  for (i = 0; i < transition_matrix.row_length; ++i) {
+    for (j = 0; j < transition_matrix.row_length; ++j) {
       if (i != parameters.end_state && j != parameters.end_state) {
         x = (i > parameters.end_state ? i - 1 : i);
         y = (j > parameters.end_state ? j - 1 : j);
@@ -360,8 +360,7 @@ void extend_klp_matrix_to_all_possible_positions(KLP_MATRIX* klp_matrix, const M
     }
   }
 
-  klp_matrix->length     = valid_positions;
-  klp_matrix->row_length = valid_positions;
+  klp_matrix->length = valid_positions;
 }
 
 void populate_remaining_probabilities_in_klp_matrix(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters) {
@@ -421,12 +420,12 @@ TRANSITION_MATRIX populate_transition_matrix_from_stationary_matrix(const KLP_MA
   double row_sum;
   TRANSITION_MATRIX transition_matrix;
 
-  transition_matrix = init_transition_matrix(klp_matrix.row_length, parameters.rate_matrix ? 'R' : 'P');
+  transition_matrix = init_transition_matrix(klp_matrix.length, parameters.rate_matrix ? 'R' : 'P');
 
-  for (i = 0; i < klp_matrix.row_length; ++i) {
+  for (i = 0; i < transition_matrix.row_length; ++i) {
     row_sum = 0.;
 
-    for (j = 0; j < klp_matrix.row_length; ++j) {
+    for (j = 0; j < transition_matrix.row_length; ++j) {
       if (i != j) {
         if (RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) || (RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG) && ONE_BP_MOVE(i, j))) {
           if (NONZERO_TO_NONZERO_PROB(i, j)) {

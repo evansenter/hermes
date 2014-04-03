@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 #if SUPER_HEAVY_DEBUG
   print_transition_matrix(klp_matrix, transition_matrix, parameters);
 #endif
-  mfpt = compute_mfpt(&klp_matrix, parameters, transition_matrix);
+  mfpt = compute_mfpt(transition_matrix, parameters);
   printf("%+.8f\n", mfpt);
   free_transition_matrix(transition_matrix);
   free_klp_matrix(klp_matrix);

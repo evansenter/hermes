@@ -33,8 +33,8 @@ TRANSITION_MATRIX transition_matrix_from_klp_matrix(KLP_MATRIX* klp_matrix, cons
   }
 
   // The transition matrix is 0-ordered, so we looked for the highest k, l position above and then we add one for the row length.
-  klp_matrix->row_length = ++row_length;
-  transition_matrix = init_transition_matrix(klp_matrix->row_length, parameters.rate_matrix ? 'R' : 'P');
+  // i.e. if the largest value we saw was 10, then we have rows going from 0..10 so row_length == 10 + 1, or 11.
+  transition_matrix = init_transition_matrix(row_length + 1, parameters.rate_matrix ? 'R' : 'P');
 
   for (i = 0; i < klp_matrix->length; ++i) {
     ROW_ORDER(transition_matrix.matrix, klp_matrix->k[i], klp_matrix->l[i], transition_matrix.row_length) = klp_matrix->p[i];
