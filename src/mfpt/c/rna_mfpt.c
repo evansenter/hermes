@@ -8,9 +8,9 @@
 
 int main(int argc, char** argv) {
   double mfpt;
-  double* transition_matrix;
   MFPT_PARAMS parameters;
   KLP_MATRIX klp_matrix;
+  TRANSITION_MATRIX transition_matrix;
   parameters = init_mfpt_params();
   parse_mfpt_args(&parameters, argc, argv);
 
@@ -19,12 +19,11 @@ int main(int argc, char** argv) {
   print_klp_matrix(klp_matrix);
 #endif
 
-  // We already have a transition matrix, this is the easy case. Just need to find MFPT.
   if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG)) {
-    transition_matrix = transition_matrix_from_klp_matrix(&klp_matrix);
-
-    // We have an energy grid, this requires converting the energy grid into a transition matrix data structure before finding MFPT.
+    // We already have a transition matrix, this is the easy case. Just need to find MFPT.
+    transition_matrix = transition_matrix_from_klp_matrix(&klp_matrix, parameters);
   } else {
+    // We have an energy grid, this requires converting the energy grid into a transition matrix data structure before finding MFPT.
     transition_matrix = convert_klp_matrix_to_transition_matrix(&klp_matrix, &parameters);
   }
 

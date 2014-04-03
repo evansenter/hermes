@@ -22,9 +22,9 @@ KLP_MATRIX klp_matrix_from_file(const MFPT_PARAMS parameters) {
   return klp_matrix;
 }
 
-double* transition_matrix_from_klp_matrix(KLP_MATRIX* klp_matrix) {
+TRANSITION_MATRIX transition_matrix_from_klp_matrix(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters) {
   int i, row_length = 0;
-  double* transition_matrix;
+  TRANSITION_MATRIX transition_matrix;
 
   // We need to infer the dimensions of the transition matrix.
   for (i = 0; i < klp_matrix->length; ++i) {
@@ -34,10 +34,10 @@ double* transition_matrix_from_klp_matrix(KLP_MATRIX* klp_matrix) {
 
   // The transition matrix is 0-ordered, so we looked for the highest k, l position above and then we add one for the row length.
   klp_matrix->row_length = ++row_length;
-  transition_matrix = init_transition_matrix(klp_matrix->row_length);
+  transition_matrix = init_transition_matrix(klp_matrix->row_length, parameters.rate_matrix ? 'R' : 'P');
 
   for (i = 0; i < klp_matrix->length; ++i) {
-    ROW_ORDER(transition_matrix, klp_matrix->k[i], klp_matrix->l[i], klp_matrix->row_length) = klp_matrix->p[i];
+    ROW_ORDER(transition_matrix.matrix, klp_matrix->k[i], klp_matrix->l[i], transition_matrix.row_length) = klp_matrix->p[i];
   }
 
   return transition_matrix;

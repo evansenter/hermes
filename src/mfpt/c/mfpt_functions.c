@@ -9,7 +9,7 @@
 #define ONE_BP_MOVE(i, j) ((int)abs(klp_matrix.k[(i)] - klp_matrix.k[(j)]) == 1 && (int)abs(klp_matrix.l[(i)] - klp_matrix.l[(j)]) == 1)
 #define NONZERO_TO_NONZERO_PROB(i, j) (klp_matrix.p[(i)] > 0 && klp_matrix.p[(j)] > 0)
 
-double* convert_klp_matrix_to_transition_matrix(KLP_MATRIX* klp_matrix, MFPT_PARAMS* parameters) {
+TRANSITION_MATRIX convert_klp_matrix_to_transition_matrix(KLP_MATRIX* klp_matrix, MFPT_PARAMS* parameters) {
   int resolved;
   double* number_of_adjacent_moves;
   transition_probability probability_function = NULL;
@@ -75,9 +75,11 @@ double* convert_klp_matrix_to_transition_matrix(KLP_MATRIX* klp_matrix, MFPT_PAR
   return populate_transition_matrix_from_stationary_matrix(*klp_matrix, *parameters, number_of_adjacent_moves, probability_function);
 }
 
-double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const double* transition_matrix) {
-  int i, j, x, y, start_pointer, inversion_matrix_row_length = klp_matrix->row_length - 1;
+double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const TRANSITION_MATRIX transition_matrix) {
+  int i, j, x, y, start_pointer;
   double mfpt_from_start;
+  TRANSITION_MATRIX inversion_matrix;
+  double* mfpt;
 
   if (parameters.start_state < 0 || parameters.end_state < 0) {
     if (parameters.start_state < 0) {
@@ -96,10 +98,9 @@ double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const 
   }
 
   // If start_index > end_index, we need to shift to the left by one because the end_index row / column is being removed.
-  start_pointer = parameters.start_state - (parameters.start_state > parameters.end_state ? 1 : 0);
-
-  double* mfpt             = calloc(inversion_matrix_row_length, sizeof(double));
-  double* inversion_matrix = malloc((int)pow((double)inversion_matrix_row_length, 2.) * sizeof(double));
+  start_pointer    = parameters.start_state - (parameters.start_state > parameters.end_state ? 1 : 0);
+  inversion_matrix = init_transition_matrix(transition_matrix.row_length - 1, 'P');
+  mfpt             = calloc(inversion_matrix.row_length, sizeof(double));
 
   for (i = 0; i < klp_matrix->row_length; ++i) {
     for (j = 0; j < klp_matrix->row_length; ++j) {
@@ -107,17 +108,17 @@ double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const 
         x = (i > parameters.end_state ? i - 1 : i);
         y = (j > parameters.end_state ? j - 1 : j);
         // Be VERY careful changing anything here. We throw out anything at base pair distance 0 (end_index) from the second structure (the target of the MFPT calculation) and maximally distant from the first structure. Because of this, there's a chunk of indices that need to get shifted to the left by one, to keep the array tight (this is what x, y are doing). Hence, x and y are used for indexing into inversion_matrix and i, j are used for indexing into transition_matrix.
-        inversion_matrix[x * inversion_matrix_row_length + y] = \
-            (i == j ? 1 - ROW_ORDER(transition_matrix, i, j, klp_matrix->row_length) : -ROW_ORDER(transition_matrix, i, j, klp_matrix->row_length));
+        ROW_ORDER(inversion_matrix.matrix, x, y, inversion_matrix.row_length) = \
+            (i == j ? 1 - ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length) : -ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length));
       }
     }
   }
 
-  inversion_matrix = parameters.pseudoinverse ? pseudoinverse(inversion_matrix, inversion_matrix_row_length) : inverse(inversion_matrix, inversion_matrix_row_length);
+  inversion_matrix = parameters.pseudoinverse ? pseudoinverse(inversion_matrix) : inverse(inversion_matrix);
 
-  for (i = 0; i < inversion_matrix_row_length; ++i) {
-    for (j = 0; j < inversion_matrix_row_length; ++j) {
-      mfpt[i] += inversion_matrix[i * inversion_matrix_row_length + j];
+  for (i = 0; i < inversion_matrix.row_length; ++i) {
+    for (j = 0; j < inversion_matrix.row_length; ++j) {
+      mfpt[i] += ROW_ORDER(inversion_matrix.matrix, i, j, inversion_matrix.row_length);
     }
 
     if (parameters.all_mfpt) {
@@ -127,13 +128,20 @@ double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const 
   }
 
   mfpt_from_start = mfpt[start_pointer];
+
   free(mfpt);
-  free(inversion_matrix);
+  free_transition_matrix(inversion_matrix);
   return mfpt_from_start;
 }
 
-double* inverse(double* a, int size) {
+TRANSITION_MATRIX inverse(TRANSITION_MATRIX matrix_to_invert) {
   // http://stackoverflow.com/questions/3519959/computing-the-inverse-of-a-matrix-using-lapack-in-c
+  double* a = matrix_to_invert.matrix;
+  int size  = matrix_to_invert.row_length;
+
+  // -----------------------------------------------------
+  // Begin LAPACK calls
+  // -----------------------------------------------------
   int* ipiv    = malloc((size + 1) * sizeof(int));
   int lwork    = size * size;
   double* work = malloc(lwork * sizeof(double));
@@ -148,11 +156,21 @@ double* inverse(double* a, int size) {
 #endif
   free(ipiv);
   free(work);
-  return a;
+  // -----------------------------------------------------
+  // End LAPACK calls
+  // -----------------------------------------------------
+
+  return matrix_to_invert;
 }
 
-double* pseudoinverse(double* a, int size) {
+TRANSITION_MATRIX pseudoinverse(TRANSITION_MATRIX matrix_to_invert) {
   // Least-squares fit solution to B - Ax, where (in this case) A is square and B is the identity matrix.
+  double* a = matrix_to_invert.matrix;
+  int size  = matrix_to_invert.row_length;
+
+  // -----------------------------------------------------
+  // Begin LAPACK calls
+  // -----------------------------------------------------
   char trans;
   int i, m, n, nrhs, lda, ldb, lwork, info;
   trans = 'N';
@@ -184,7 +202,19 @@ double* pseudoinverse(double* a, int size) {
   printf("info:\t%d\n", info);
 #endif
   free(work);
-  return (b);
+  // -----------------------------------------------------
+  // End LAPACK calls.
+  // -----------------------------------------------------
+
+  TRANSITION_MATRIX inverted_matrix = {
+    .matrix     = b,
+    .row_length = matrix_to_invert.row_length,
+    .type       = matrix_to_invert.type
+  };
+
+  free_transition_matrix(matrix_to_invert);
+
+  return inverted_matrix;
 }
 
 int find_start_and_end_positions_in_klp_matrix(KLP_MATRIX* klp_matrix, MFPT_PARAMS* parameters) {
@@ -386,12 +416,12 @@ int number_of_permissible_single_bp_moves(const KLP_MATRIX klp_matrix, int i) {
   return num_moves;
 }
 
-double* populate_transition_matrix_from_stationary_matrix(const KLP_MATRIX klp_matrix, const MFPT_PARAMS parameters, const double* number_of_adjacent_moves, transition_probability probability_function) {
+TRANSITION_MATRIX populate_transition_matrix_from_stationary_matrix(const KLP_MATRIX klp_matrix, const MFPT_PARAMS parameters, const double* number_of_adjacent_moves, transition_probability probability_function) {
   int i, j;
   double row_sum;
-  double* transition_matrix;
+  TRANSITION_MATRIX transition_matrix;
 
-  transition_matrix = init_transition_matrix(klp_matrix.row_length);
+  transition_matrix = init_transition_matrix(klp_matrix.row_length, parameters.rate_matrix ? 'R' : 'P');
 
   for (i = 0; i < klp_matrix.row_length; ++i) {
     row_sum = 0.;
@@ -400,16 +430,16 @@ double* populate_transition_matrix_from_stationary_matrix(const KLP_MATRIX klp_m
       if (i != j) {
         if (RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) || (RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG) && ONE_BP_MOVE(i, j))) {
           if (NONZERO_TO_NONZERO_PROB(i, j)) {
-            ROW_ORDER(transition_matrix, i, j, klp_matrix.row_length) = \
+            ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length) = \
                 probability_function(klp_matrix, number_of_adjacent_moves, i, j, parameters.rate_matrix);
           }
         }
 
-        row_sum += ROW_ORDER(transition_matrix, i, j, klp_matrix.row_length);
+        row_sum += ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length);
       }
     }
 
-    ROW_ORDER(transition_matrix, i, i, klp_matrix.row_length) = parameters.rate_matrix ? -row_sum : 1 - row_sum;
+    ROW_ORDER(transition_matrix.matrix, i, i, transition_matrix.row_length) = parameters.rate_matrix ? -row_sum : 1 - row_sum;
   }
 
   return transition_matrix;

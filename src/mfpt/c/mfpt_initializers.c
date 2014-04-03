@@ -30,17 +30,28 @@ void print_klp_matrix(KLP_MATRIX klp_matrix) {
   printf("\n");
 }
 
-double* init_transition_matrix(int length) {
-  return calloc(length * length, sizeof(double));;
+TRANSITION_MATRIX init_transition_matrix(int length, char type) {
+  if (!(type == 'P' || type == 'R')) {
+    fprintf(stderr, "Error: init_transition_matrix type was %c, must be one of (P)robability, (R)ate.\n", type);
+    abort();
+  }
+
+  TRANSITION_MATRIX transition_matrix = {
+    .matrix     = calloc(length * length, sizeof(double)),
+    .row_length = length,
+    .type       = type
+  };
+
+  return transition_matrix;
 }
 
-double* transpose_matrix(double* matrix, int length) {
+TRANSITION_MATRIX transpose_matrix(TRANSITION_MATRIX matrix) {
   int i, j;
-  double* transposed_matrix = init_transition_matrix(length);
+  TRANSITION_MATRIX transposed_matrix = init_transition_matrix(matrix.row_length, matrix.type);
 
-  for (i = 0; i < length; ++i) {
-    for (j = 0; j < length; ++j) {
-      COL_ORDER(transposed_matrix, i, j, length) = ROW_ORDER(matrix, i, j, length);
+  for (i = 0; i < matrix.row_length; ++i) {
+    for (j = 0; j < matrix.row_length; ++j) {
+      COL_ORDER(transposed_matrix.matrix, i, j, transposed_matrix.row_length) = ROW_ORDER(matrix.matrix, i, j, matrix.row_length);
     }
   }
 
@@ -48,8 +59,8 @@ double* transpose_matrix(double* matrix, int length) {
   return transposed_matrix;
 }
 
-void free_transition_matrix(double* transition_matrix) {
-  free(transition_matrix);
+void free_transition_matrix(TRANSITION_MATRIX transition_matrix) {
+  free(transition_matrix.matrix);
 }
 
 void print_transition_matrix(KLP_MATRIX klp_matrix, double* transition_matrix, MFPT_PARAMS parameters) {
