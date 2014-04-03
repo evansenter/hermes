@@ -27,11 +27,11 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 	CCFLAGS += -fdiagnostics-color=always
 endif
 
-RNAmfpt.out: $(CODE)/rna_mfpt.o $(CODE)/mfpt_params.o $(CODE)/mfpt_energy_grid.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_initializers.o
-	$(CC) $(CODE)/rna_mfpt.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_params.o $(CODE)/mfpt_energy_grid.o $(CODE)/mfpt_initializers.o $(LDFLAGS) RNAmfpt.out
-	ar cr $(LIB)/libmfpt.a $(CODE)/mfpt_energy_grid.o $(CODE)/mfpt_params.o $(CODE)/mfpt_initializers.o
+RNAmfpt.out: $(CODE)/rna_mfpt.o $(CODE)/mfpt_params.o $(CODE)/mfpt_functions.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_initializers.o
+	$(CC) $(CODE)/rna_mfpt.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_params.o $(CODE)/mfpt_functions.o $(CODE)/mfpt_initializers.o $(LDFLAGS) RNAmfpt.out
+	ar cr $(LIB)/libmfpt.a $(CODE)/mfpt_functions.o $(CODE)/mfpt_params.o $(CODE)/mfpt_initializers.o
 	
-$(CODE)/rna_mfpt.o: $(CODE)/rna_mfpt.c $(HEADER)/parser.h $(HEADER)/energy_grid.h $(HEADER)/constants.h $(HEADER)/params.h $(HEADER)/initializers.h
+$(CODE)/rna_mfpt.o: $(CODE)/rna_mfpt.c $(HEADER)/parser.h $(HEADER)/functions.h $(HEADER)/constants.h $(HEADER)/params.h $(HEADER)/initializers.h
 	$(CC) $(CCFLAGS) $(CODE)/rna_mfpt.c -o $(CODE)/rna_mfpt.o
 
 $(CODE)/mfpt_initializers.o: $(CODE)/mfpt_initializers.c $(HEADER)/initializers.h
@@ -43,8 +43,8 @@ $(CODE)/mfpt_parser.o: $(CODE)/mfpt_parser.c $(HEADER)/parser.h
 $(CODE)/mfpt_params.o: $(CODE)/mfpt_params.c $(HEADER)/params.h
 	$(CC) $(CCFLAGS) $(CODE)/mfpt_params.c -o $(CODE)/mfpt_params.o
 	
-$(CODE)/mfpt_energy_grid.o: $(CODE)/mfpt_energy_grid.c $(HEADER)/energy_grid.h $(HEADER)/constants.h $(HEADER)/params.h $(HEADER)/initializers.h
-	$(CC) $(CCFLAGS) $(CODE)/mfpt_energy_grid.c -o $(CODE)/mfpt_energy_grid.o
+$(CODE)/mfpt_functions.o: $(CODE)/mfpt_functions.c $(HEADER)/functions.h $(HEADER)/constants.h $(HEADER)/params.h $(HEADER)/initializers.h
+	$(CC) $(CCFLAGS) $(CODE)/mfpt_functions.c -o $(CODE)/mfpt_functions.o
 
 clean:
 	rm -f $(CODE)/*.o $(LIB)/libmfpt.a RNAmfpt.out

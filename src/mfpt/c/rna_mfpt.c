@@ -3,7 +3,7 @@
 #include "params.h"
 #include "parser.h"
 #include "initializers.h"
-#include "energy_grid.h"
+#include "functions.h"
 #include "constants.h"
 
 int main(int argc, char** argv) {

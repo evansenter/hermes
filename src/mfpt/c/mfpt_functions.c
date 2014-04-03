@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include "constants.h"
 #include "initializers.h"
-#include "energy_grid.h"
+#include "functions.h"
 
 #define ONE_BP_MOVE(i, j) ((int)abs(klp_matrix.k[(i)] - klp_matrix.k[(j)]) == 1 && (int)abs(klp_matrix.l[(i)] - klp_matrix.l[(j)]) == 1)
 #define NONZERO_TO_NONZERO_PROB(i, j) (klp_matrix.p[(i)] > 0 && klp_matrix.p[(j)] > 0)
@@ -75,7 +75,7 @@ double* convert_klp_matrix_to_transition_matrix(KLP_MATRIX* klp_matrix, MFPT_PAR
   return populate_transition_matrix_from_stationary_matrix(*klp_matrix, *parameters, number_of_adjacent_moves, probability_function);
 }
 
-double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const double* transition_probabilities) {
+double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const double* transition_matrix) {
   int i, j, x, y, start_pointer, inversion_matrix_row_length = klp_matrix->row_length - 1;
   double mfpt_from_start;
 
@@ -106,9 +106,9 @@ double compute_mfpt(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters, const 
       if (i != parameters.end_state && j != parameters.end_state) {
         x = (i > parameters.end_state ? i - 1 : i);
         y = (j > parameters.end_state ? j - 1 : j);
-        // Be VERY careful changing anything here. We throw out anything at base pair distance 0 (end_index) from the second structure (the target of the MFPT calculation) and maximally distant from the first structure. Because of this, there's a chunk of indices that need to get shifted to the left by one, to keep the array tight (this is what x, y are doing). Hence, x and y are used for indexing into inversion_matrix and i, j are used for indexing into transition_probabilities.
+        // Be VERY careful changing anything here. We throw out anything at base pair distance 0 (end_index) from the second structure (the target of the MFPT calculation) and maximally distant from the first structure. Because of this, there's a chunk of indices that need to get shifted to the left by one, to keep the array tight (this is what x, y are doing). Hence, x and y are used for indexing into inversion_matrix and i, j are used for indexing into transition_matrix.
         inversion_matrix[x * inversion_matrix_row_length + y] = \
-            (i == j ? 1 - ROW_ORDER(transition_probabilities, i, j, klp_matrix->row_length) : -ROW_ORDER(transition_probabilities, i, j, klp_matrix->row_length));
+            (i == j ? 1 - ROW_ORDER(transition_matrix, i, j, klp_matrix->row_length) : -ROW_ORDER(transition_matrix, i, j, klp_matrix->row_length));
       }
     }
   }
