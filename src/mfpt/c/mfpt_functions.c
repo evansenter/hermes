@@ -108,8 +108,8 @@ double compute_mfpt(const TRANSITION_MATRIX transition_matrix, const MFPT_PARAMS
         x = (i > parameters.end_state ? i - 1 : i);
         y = (j > parameters.end_state ? j - 1 : j);
         // Be VERY careful changing anything here. We throw out anything at base pair distance 0 (end_index) from the second structure (the target of the MFPT calculation) and maximally distant from the first structure. Because of this, there's a chunk of indices that need to get shifted to the left by one, to keep the array tight (this is what x, y are doing). Hence, x and y are used for indexing into inversion_matrix and i, j are used for indexing into transition_matrix.
-        ROW_ORDER(inversion_matrix.matrix, x, y, inversion_matrix.row_length) = \
-            (i == j ? 1 - ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length) : -ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length));
+        ROW_ORDER(inversion_matrix, x, y) = \
+            (i == j ? 1 - ROW_ORDER(transition_matrix, i, j) : -ROW_ORDER(transition_matrix, i, j));
       }
     }
   }
@@ -118,7 +118,7 @@ double compute_mfpt(const TRANSITION_MATRIX transition_matrix, const MFPT_PARAMS
 
   for (i = 0; i < inversion_matrix.row_length; ++i) {
     for (j = 0; j < inversion_matrix.row_length; ++j) {
-      mfpt[i] += ROW_ORDER(inversion_matrix.matrix, i, j, inversion_matrix.row_length);
+      mfpt[i] += ROW_ORDER(inversion_matrix, i, j);
     }
 
     if (parameters.all_mfpt) {
@@ -429,16 +429,16 @@ TRANSITION_MATRIX populate_transition_matrix_from_stationary_matrix(const KLP_MA
       if (i != j) {
         if (RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) || (RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG) && ONE_BP_MOVE(i, j))) {
           if (NONZERO_TO_NONZERO_PROB(i, j)) {
-            ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length) = \
+            ROW_ORDER(transition_matrix, i, j) = \
                 probability_function(klp_matrix, number_of_adjacent_moves, i, j, parameters.rate_matrix);
           }
         }
 
-        row_sum += ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length);
+        row_sum += ROW_ORDER(transition_matrix, i, j);
       }
     }
 
-    ROW_ORDER(transition_matrix.matrix, i, i, transition_matrix.row_length) = parameters.rate_matrix ? -row_sum : 1 - row_sum;
+    ROW_ORDER(transition_matrix, i, i) = parameters.rate_matrix ? -row_sum : 1 - row_sum;
   }
 
   return transition_matrix;

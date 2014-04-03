@@ -50,7 +50,7 @@ TRANSITION_MATRIX transpose_matrix(TRANSITION_MATRIX matrix) {
 
   for (i = 0; i < matrix.row_length; ++i) {
     for (j = 0; j < matrix.row_length; ++j) {
-      COL_ORDER(transposed_matrix.matrix, i, j, transposed_matrix.row_length) = ROW_ORDER(matrix.matrix, i, j, matrix.row_length);
+      COL_ORDER(transposed_matrix, i, j) = ROW_ORDER(matrix, i, j);
     }
   }
 
@@ -74,7 +74,7 @@ void print_transition_matrix(const KLP_MATRIX klp_matrix, const TRANSITION_MATRI
           "%d\t=>\t%d\t%.8f\n",
           i,
           j,
-          ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length)
+          ROW_ORDER(transition_matrix, i, j)
         );
       } else {
         printf(
@@ -83,7 +83,7 @@ void print_transition_matrix(const KLP_MATRIX klp_matrix, const TRANSITION_MATRI
           klp_matrix.l[i],
           klp_matrix.k[j],
           klp_matrix.l[j],
-          ROW_ORDER(transition_matrix.matrix, i, j, transition_matrix.row_length)
+          ROW_ORDER(transition_matrix, i, j)
         );
       }
     }
