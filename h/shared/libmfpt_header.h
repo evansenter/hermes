@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "mfpt/params.h"
+#include "mfpt/parser.h"
 #include "mfpt/initializers.h"
 #include "mfpt/functions.h"
 

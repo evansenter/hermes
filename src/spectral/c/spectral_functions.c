@@ -4,8 +4,8 @@
 #include <math.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_eigen.h>
-#include <tpl.h>
 #include "shared/libmfpt_header.h"
+#include "shared/libtpl_header.h"
 #include "constants.h"
 #include "initializers.h"
 #include "functions.h"

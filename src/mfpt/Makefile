@@ -29,8 +29,8 @@ endif
 
 RNAmfpt.out: $(CODE)/rna_mfpt.o $(CODE)/mfpt_params.o $(CODE)/mfpt_functions.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_initializers.o
 	$(CC) $(CODE)/rna_mfpt.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_params.o $(CODE)/mfpt_functions.o $(CODE)/mfpt_initializers.o $(LDFLAGS) RNAmfpt.out
-	ar cr $(LIB)/libmfpt.a $(CODE)/mfpt_functions.o $(CODE)/mfpt_params.o $(CODE)/mfpt_initializers.o
-	
+	ar cr $(LIB)/libmfpt.a $(CODE)/mfpt_functions.o $(CODE)/mfpt_params.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_initializers.o
+
 $(CODE)/rna_mfpt.o: $(CODE)/rna_mfpt.c $(HEADER)/parser.h $(HEADER)/functions.h $(HEADER)/constants.h $(HEADER)/params.h $(HEADER)/initializers.h
 	$(CC) $(CCFLAGS) $(CODE)/rna_mfpt.c -o $(CODE)/rna_mfpt.o
 
@@ -39,10 +39,10 @@ $(CODE)/mfpt_initializers.o: $(CODE)/mfpt_initializers.c $(HEADER)/initializers.
 
 $(CODE)/mfpt_parser.o: $(CODE)/mfpt_parser.c $(HEADER)/parser.h
 	$(CC) $(CCFLAGS) $(CODE)/mfpt_parser.c -o $(CODE)/mfpt_parser.o
-	
+
 $(CODE)/mfpt_params.o: $(CODE)/mfpt_params.c $(HEADER)/params.h
 	$(CC) $(CCFLAGS) $(CODE)/mfpt_params.c -o $(CODE)/mfpt_params.o
-	
+
 $(CODE)/mfpt_functions.o: $(CODE)/mfpt_functions.c $(HEADER)/functions.h $(HEADER)/constants.h $(HEADER)/params.h $(HEADER)/initializers.h
 	$(CC) $(CCFLAGS) $(CODE)/mfpt_functions.c -o $(CODE)/mfpt_functions.o
 
@@ -52,4 +52,3 @@ clean:
 install: RNAmfpt.out
 	cp RNAmfpt $(BINDIR)/RNAmfpt
 	cp $(LIB)/libmfpt.a $(LIBDIR)
-	
