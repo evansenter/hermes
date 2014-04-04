@@ -5,6 +5,7 @@
 #include "shared/libfftbor2d_header.h"
 #include "shared/libmfpt_header.h"
 #include "shared/libspectral_header.h"
+#include "shared/libtpl_header.h"
 
 KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA);
 
