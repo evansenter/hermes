@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include "shared/libtpl_header.h"
 #include "spectral/params.h"
 #include "spectral/initializers.h"
 #include "spectral/functions.h"
