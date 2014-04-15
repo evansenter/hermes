@@ -37,6 +37,7 @@ void equilibrium_from_row_ordered_transition_matrix(const SPECTRAL_PARAMS parame
 }
 
 TRANSITION_MATRIX convert_structures_to_transition_matrix(const SOLUTION* all_structures, int num_structures) {
+  // This code to convert the list of structures to a transition matrix does not ensure that there are only single b.p. moves.
   int i, j;
   double col_sum;
   TRANSITION_MATRIX transition_matrix = init_transition_matrix(num_structures, 'R');
