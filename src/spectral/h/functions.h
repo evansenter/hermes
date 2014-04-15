@@ -15,6 +15,7 @@ void find_key_structure_indices_in_structure_list(SPECTRAL_PARAMS*, const SOLUTI
 void serialize_eigensystem(const EIGENSYSTEM, const SPECTRAL_PARAMS);
 EIGENSYSTEM deserialize_eigensystem(const SPECTRAL_PARAMS);
 long double estimate_equilibrium(const EIGENSYSTEM, const SPECTRAL_PARAMS);
+int estimate_starting_index_to_scan_for_equilibrium(int, const EIGENSYSTEM, const SPECTRAL_PARAMS);
 void print_equilibrium(const EIGENSYSTEM, const SPECTRAL_PARAMS);
 void print_population_proportion(const EIGENSYSTEM, const SPECTRAL_PARAMS);
 void print_array(char*, double*, int);

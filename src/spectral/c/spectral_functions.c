@@ -221,54 +221,11 @@ EIGENSYSTEM deserialize_eigensystem(const SPECTRAL_PARAMS parameters) {
 }
 
 long double estimate_equilibrium(const EIGENSYSTEM eigensystem, const SPECTRAL_PARAMS parameters) {
-  int i, j, num_points, equilibrium_count = 0, starting_index = 0;
-  double str_1_start, str_1_current, str_1_end, str_2_start, str_2_current, str_2_end, current_proportion, future_proportion, epsilon = parameters.equilibrium;
+  int i, j, starting_index, num_points, equilibrium_count = 0;
+  double current_proportion, future_proportion, epsilon = parameters.equilibrium;
 
-  num_points  = (int)((parameters.end_time - parameters.start_time) / parameters.step_size);
-
-  str_1_start = probability_at_time(eigensystem, pow(10, parameters.start_time), parameters.start_index, parameters.start_index);
-  str_1_end   = probability_at_time(eigensystem, pow(10, parameters.end_time),   parameters.start_index, parameters.start_index);
-
-  str_2_start = probability_at_time(eigensystem, pow(10, parameters.start_time), parameters.start_index, parameters.end_index);
-  str_2_end   = probability_at_time(eigensystem, pow(10, parameters.end_time),   parameters.start_index, parameters.end_index);
-
-#ifdef HEAVY_DEBUG
-  printf("epsilon:\t%e\n", epsilon);
-  printf("str_1_start:\t%f\n", str_1_start);
-  printf("str_1_end:\t%f\n", str_1_end);
-  printf("str_2_start:\t%f\n", str_2_start);
-  printf("str_2_end:\t%f\n", str_2_end);
-#endif
-
-  if (fabs(str_1_start - str_1_end) > epsilon || fabs(str_2_start - str_2_end) > epsilon) {
-    i = 0;
-
-    do {
-      str_1_current = probability_at_time(
-        eigensystem,
-        pow(10, parameters.start_time + parameters.step_size * i),
-        parameters.start_index,
-        parameters.start_index
-      );
-
-      str_2_current = probability_at_time(
-        eigensystem,
-        pow(10, parameters.start_time + parameters.step_size * i),
-        parameters.start_index,
-        parameters.end_index
-      );
-
-#ifdef INSANE_DEBUG
-      printf("%d\t%f\t%f\n", i, fabs(str_1_current - str_1_end), fabs(str_2_current - str_2_end));
-#endif
-
-      starting_index = i++;
-    } while (i < num_points - WINDOW_SIZE && (fabs(str_1_current - str_1_end) > epsilon || fabs(str_2_current - str_2_end) > epsilon));
-  }
-
-#ifdef HEAVY_DEBUG
-  printf("starting_index:\t%d\n", starting_index);
-#endif
+  num_points     = (int)((parameters.end_time - parameters.start_time) / parameters.step_size);
+  starting_index = estimate_starting_index_to_scan_for_equilibrium(num_points, eigensystem, parameters);
 
   for (i = starting_index; i < num_points - WINDOW_SIZE + 1 && equilibrium_count < eigensystem.length; ++i) {
     equilibrium_count = 0;
@@ -298,11 +255,65 @@ long double estimate_equilibrium(const EIGENSYSTEM eigensystem, const SPECTRAL_P
     }
   }
 
+#ifdef DEBUG
+  printf("eq_index:\t%d\n", i);
+#endif
+
   if (i == num_points - WINDOW_SIZE + 1) {
     return -1;
   } else {
     return pow(10, parameters.start_time + parameters.step_size * i);
   }
+}
+
+int estimate_starting_index_to_scan_for_equilibrium(int num_points, const EIGENSYSTEM eigensystem, const SPECTRAL_PARAMS parameters) {
+  int i = 0, starting_index = 0;
+  double str_1_start, str_1_current, str_1_end, str_2_start, str_2_current, str_2_end, epsilon = parameters.equilibrium;
+
+  str_1_start = probability_at_time(eigensystem, pow(10, parameters.start_time), parameters.start_index, parameters.start_index);
+  str_1_end   = probability_at_time(eigensystem, pow(10, parameters.end_time),   parameters.start_index, parameters.start_index);
+
+  str_2_start = probability_at_time(eigensystem, pow(10, parameters.start_time), parameters.start_index, parameters.end_index);
+  str_2_end   = probability_at_time(eigensystem, pow(10, parameters.end_time),   parameters.start_index, parameters.end_index);
+
+#ifdef DEBUG
+  printf("epsilon:\t%.2e\n", epsilon);
+  printf("str_1_start:\t%f\n", str_1_start);
+  printf("str_1_end:\t%f\n", str_1_end);
+  printf("str_2_start:\t%f\n", str_2_start);
+  printf("str_2_end:\t%f\n", str_2_end);
+#endif
+
+  if (fabs(str_1_start - str_1_end) > epsilon || fabs(str_2_start - str_2_end) > epsilon) {
+    do {
+      str_1_current = probability_at_time(
+        eigensystem,
+        pow(10, parameters.start_time + parameters.step_size * i),
+        parameters.start_index,
+        parameters.start_index
+      );
+
+      str_2_current = probability_at_time(
+        eigensystem,
+        pow(10, parameters.start_time + parameters.step_size * i),
+        parameters.start_index,
+        parameters.end_index
+      );
+
+#ifdef INSANE_DEBUG
+      printf("%d\t%f\t%f\n", i, fabs(str_1_current - str_1_end), fabs(str_2_current - str_2_end));
+#endif
+
+      starting_index = i++;
+    } while (i < num_points - WINDOW_SIZE && (fabs(str_1_current - str_1_end) > epsilon || fabs(str_2_current - str_2_end) > epsilon));
+  }
+
+#ifdef DEBUG
+  printf("starting_index:\t%d\n", starting_index);
+  printf("num_points:\t%d\n", num_points);
+#endif
+
+  return starting_index;
 }
 
 void print_equilibrium(const EIGENSYSTEM eigensystem, const SPECTRAL_PARAMS parameters) {
