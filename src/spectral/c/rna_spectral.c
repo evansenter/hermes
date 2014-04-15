@@ -141,6 +141,13 @@ int main(int argc, char** argv) {
   if (parameters.eigen_only) {
     print_eigenvalues(eigensystem);
     exit(0);
+  } else if (parameters.equilibrium) {
+    printf("%Le\n", estimate_equilibrium(eigensystem, parameters));
+
+    if (parameters.benchmark) {
+      gettimeofday(&stop, NULL);
+      TIMING(start, stop, "estimate_equilibrium")
+    }
   } else if (SERIALIZING(parameters)) {
     serialize_eigensystem(eigensystem, parameters);
 

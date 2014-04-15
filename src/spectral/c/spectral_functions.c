@@ -203,6 +203,91 @@ EIGENSYSTEM deserialize_eigensystem(const SPECTRAL_PARAMS parameters) {
   return eigensystem;
 }
 
+long double estimate_equilibrium(const EIGENSYSTEM eigensystem, const SPECTRAL_PARAMS parameters) {
+  int i, j, num_points, equilibrium_count = 0, starting_index = 0;
+  double str_1_start, str_1_current, str_1_end, str_2_start, str_2_current, str_2_end, current_proportion, future_proportion, epsilon = parameters.equilibrium;
+
+  num_points  = (int)((parameters.end_time - parameters.start_time) / parameters.step_size);
+
+  str_1_start = probability_at_time(eigensystem, pow(10, parameters.start_time), parameters.start_index, parameters.start_index);
+  str_1_end   = probability_at_time(eigensystem, pow(10, parameters.end_time),   parameters.start_index, parameters.start_index);
+
+  str_2_start = probability_at_time(eigensystem, pow(10, parameters.start_time), parameters.start_index, parameters.end_index);
+  str_2_end   = probability_at_time(eigensystem, pow(10, parameters.end_time),   parameters.start_index, parameters.end_index);
+
+#ifdef HEAVY_DEBUG
+  printf("epsilon:\t%e\n", epsilon);
+  printf("str_1_start:\t%f\n", str_1_start);
+  printf("str_1_end:\t%f\n", str_1_end);
+  printf("str_2_start:\t%f\n", str_2_start);
+  printf("str_2_end:\t%f\n", str_2_end);
+#endif
+
+  if (fabs(str_1_start - str_1_end) > epsilon || fabs(str_2_start - str_2_end) > epsilon) {
+    i = 0;
+
+    do {
+      str_1_current = probability_at_time(
+        eigensystem,
+        pow(10, parameters.start_time + parameters.step_size * i),
+        parameters.start_index,
+        parameters.start_index
+      );
+
+      str_2_current = probability_at_time(
+        eigensystem,
+        pow(10, parameters.start_time + parameters.step_size * i),
+        parameters.start_index,
+        parameters.end_index
+      );
+
+#ifdef INSANE_DEBUG
+      printf("%d\t%f\t%f\n", i, fabs(str_1_current - str_1_end), fabs(str_2_current - str_2_end));
+#endif
+
+      starting_index = i++;
+    } while (i < num_points - WINDOW_SIZE && (fabs(str_1_current - str_1_end) > epsilon || fabs(str_2_current - str_2_end) > epsilon));
+  }
+
+#ifdef HEAVY_DEBUG
+  printf("starting_index:\t%d\n", starting_index);
+#endif
+
+  for (i = starting_index; i < num_points - WINDOW_SIZE + 1 && equilibrium_count < eigensystem.length; ++i) {
+    equilibrium_count = 0;
+
+    for (j = 0; j < eigensystem.length; ++j) {
+      current_proportion = probability_at_time(
+        eigensystem,
+        pow(10, parameters.start_time + parameters.step_size * i),
+        parameters.start_index,
+        j
+      );
+
+      future_proportion = probability_at_time(
+        eigensystem,
+        pow(10, parameters.start_time + parameters.step_size * (i + WINDOW_SIZE - 1)),
+        parameters.start_index,
+        j
+      );
+
+#ifdef INSANE_DEBUG
+      printf("%d\t%d\t%f\t%f\t%e\n", i, j, current_proportion, future_proportion, fabs(current_proportion - future_proportion));
+#endif
+
+      if (fabs(current_proportion - future_proportion) < epsilon) {
+        equilibrium_count++;
+      }
+    }
+  }
+
+  if (i == num_points - WINDOW_SIZE + 1) {
+    return -1;
+  } else {
+    return pow(10, parameters.start_time + parameters.step_size * i);
+  }
+}
+
 void print_population_proportion(const SPECTRAL_PARAMS parameters, const EIGENSYSTEM eigensystem) {
   double step_counter;
 

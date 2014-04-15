@@ -16,6 +16,7 @@ typedef struct {
   double start_time;
   double end_time;
   double step_size;
+  double equilibrium;
   short lonely_bp;
   double energy_cap;
   short eigen_only;
