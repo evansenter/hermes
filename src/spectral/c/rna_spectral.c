@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
     print_eigenvalues(eigensystem);
     exit(0);
   } else if (parameters.equilibrium) {
-    printf("%Le\n", estimate_equilibrium(eigensystem, parameters));
+    print_equilibrium(eigensystem, parameters);
 
     if (parameters.benchmark) {
       gettimeofday(&stop, NULL);
@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
     print_eigensystem(eigensystem);
 #endif
 
-    print_population_proportion(parameters, eigensystem);
+    print_population_proportion(eigensystem, parameters);
 
     if (parameters.benchmark) {
       gettimeofday(&stop, NULL);

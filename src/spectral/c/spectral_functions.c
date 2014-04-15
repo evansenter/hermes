@@ -10,14 +10,30 @@
 #include "initializers.h"
 #include "functions.h"
 
-void population_proportion_from_row_ordered_transition_matrix(const SPECTRAL_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
+EIGENSYSTEM eigensystem_from_row_ordered_transition_matrix(TRANSITION_MATRIX row_transition_matrix) {
   TRANSITION_MATRIX column_transition_matrix;
   EIGENSYSTEM eigensystem;
 
   column_transition_matrix = transpose_matrix(row_transition_matrix);
   eigensystem              = convert_transition_matrix_to_eigenvectors(column_transition_matrix);
   invert_matrix(&eigensystem);
-  print_population_proportion(parameters, eigensystem);
+
+  return eigensystem;
+}
+
+void population_proportion_from_row_ordered_transition_matrix(const SPECTRAL_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
+  EIGENSYSTEM eigensystem;
+
+  eigensystem = eigensystem_from_row_ordered_transition_matrix(row_transition_matrix);
+  print_population_proportion(eigensystem, parameters);
+}
+
+void equilibrium_from_row_ordered_transition_matrix(const SPECTRAL_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
+  EIGENSYSTEM eigensystem;
+
+  eigensystem = eigensystem_from_row_ordered_transition_matrix(row_transition_matrix);
+  print_equilibrium(eigensystem, parameters);
+
 }
 
 TRANSITION_MATRIX convert_structures_to_transition_matrix(const SOLUTION* all_structures, int num_structures) {
@@ -288,7 +304,19 @@ long double estimate_equilibrium(const EIGENSYSTEM eigensystem, const SPECTRAL_P
   }
 }
 
-void print_population_proportion(const SPECTRAL_PARAMS parameters, const EIGENSYSTEM eigensystem) {
+void print_equilibrium(const EIGENSYSTEM eigensystem, const SPECTRAL_PARAMS parameters) {
+  long double equilibrium_time;
+
+  equilibrium_time = estimate_equilibrium(eigensystem, parameters);
+
+  if (equilibrium_time > 0) {
+    printf("%f\n", log(equilibrium_time) / log(10.));
+  } else {
+    printf("Infinity\n");
+  }
+}
+
+void print_population_proportion(const EIGENSYSTEM eigensystem, const SPECTRAL_PARAMS parameters) {
   double step_counter;
 
   for (step_counter = parameters.start_time; step_counter <= parameters.end_time; step_counter += parameters.step_size) {
