@@ -30,12 +30,6 @@ int main(int argc, char** argv) {
   
   parse_spectral_args(&spectral_params, params[1].argc, params[1].argv);
   
-  // This will print everything:
-  // EIGENSYSTEM eigensystem;
-  // eigensystem = eigensystem_from_row_ordered_transition_matrix(transition_matrix);
-  // print_population_proportion(eigensystem, spectral_params);
-  // print_equilibrium(eigensystem, spectral_params);
-  
   equilibrium_from_row_ordered_transition_matrix(spectral_params, transition_matrix);
   
   return 0;

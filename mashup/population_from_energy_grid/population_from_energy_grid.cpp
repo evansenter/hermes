@@ -43,7 +43,11 @@ int main(int argc, char** argv) {
   
   parse_spectral_args(&spectral_params, params[2].argc, params[2].argv);
   
-  population_proportion_from_row_ordered_transition_matrix(spectral_params, transition_matrix);
+  if (spectral_params.equilibrium) {
+    equilibrium_from_row_ordered_transition_matrix(spectral_params, transition_matrix);
+  } else {
+    population_proportion_from_row_ordered_transition_matrix(spectral_params, transition_matrix);
+  }
   
   return 0;
 }
