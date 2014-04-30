@@ -6,8 +6,9 @@ extern "C" {
 #endif
 
 #include "mfpt/params.h"
+#include "mfpt/parser.h"
 #include "mfpt/initializers.h"
-#include "mfpt/energy_grid.h"
+#include "mfpt/functions.h"
 
 #ifdef __cplusplus
 }

@@ -1,9 +1,0 @@
-[submodule "src/fftbor2d"]
-	path = src/fftbor2d
-	url = git://github.com/evansenter/fftbor.git
-[submodule "src/mfpt"]
-	path = src/mfpt
-	url = git://github.com/evansenter/rna_mfpt.git
-[submodule "src/spectral"]
-	path = src/spectral
-	url = git://github.com/evansenter/rna_spectral.git
