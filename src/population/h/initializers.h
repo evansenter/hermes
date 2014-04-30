@@ -1,5 +1,5 @@
-#ifndef SPECTRAL_INITIALIZERS_H
-#define SPECTRAL_INITIALIZERS_H
+#ifndef POPULATION_INITIALIZERS_H
+#define POPULATION_INITIALIZERS_H
 
 #include "data_structures.h"
 

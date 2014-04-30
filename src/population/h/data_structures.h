@@ -1,5 +1,5 @@
-#ifndef SPECTRAL_DATA_STRUCTURES_H
-#define SPECTRAL_DATA_STRUCTURES_H
+#ifndef POPULATION_DATA_STRUCTURES_H
+#define POPULATION_DATA_STRUCTURES_H
 
 #include "vienna/data_structures.h"
 
@@ -17,12 +17,14 @@ typedef struct {
   double end_time;
   double step_size;
   double equilibrium;
+  int window_size;
+  int all_subpop_for_eq;
   short lonely_bp;
   double energy_cap;
   short eigen_only;
   short input;
   short benchmark;
-} SPECTRAL_PARAMS;
+} POPULATION_PARAMS;
 
 typedef struct {
   double* values;

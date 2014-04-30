@@ -16,18 +16,18 @@ extern double temperature;
 
 int main(int argc, char** argv) {
   struct timeval full_start, full_stop, start, stop;
-  SPECTRAL_PARAMS parameters;
+  POPULATION_PARAMS parameters;
   paramT*         vienna_params;
   model_detailsT  vienna_details;
   set_model_details(&vienna_details);
   vienna_details.noLP = !parameters.lonely_bp;
   vienna_params       = get_scaled_parameters(temperature, vienna_details);
   subopt_sorted       = 1;
-  parameters          = init_spectral_params();
-  parse_spectral_args(&parameters, argc, argv);
+  parameters          = init_population_params();
+  parse_population_args(&parameters, argc, argv);
   
   if (parameters.sequence == NULL) {
-    spectral_usage();
+    population_usage();
   }
   
   if (parameters.benchmark) {
