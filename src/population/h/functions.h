@@ -4,6 +4,7 @@
 #include "shared/libmfpt_header.h"
 #include "data_structures.h"
 
+void population_from_row_ordered_transition_matrix(const POPULATION_PARAMS, TRANSITION_MATRIX);
 EIGENSYSTEM eigensystem_from_row_ordered_transition_matrix(TRANSITION_MATRIX);
 void population_proportion_from_row_ordered_transition_matrix(const POPULATION_PARAMS, TRANSITION_MATRIX);
 void equilibrium_from_row_ordered_transition_matrix(const POPULATION_PARAMS, TRANSITION_MATRIX);

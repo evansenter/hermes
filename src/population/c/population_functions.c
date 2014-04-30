@@ -10,6 +10,14 @@
 #include "initializers.h"
 #include "functions.h"
 
+void population_from_row_ordered_transition_matrix(const POPULATION_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
+  if (parameters.equilibrium) {
+    equilibrium_from_row_ordered_transition_matrix(parameters, row_transition_matrix);
+  } else {
+    population_proportion_from_row_ordered_transition_matrix(parameters, row_transition_matrix);
+  }
+}
+
 EIGENSYSTEM eigensystem_from_row_ordered_transition_matrix(TRANSITION_MATRIX row_transition_matrix) {
   TRANSITION_MATRIX column_transition_matrix;
   EIGENSYSTEM eigensystem;

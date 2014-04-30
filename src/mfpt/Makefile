@@ -1,4 +1,4 @@
-# Makefile for RNAmfpt
+# Makefile for CSVmfpt
 
 CCFLAGS          = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER)
 LDFLAGS          = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lm -lgomp -llapack -lgslcblas -lgsl -o
@@ -27,12 +27,12 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 	CCFLAGS += -fdiagnostics-color=always
 endif
 
-RNAmfpt.out: $(CODE)/rna_mfpt.o $(CODE)/mfpt_params.o $(CODE)/mfpt_functions.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_initializers.o
-	$(CC) $(CODE)/rna_mfpt.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_params.o $(CODE)/mfpt_functions.o $(CODE)/mfpt_initializers.o $(LDFLAGS) RNAmfpt.out
+CSVmfpt.out: $(CODE)/csv_mfpt.o $(CODE)/mfpt_params.o $(CODE)/mfpt_functions.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_initializers.o
+	$(CC) $(CODE)/csv_mfpt.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_params.o $(CODE)/mfpt_functions.o $(CODE)/mfpt_initializers.o $(LDFLAGS) CSVmfpt.out
 	ar cr $(LIB)/libmfpt.a $(CODE)/mfpt_functions.o $(CODE)/mfpt_params.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_initializers.o
 
-$(CODE)/rna_mfpt.o: $(CODE)/rna_mfpt.c $(HEADER)/parser.h $(HEADER)/functions.h $(HEADER)/constants.h $(HEADER)/params.h $(HEADER)/initializers.h
-	$(CC) $(CCFLAGS) $(CODE)/rna_mfpt.c -o $(CODE)/rna_mfpt.o
+$(CODE)/csv_mfpt.o: $(CODE)/csv_mfpt.c $(HEADER)/parser.h $(HEADER)/functions.h $(HEADER)/constants.h $(HEADER)/params.h $(HEADER)/initializers.h
+	$(CC) $(CCFLAGS) $(CODE)/csv_mfpt.c -o $(CODE)/csv_mfpt.o
 
 $(CODE)/mfpt_initializers.o: $(CODE)/mfpt_initializers.c $(HEADER)/initializers.h
 	$(CC) $(CCFLAGS) $(CODE)/mfpt_initializers.c -o $(CODE)/mfpt_initializers.o
@@ -47,8 +47,8 @@ $(CODE)/mfpt_functions.o: $(CODE)/mfpt_functions.c $(HEADER)/functions.h $(HEADE
 	$(CC) $(CCFLAGS) $(CODE)/mfpt_functions.c -o $(CODE)/mfpt_functions.o
 
 clean:
-	rm -f $(CODE)/*.o $(LIB)/libmfpt.a RNAmfpt.out
+	rm -f $(CODE)/*.o $(LIB)/libmfpt.a CSVmfpt.out
 
-install: RNAmfpt.out
-	cp RNAmfpt $(BINDIR)/RNAmfpt
+install: CSVmfpt.out
+	cp CSVmfpt $(BINDIR)/CSVmfpt
 	cp $(LIB)/libmfpt.a $(LIBDIR)

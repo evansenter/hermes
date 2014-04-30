@@ -1,5 +1,5 @@
 CCFLAGS          = -c -std=c++11 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wno-write-strings -Wa,-q -I $(HEADER) -I $(SHARED_HEADER)
-LDFLAGS          = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lfftw3 -lgomp -llapack -lgslcblas -lgsl -lfftbor2d -lmfpt -lmulti_param -lRNA -o
+LDFLAGS          = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lfftw3 -lgomp -llapack -lgslcblas -lgsl -lmfpt -lpopulation -lmulti_param -ltpl -lRNA -o
 BINDIR           = ~/bin
 LIBDIR           = ~/lib
 CC               = g++
@@ -25,14 +25,14 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 	CCFLAGS += -fdiagnostics-color=always
 endif
 
-FFTmfpt.out: $(CODE)/mfpt_from_energy_grid.o
-	$(CC) $(CODE)/mfpt_from_energy_grid.o $(LDFLAGS) FFTmfpt.out
+pop_from_rate_matrix.out: $(CODE)/population_from_rate_matrix.o
+	$(CC) $(CODE)/population_from_rate_matrix.o $(LDFLAGS) pop_from_rate_matrix.out
 
-$(CODE)/mfpt_from_energy_grid.o: $(CODE)/mfpt_from_energy_grid.cpp $(SHARED_HEADER)/shared/libfftbor2d_header.h $(SHARED_HEADER)/shared/libmfpt_header.h
-	$(CC) $(CCFLAGS) $(CODE)/mfpt_from_energy_grid.cpp -o $(CODE)/mfpt_from_energy_grid.o
+$(CODE)/population_from_rate_matrix.o: $(CODE)/population_from_rate_matrix.c $(SHARED_HEADER)/shared/libmfpt_header.h $(SHARED_HEADER)/shared/libpopulation_header.h $(SHARED_HEADER)/shared/libmulti_param_header.h
+	$(CC) $(CCFLAGS) $(CODE)/population_from_rate_matrix.c -o $(CODE)/population_from_rate_matrix.o
 
-install: FFTmfpt.out
-	cp FFTmfpt.out $(BINDIR)/FFTmfpt
+install: pop_from_rate_matrix.out
+	cp pop_from_rate_matrix.out $(BINDIR)/pop_from_rate_matrix
 
 clean:
-	rm -f $(CODE)/*.o FFTmfpt.out
+	rm -f $(CODE)/*.o pop_from_rate_matrix.out

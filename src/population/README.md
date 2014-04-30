@@ -1,4 +1,4 @@
 rna_population
-============
+==============
 
-./RNApopulation.out -vob -s GGGAAACCC -l "(((...)))" -p 1
+RNApopulation -vob -s GGGAAACCC -l "(((...)))" -p 1
