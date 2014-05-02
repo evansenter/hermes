@@ -297,7 +297,7 @@ int population_error_handling(const POPULATION_PARAMS parameters) {
 }
 
 void debug_population_parameters(const POPULATION_PARAMS parameters) {
-  printf("RNApopulation parameters\n");
+  printf("RNAeq parameters\n");
   printf("(s) sequence\t\t\t%s\n",              parameters.sequence);
   printf("(k) start_structure\t\t%s\n",         parameters.start_structure == NULL && parameters.start_index < 0 ? "empty" : parameters.start_structure);
   printf("(l) end_structure\t\t%s\n",           parameters.end_structure == NULL && parameters.end_index < 0 ? "mfe" : parameters.end_structure);
@@ -321,14 +321,14 @@ void debug_population_parameters(const POPULATION_PARAMS parameters) {
 }
 
 void population_usage() {
-  fprintf(stderr, "RNApopulation [options] -s [sequence]\n\n");
+  fprintf(stderr, "RNAeq [options] -s [sequence]\n\n");
   fprintf(stderr, "Options include the following:\n");
   fprintf(stderr, "-A/a\tstart state,           default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the starting structure (see options for -k).\n");
-  fprintf(stderr, "-B/b\t(b)enchmarking,        default is disabled. When enabled, RNApopulation will print benchmarking times for internal function calls.\n");
+  fprintf(stderr, "-B/b\t(b)enchmarking,        default is disabled. When enabled, RNAeq will print benchmarking times for internal function calls.\n");
   fprintf(stderr, "-C/c\tenergy (c)ap,          default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
   fprintf(stderr, "-E/e\t(e)quilibrium,         default is disabled. When provided, we will output the time at which the equilibrium stable within -e for a window of size -w.\n");
   fprintf(stderr, "-F/f\tbin (f)ilename,        Provided in conjunction with the -r flag to specify the read / write file for serializing the eigensystem.\n");
-  fprintf(stderr, "-G/g\tei(g)envalues only,    default is disabled. When enabled, RNApopulation will only generate the eigenvalues for the transition rate matrix.\n");
+  fprintf(stderr, "-G/g\tei(g)envalues only,    default is disabled. When enabled, RNAeq will only generate the eigenvalues for the transition rate matrix.\n");
   fprintf(stderr, "-H/h\tall subpop. in eq.,    default is disabled. When provided alongside the -e flag, the equilibrium time is estimated for when *all* subpopulations approach equilibrium, rather than when just the start-to-end state curve (-a to -z) doesn't deviate more than epsilon (-e) within the window size (-w).\n");
   fprintf(stderr, "-I/i\tstart time,            natrual log of the starting time for computing population proportion.\n");
   fprintf(stderr, "-J/j\tend time,              natrual log of the ending time for computing population proportion.\n");

@@ -1,4 +1,4 @@
 mfpt
 ====
 
-CSVmfpt -c ./example.csv -xhv
+RNAmfpt -c ./example.csv -xhv

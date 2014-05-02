@@ -1,36 +1,36 @@
 # Base Makefile
 
-all: FFTbor2D CSVmfpt RNApopulation MultiParam mfpt_from_fftbor2d pop_from_fftbor2d pop_from_rate_matrix
+all: FFTbor2D RNAmfpt RNAeq MultiParam FFTmfpt FFTeq RateEq
 
 install: all
-	cp bin/FFTbor2D bin/CSVmfpt bin/RNApopulation bin/mfpt_from_fftbor2d bin/pop_from_fftbor2d bin/pop_from_rate_matrix ~/bin
+	cp bin/FFTbor2D bin/RNAmfpt bin/RNAeq bin/FFTmfpt bin/FFTeq bin/RateEq ~/bin
 
 FFTbor2D:
 	cd src/fftbor2d; make
 	cp src/fftbor2d/FFTbor2D.out bin/FFTbor2D
 
-CSVmfpt:
+RNAmfpt:
 	cd src/mfpt; make
-	cp src/mfpt/CSVmfpt.out bin/CSVmfpt
+	cp src/mfpt/RNAmfpt.out bin/RNAmfpt
 
-RNApopulation:
+RNAeq:
 	cd src/population; make
-	cp src/population/RNApopulation.out bin/RNApopulation
+	cp src/population/RNAeq.out bin/RNAeq
 
 MultiParam:
 	cd src/multi_param; make
 
-mfpt_from_fftbor2d:
+FFTmfpt:
 	cd mashup/mfpt_from_fftbor2d; make
-	cp mashup/mfpt_from_fftbor2d/mfpt_from_fftbor2d.out bin/mfpt_from_fftbor2d
+	cp mashup/mfpt_from_fftbor2d/FFTmfpt.out bin/FFTmfpt
 
-pop_from_fftbor2d:
+FFTeq:
 	cd mashup/population_from_fftbor2d; make
-	cp mashup/population_from_fftbor2d/pop_from_fftbor2d.out bin/pop_from_fftbor2d
+	cp mashup/population_from_fftbor2d/FFTeq.out bin/FFTeq
 
-pop_from_rate_matrix:
+RateEq:
 	cd mashup/population_from_rate_matrix; make
-	cp mashup/population_from_rate_matrix/pop_from_rate_matrix.out bin/pop_from_rate_matrix
+	cp mashup/population_from_rate_matrix/RateEq.out bin/RateEq
 
 clean:
 	cd src/fftbor2d; make clean
@@ -40,4 +40,4 @@ clean:
 	cd mashup/mfpt_from_fftbor2d; make clean
 	cd mashup/population_from_fftbor2d; make clean
 	cd mashup/population_from_rate_matrix; make clean
-	rm bin/CSVmfpt bin/RNApopulation bin/FFTbor2D bin/mfpt_from_fftbor2d bin/pop_from_fftbor2d bin/pop_from_rate_matrix
+	rm bin/RNAmfpt bin/RNAeq bin/FFTbor2D bin/FFTmfpt bin/FFTeq bin/RateEq

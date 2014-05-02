@@ -25,14 +25,14 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 	CCFLAGS += -fdiagnostics-color=always
 endif
 
-pop_from_rate_matrix.out: $(CODE)/population_from_rate_matrix.o
-	$(CC) $(CODE)/population_from_rate_matrix.o $(LDFLAGS) pop_from_rate_matrix.out
+RateEq.out: $(CODE)/population_from_rate_matrix.o
+	$(CC) $(CODE)/population_from_rate_matrix.o $(LDFLAGS) RateEq.out
 
 $(CODE)/population_from_rate_matrix.o: $(CODE)/population_from_rate_matrix.c $(SHARED_HEADER)/shared/libmfpt_header.h $(SHARED_HEADER)/shared/libpopulation_header.h $(SHARED_HEADER)/shared/libmulti_param_header.h
 	$(CC) $(CCFLAGS) $(CODE)/population_from_rate_matrix.c -o $(CODE)/population_from_rate_matrix.o
 
-install: pop_from_rate_matrix.out
-	cp pop_from_rate_matrix.out $(BINDIR)/pop_from_rate_matrix
+install: RateEq.out
+	cp RateEq.out $(BINDIR)/RateEq
 
 clean:
-	rm -f $(CODE)/*.o pop_from_rate_matrix.out
+	rm -f $(CODE)/*.o RateEq.out

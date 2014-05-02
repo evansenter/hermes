@@ -1,4 +1,4 @@
 rna_population
 ==============
 
-RNApopulation -vob -s GGGAAACCC -l "(((...)))" -p 1
+RNAeq -vob -s GGGAAACCC -l "(((...)))" -p 1

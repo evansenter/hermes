@@ -1,4 +1,4 @@
-# Makefile for RNApopulation
+# Makefile for RNAeq
 
 CCFLAGS          = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) -I ~/local/include
 LDFLAGS          = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lm -lgomp -llapack -lgslcblas -lgsl -ltpl -lmfpt -lRNA -o
@@ -27,8 +27,8 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 	CCFLAGS += -fdiagnostics-color=always
 endif
 
-RNApopulation.out: $(CODE)/rna_population.o $(CODE)/population_params.o $(CODE)/population_functions.o $(CODE)/population_initializers.o $(LIB)/libmfpt.a
-	$(CC) $(CODE)/rna_population.o $(CODE)/population_params.o $(CODE)/population_functions.o $(CODE)/population_initializers.o $(LDFLAGS) RNApopulation.out
+RNAeq.out: $(CODE)/rna_population.o $(CODE)/population_params.o $(CODE)/population_functions.o $(CODE)/population_initializers.o $(LIB)/libmfpt.a
+	$(CC) $(CODE)/rna_population.o $(CODE)/population_params.o $(CODE)/population_functions.o $(CODE)/population_initializers.o $(LDFLAGS) RNAeq.out
 	ar cr $(LIB)/libpopulation.a $(CODE)/population_functions.o $(CODE)/population_params.o $(CODE)/population_initializers.o
 
 $(CODE)/rna_population.o: $(CODE)/rna_population.c $(SHARED_HEADER)/vienna/data_structures.h $(HEADER)/functions.h $(HEADER)/params.h $(HEADER)/constants.h $(HEADER)/initializers.h
@@ -47,8 +47,8 @@ $(LIB)/libmfpt.a:
 	cd ../mfpt; make
 
 clean:
-	rm -f $(CODE)/*.o $(LIB)/libpopulation.a RNApopulation.out
+	rm -f $(CODE)/*.o $(LIB)/libpopulation.a RNAeq.out
 
-install: RNApopulation.out
-	cp RNApopulation.out $(BINDIR)/RNApopulation
+install: RNAeq.out
+	cp RNAeq.out $(BINDIR)/RNAeq
 	cp $(LIB)/libpopulation.a $(LIBDIR)

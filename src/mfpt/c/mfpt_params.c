@@ -253,7 +253,7 @@ int mfpt_error_handling(const MFPT_PARAMS parameters) {
 void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   char* buffer = calloc(128, sizeof(char));
   
-  printf("CSVmfpt parameters\n");
+  printf("RNAmfpt parameters\n");
   printf("(c) input_file\t\t\t%s\n",          parameters.input_file);
   printf("(e) energy_based\t\t%s\n",          parameters.energy_based                     ? "Yes" : "No");
   printf("(t) transition_matrix_input\t%s\n", RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) ? "Yes" : "No");
@@ -287,7 +287,7 @@ void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
 }
 
 void mfpt_usage() {
-  fprintf(stderr, "CSVmfpt [options] input_csv\n\n");
+  fprintf(stderr, "RNAmfpt [options] input_csv\n\n");
   fprintf(stderr, "where input_csv is a CSV file (with *no* header) of the format:\n");
   fprintf(stderr, "k_0,l_0,p_0\n");
   fprintf(stderr, "...,...,...\n");

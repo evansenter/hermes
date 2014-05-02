@@ -1,4 +1,4 @@
-mfpt_from_fftbor2d
+FFTmfpt
 ==================
 
-mfpt_from_fftbor2d --all-v --fftbor2d-i GGGAAACCC --fftbor2d-j "........." --fftbor2d-k "(((...)))" --mfpt-x --mfpt-h
+FFTmfpt --all-v --fftbor2d-i GGGAAACCC --fftbor2d-j "........." --fftbor2d-k "(((...)))" --mfpt-x --mfpt-h
