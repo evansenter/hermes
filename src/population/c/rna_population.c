@@ -80,18 +80,6 @@ int main(int argc, char** argv) {
       printf("\n");
     }
     
-    if (!SERIALIZING(parameters) && (parameters.start_index < 0 || parameters.end_index < 0)) {
-      if (parameters.start_index < 0) {
-        fprintf(stderr, "Error: the starting structure could not be found. Usually this means that you did not specify an explicit starting structure so the empty structure was used, but the energy band was not wide enough for RNAsubopt to sample it.\n");
-      }
-      
-      if (parameters.end_index < 0) {
-        fprintf(stderr, "Error: the ending structure could not be found. Usually this means that you did explicitly provided a suboptimal ending structure, but the energy band was not wide enough for RNAsubopt to sample it.\n");
-      }
-      
-      abort();
-    }
-    
     if (parameters.benchmark) {
       gettimeofday(&stop, NULL);
       TIMING(start, stop, "initialization")

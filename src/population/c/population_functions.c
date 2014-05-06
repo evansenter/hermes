@@ -127,10 +127,22 @@ void invert_matrix(EIGENSYSTEM* eigensystem) {
   gsl_permutation_free(permutation);
 }
 
-double probability_at_time(const EIGENSYSTEM eigensystem, double timepoint, int start_index, int target_index) {
+double probability_at_time(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, double timepoint, int start_index, int target_index) {
   // This function is hard-wired to only consider the kinetics for folding from a distribution where p_{0}(start_index) == 1.
   int i;
   double cumulative_probability = 0;
+  
+  if (parameters.start_index < 0 || parameters.end_index < 0) {
+    if (parameters.start_index < 0) {
+      fprintf(stderr, "Error: the starting structure could not be found. Usually this means that you did not specify an explicit starting structure so the empty structure was used, but the energy band was not wide enough for RNAsubopt to sample it.\n");
+    }
+    
+    if (parameters.end_index < 0) {
+      fprintf(stderr, "Error: the ending structure could not be found. Usually this means that you did explicitly provided a suboptimal ending structure, but the energy band was not wide enough for RNAsubopt to sample it.\n");
+    }
+    
+    abort();
+  }
   
   for (i = 0; i < eigensystem.length; ++i) {
     cumulative_probability +=
@@ -267,11 +279,11 @@ int estimate_starting_index_to_scan_for_equilibrium(int num_points, const EIGENS
   int i = 0, starting_index = 0;
   double str_1_start, str_1_current, str_1_end, str_2_start, str_2_current, str_2_end, epsilon = parameters.equilibrium;
   
-  str_1_start = probability_at_time(eigensystem, pow(10, parameters.start_time), parameters.start_index, parameters.start_index);
-  str_1_end   = probability_at_time(eigensystem, pow(10, parameters.end_time),   parameters.start_index, parameters.start_index);
+  str_1_start = probability_at_time(eigensystem, parameters, pow(10, parameters.start_time), parameters.start_index, parameters.start_index);
+  str_1_end   = probability_at_time(eigensystem, parameters, pow(10, parameters.end_time),   parameters.start_index, parameters.start_index);
   
-  str_2_start = probability_at_time(eigensystem, pow(10, parameters.start_time), parameters.start_index, parameters.end_index);
-  str_2_end   = probability_at_time(eigensystem, pow(10, parameters.end_time),   parameters.start_index, parameters.end_index);
+  str_2_start = probability_at_time(eigensystem, parameters, pow(10, parameters.start_time), parameters.start_index, parameters.end_index);
+  str_2_end   = probability_at_time(eigensystem, parameters, pow(10, parameters.end_time),   parameters.start_index, parameters.end_index);
   
 #ifdef DEBUG
   printf("epsilon:\t%.2e\n", epsilon);
@@ -285,6 +297,7 @@ int estimate_starting_index_to_scan_for_equilibrium(int num_points, const EIGENS
     do {
       str_1_current = probability_at_time(
                         eigensystem,
+                        parameters,
                         pow(10, parameters.start_time + parameters.step_size * i),
                         parameters.start_index,
                         parameters.start_index
@@ -292,6 +305,7 @@ int estimate_starting_index_to_scan_for_equilibrium(int num_points, const EIGENS
                       
       str_2_current = probability_at_time(
                         eigensystem,
+                        parameters,
                         pow(10, parameters.start_time + parameters.step_size * i),
                         parameters.start_index,
                         parameters.end_index
@@ -319,6 +333,7 @@ int is_index_in_equilibrium_within_window_position(const EIGENSYSTEM eigensystem
   
   current_proportion = probability_at_time(
                          eigensystem,
+                         parameters,
                          pow(10, parameters.start_time + parameters.step_size * window_start),
                          parameters.start_index,
                          eigensystem_index
@@ -327,6 +342,7 @@ int is_index_in_equilibrium_within_window_position(const EIGENSYSTEM eigensystem
   for (i = 1; i < parameters.window_size; ++i) {
     future_proportion = probability_at_time(
                           eigensystem,
+                          parameters,
                           pow(10, parameters.start_time + parameters.step_size * (window_start + i)),
                           parameters.start_index,
                           eigensystem_index
@@ -363,8 +379,8 @@ void print_population_proportion(const EIGENSYSTEM eigensystem, const POPULATION
     printf(
       "%+f\t%+.8f\t%+.8f\n",
       step_counter,
-      probability_at_time(eigensystem, pow(10, step_counter), parameters.start_index, parameters.end_index),
-      probability_at_time(eigensystem, pow(10, step_counter), parameters.start_index, parameters.start_index)
+      probability_at_time(eigensystem, parameters, pow(10, step_counter), parameters.start_index, parameters.end_index),
+      probability_at_time(eigensystem, parameters, pow(10, step_counter), parameters.start_index, parameters.start_index)
     );
   }
 }

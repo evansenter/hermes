@@ -11,7 +11,7 @@ void equilibrium_from_row_ordered_transition_matrix(const POPULATION_PARAMS, TRA
 TRANSITION_MATRIX convert_structures_to_transition_matrix(const SOLUTION*, int);
 EIGENSYSTEM convert_transition_matrix_to_eigenvectors(TRANSITION_MATRIX);
 void invert_matrix(EIGENSYSTEM*);
-double probability_at_time(const EIGENSYSTEM, double, int, int);
+double probability_at_time(const EIGENSYSTEM, const POPULATION_PARAMS, double, int, int);
 void find_key_structure_indices_in_structure_list(POPULATION_PARAMS*, const SOLUTION*, int, char*, char*);
 void serialize_eigensystem(const EIGENSYSTEM, const POPULATION_PARAMS);
 EIGENSYSTEM deserialize_eigensystem(const POPULATION_PARAMS);
