@@ -26,6 +26,9 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 endif
 
 FFTeq.out: $(CODE)/population_from_fftbor2d.o
+	cd ../../src/fftbor2d; make
+	cd ../../src/mfpt; make
+	cd ../../src/population; make
 	$(CC) $(CODE)/population_from_fftbor2d.o $(LDFLAGS) FFTeq.out
 
 $(CODE)/population_from_fftbor2d.o: $(CODE)/population_from_fftbor2d.cpp $(SHARED_HEADER)/shared/libfftbor2d_header.h $(SHARED_HEADER)/shared/libmfpt_header.h $(SHARED_HEADER)/shared/libpopulation_header.h  $(SHARED_HEADER)/shared/libmulti_param_header.h

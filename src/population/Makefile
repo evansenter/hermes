@@ -27,7 +27,8 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 	CCFLAGS += -fdiagnostics-color=always
 endif
 
-RNAeq.out: $(CODE)/rna_population.o $(CODE)/population_params.o $(CODE)/population_functions.o $(CODE)/population_initializers.o $(LIB)/libmfpt.a
+RNAeq.out: $(CODE)/rna_population.o $(CODE)/population_params.o $(CODE)/population_functions.o $(CODE)/population_initializers.o
+	cd ../mfpt; make
 	$(CC) $(CODE)/rna_population.o $(CODE)/population_params.o $(CODE)/population_functions.o $(CODE)/population_initializers.o $(LDFLAGS) RNAeq.out
 	ar cr $(LIB)/libpopulation.a $(CODE)/population_functions.o $(CODE)/population_params.o $(CODE)/population_initializers.o
 
@@ -42,9 +43,6 @@ $(CODE)/population_params.o: $(CODE)/population_params.c $(HEADER)/params.h $(HE
 
 $(CODE)/population_initializers.o: $(CODE)/population_initializers.c $(HEADER)/initializers.h $(HEADER)/functions.h $(SHARED_HEADER)/shared/libmfpt_header.h
 	$(CC) $(CCFLAGS) $(CODE)/population_initializers.c -o $(CODE)/population_initializers.o
-
-$(LIB)/libmfpt.a:
-	cd ../mfpt; make
 
 clean:
 	rm -f $(CODE)/*.o $(LIB)/libpopulation.a RNAeq.out

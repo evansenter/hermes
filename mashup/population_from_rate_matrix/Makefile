@@ -26,6 +26,8 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 endif
 
 RateEq.out: $(CODE)/population_from_rate_matrix.o
+	cd ../../src/mfpt; make
+	cd ../../src/population; make
 	$(CC) $(CODE)/population_from_rate_matrix.o $(LDFLAGS) RateEq.out
 
 $(CODE)/population_from_rate_matrix.o: $(CODE)/population_from_rate_matrix.c $(SHARED_HEADER)/shared/libmfpt_header.h $(SHARED_HEADER)/shared/libpopulation_header.h $(SHARED_HEADER)/shared/libmulti_param_header.h

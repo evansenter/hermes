@@ -9,4 +9,7 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
+#define POS_INF -1
+#define NEG_INF -2
+
 #endif

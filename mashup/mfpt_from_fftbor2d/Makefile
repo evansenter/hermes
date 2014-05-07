@@ -26,6 +26,8 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 endif
 
 FFTmfpt.out: $(CODE)/mfpt_from_fftbor2d.o
+	cd ../../src/fftbor2d; make
+	cd ../../src/mfpt; make
 	$(CC) $(CODE)/mfpt_from_fftbor2d.o $(LDFLAGS) FFTmfpt.out
 
 $(CODE)/mfpt_from_fftbor2d.o: $(CODE)/mfpt_from_fftbor2d.cpp $(SHARED_HEADER)/shared/libfftbor2d_header.h $(SHARED_HEADER)/shared/libmfpt_header.h
