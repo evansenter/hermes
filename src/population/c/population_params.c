@@ -22,9 +22,9 @@ POPULATION_PARAMS init_population_params() {
     .temperature       = 37.,
     .start_time        = -10,
     .end_time          = 10,
-    .step_size         = 1e-1,
+    .step_size         = 1e-3,
     .equilibrium       = 0,
-    .delta             = 0,
+    .delta             = 1e-3,
     .window_size       = 5,
     .all_subpop_for_eq = 0,
     .lonely_bp         = 0,
@@ -263,13 +263,13 @@ int population_error_handling(const POPULATION_PARAMS parameters) {
     error++;
   }
 
-  if (parameters.delta && !parameters.equilibrium) {
-    fprintf(stderr, "Error: the equilibrium delta value must be provided in conjunction with the epsilon value (-e).\n");
+  if (parameters.delta < 0 || parameters.delta > 1) {
+    fprintf(stderr, "Error: the equilibrium delta (provided as the value for the -d flag) must be the delta value for considering a population curve to be approaching stability.\n");
     error++;
   }
 
-  if (parameters.delta < 0 || parameters.delta > 1) {
-    fprintf(stderr, "Error: the equilibrium delta (provided as the value for the -d flag) must be the delta value for considering a population curve to be approaching stability.\n");
+  if (parameters.step_size < 0 || parameters.step_size > 1) {
+    fprintf(stderr, "Error: the step size must be between 0 and 1.\n");
     error++;
   }
 

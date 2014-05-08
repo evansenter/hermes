@@ -127,7 +127,7 @@ void invert_matrix(EIGENSYSTEM* eigensystem) {
   gsl_permutation_free(permutation);
 }
 
-double probability_at_time(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, double timepoint, int start_index, int target_index) {
+double probability_at_logtime(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, double timepoint, int start_index, int target_index) {
   // This function is hard-wired to only consider the kinetics for folding from a distribution where p_{0}(start_index) == 1.
   int i;
   double cumulative_probability = 0;
@@ -148,7 +148,7 @@ double probability_at_time(const EIGENSYSTEM eigensystem, const POPULATION_PARAM
     cumulative_probability +=
       E_ROW_ORDER(eigensystem.vectors, target_index, i, eigensystem.length) *
       E_ROW_ORDER(eigensystem.inverse_vectors, i, start_index, eigensystem.length) *
-      exp(eigensystem.values[i] * timepoint);
+      exp(eigensystem.values[i] * pow(10, timepoint));
   }
 
   return cumulative_probability;
@@ -240,64 +240,67 @@ EIGENSYSTEM deserialize_eigensystem(const POPULATION_PARAMS parameters) {
   return eigensystem;
 }
 
-long double estimate_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
-  int i, j, starting_index, everything_in_equilibrium = 0;
-  double soft_right_bound;
+double estimate_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
+  int i, everything_in_equilibrium = 0;
+  double equilibrium_time;
 
-  soft_right_bound = soft_bound_for_population_proportion(eigensystem, parameters, parameters.end_index, parameters.end_time, 1);
-  starting_index   = logtime_to_index(parameters, soft_right_bound);
+  equilibrium_time = soft_bound_for_population_proportion(eigensystem, parameters, parameters.end_index, parameters.end_time, 1);
 
-  printf("soft_right_bound: %f\n", soft_right_bound);
+#ifdef INSANE_DEBUG
+  printf("equilibrium_time: %f\n", equilibrium_time);
+#endif
 
-  while (starting_index >= 0 && index_in_equilibrium_within_window_position(eigensystem, parameters, parameters.end_index, starting_index--)) {}
+  while (equilibrium_time >= parameters.start_time && index_in_equilibrium_within_window(eigensystem, parameters, parameters.end_index, equilibrium_time)) {
+    equilibrium_time -= parameters.step_size;
+  }
 
-  printf("starting time for eq. after backtrack: %f\n", index_to_logtime(parameters, starting_index));
+#ifdef INSANE_DEBUG
+  printf("equilibrium_time after backtrack: %f\n", equilibrium_time);
+#endif
 
-  if (starting_index < 0) {
-    return NEG_INF;
+  if (equilibrium_time < parameters.start_time) {
+    return NEG_INF(parameters);
   } else {
-    for (i = starting_index; i < logtime_to_index(parameters, parameters.end_time) - parameters.window_size + 1 && !everything_in_equilibrium; ++i) {
+    while (equilibrium_time <= parameters.end_time) {
       if (parameters.all_subpop_for_eq) {
         everything_in_equilibrium = 1;
 
-        for (j = 0; j < eigensystem.length && everything_in_equilibrium; ++j) {
-          everything_in_equilibrium = index_in_equilibrium_within_window_position(eigensystem, parameters, j, i);
+        for (i = 0; i < eigensystem.length && everything_in_equilibrium; ++i) {
+          everything_in_equilibrium = index_in_equilibrium_within_window(eigensystem, parameters, i, equilibrium_time);
         }
       } else {
-        everything_in_equilibrium = index_in_equilibrium_within_window_position(eigensystem, parameters, parameters.end_index, i);
+        everything_in_equilibrium = index_in_equilibrium_within_window(eigensystem, parameters, parameters.end_index, equilibrium_time);
+      }
+
+      if (everything_in_equilibrium) {
+        return equilibrium_time;
+      } else {
+        equilibrium_time += parameters.step_size;
       }
     }
 
-    if (everything_in_equilibrium) {
-      return pow(10, parameters.start_time + parameters.step_size * i);
-    } else {
-      return POS_INF;
-    }
+    return POS_INF(parameters);
   }
 }
 
 double soft_bound_for_population_proportion(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, int eigensystem_index, double final_time, int sign) {
-  double current_probability, final_probability, current_time, temp_time, last_time = final_time, delta = parameters.delta, epsilon = parameters.equilibrium;
-
-  if (!delta) {
-    delta = epsilon;
-  }
+  double current_probability, final_probability, current_time, temp_time, last_time = final_time;
 
   last_time           = final_time;
   current_time        = parameters.start_time + (parameters.end_time - parameters.start_time) / 2.0;
-  current_probability = probability_at_time(eigensystem, parameters, pow(10, current_time), parameters.start_index, eigensystem_index);
-  final_probability   = probability_at_time(eigensystem, parameters, pow(10, final_time), parameters.start_index, eigensystem_index);
+  current_probability = probability_at_logtime(eigensystem, parameters, current_time, parameters.start_index, eigensystem_index);
+  final_probability   = probability_at_logtime(eigensystem, parameters, final_time, parameters.start_index, eigensystem_index);
 
   while(fabs(current_time - last_time) > parameters.step_size) {
-    current_probability = probability_at_time(eigensystem, parameters, pow(10, current_time), parameters.start_index, eigensystem_index);
+    current_probability = probability_at_logtime(eigensystem, parameters, current_time, parameters.start_index, eigensystem_index);
 
 #ifdef INSANE_DEBUG
-    printf("current_time:\t%+f\tlast_time:\t%+f\tp(current):\t%f\tp(target):\t%f\n", current_time, last_time, current_probability, final_probability);
+    printf("current_time: %+f, last_time: %+f, p(current): %f, p(target): %f\n", current_time, last_time, current_probability, final_probability);
 #endif
 
     temp_time = current_time;
 
-    if (fabs(current_probability - final_probability) > delta) {
+    if (fabs(current_probability - final_probability) > parameters.delta) {
       current_time += sign * fabs(last_time - current_time) / 2.0;
     } else {
       current_time -= sign * fabs(last_time - current_time) / 2.0;
@@ -307,42 +310,45 @@ double soft_bound_for_population_proportion(const EIGENSYSTEM eigensystem, const
   }
 
 #ifdef INSANE_DEBUG
-    printf("Bound found at %+f within %f of requested delta, %f\n", current_time, fabs(current_probability - final_probability), delta);
+    printf("Bounded at %+f within %f of requested delta, %f\n", current_time, fabs(current_probability - final_probability), parameters.delta);
 #endif
 
-  return current_time;
+  return round(current_time / parameters.step_size) * parameters.step_size;
 }
 
-int index_in_equilibrium_within_window_position(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, int eigensystem_index, int window_start) {
+int index_in_equilibrium_within_window(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, int eigensystem_index, double logtime) {
   int i;
   double current_proportion, future_proportion, epsilon = parameters.equilibrium;
 
-  current_proportion = probability_at_time(
+  current_proportion = probability_at_logtime(
                          eigensystem,
                          parameters,
-                         pow(10, parameters.start_time + parameters.step_size * window_start),
+                         logtime,
                          parameters.start_index,
                          eigensystem_index
                        );
 
   for (i = 1; i < parameters.window_size; ++i) {
-    future_proportion = probability_at_time(
+    future_proportion = probability_at_logtime(
                           eigensystem,
                           parameters,
-                          pow(10, parameters.start_time + parameters.step_size * (window_start + i)),
+                          logtime + parameters.step_size * i,
                           parameters.start_index,
                           eigensystem_index
                         );
 
 #ifdef INSANE_DEBUG
-    printf("%d\t%d\t%d\t%f\t%f\t%e\t%d\n", window_start, window_start + i, eigensystem_index, current_proportion, future_proportion, fabs(current_proportion - future_proportion), fabs(current_proportion - future_proportion) < epsilon);
+    printf(
+      "current_time: %f, window_time: %f, index: %d, abs(p(window) - p(current)): %e, within epsilon?: %s\n",
+      logtime,
+      logtime + parameters.step_size * i,
+      eigensystem_index,
+      fabs(current_proportion - future_proportion),
+      fabs(current_proportion - future_proportion) < epsilon ? "yes" : "no"
+    );
 #endif
 
     if (fabs(current_proportion - future_proportion) > epsilon) {
-#ifdef INSANE_DEBUG
-      printf("\n");
-#endif
-
       return 0;
     }
   }
@@ -350,40 +356,32 @@ int index_in_equilibrium_within_window_position(const EIGENSYSTEM eigensystem, c
   return 1;
 }
 
-int logtime_to_index(const POPULATION_PARAMS parameters, double logtime) {
-  return (int)round((logtime - parameters.start_time) / parameters.step_size);
-}
-
-double index_to_logtime(const POPULATION_PARAMS parameters, int index) {
-  return parameters.start_time + index * parameters.step_size;
-}
-
 void print_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
-  long double equilibrium_time;
+  double equilibrium_time;
 
   equilibrium_time = estimate_equilibrium(eigensystem, parameters);
 
-  switch ((int)round(equilibrium_time)) {
-    case NEG_INF:
-      printf("-Infinity\n");
-      break;
-    case POS_INF:
-      printf("Infinity\n");
-      break;
-    default:
-      printf("%f\n", log(equilibrium_time) / log(10.));
+  if (equilibrium_time == NEG_INF(parameters)) {
+    printf("-Infinity\n");
+  } else if (equilibrium_time == POS_INF(parameters)) {
+    printf("Infinity\n");
+  } else {
+    printf("%f\n", equilibrium_time);
   }
 }
 
 void print_population_proportion(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
-  double step_counter;
+  double current_time, soft_left_bound, soft_right_bound;
 
-  for (step_counter = parameters.start_time; step_counter <= parameters.end_time; step_counter += parameters.step_size) {
+  soft_left_bound  = soft_bound_for_population_proportion(eigensystem, parameters, parameters.start_index, parameters.start_time, -1);
+  soft_right_bound = soft_bound_for_population_proportion(eigensystem, parameters, parameters.end_index, parameters.end_time, 1);
+
+  for (current_time = soft_left_bound; current_time <= soft_right_bound; current_time += parameters.step_size) {
     printf(
       "%+f\t%+.8f\t%+.8f\n",
-      step_counter,
-      probability_at_time(eigensystem, parameters, pow(10, step_counter), parameters.start_index, parameters.end_index),
-      probability_at_time(eigensystem, parameters, pow(10, step_counter), parameters.start_index, parameters.start_index)
+      current_time,
+      probability_at_logtime(eigensystem, parameters, current_time, parameters.start_index, parameters.end_index),
+      probability_at_logtime(eigensystem, parameters, current_time, parameters.start_index, parameters.start_index)
     );
   }
 }
