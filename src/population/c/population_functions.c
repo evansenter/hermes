@@ -241,67 +241,38 @@ EIGENSYSTEM deserialize_eigensystem(const POPULATION_PARAMS parameters) {
 }
 
 long double estimate_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
-  int i, j, starting_index, num_points, everything_in_equilibrium = 0;
-  double start_probability, end_probability, epsilon = parameters.equilibrium;
+  int i, j, starting_index, everything_in_equilibrium = 0;
+  double soft_right_bound;
 
-  // estimate_starting_index_to_scan_for_equilibrium does a forward / backward scan to pick the first position to use a sliding window looking for equilibrium.
-  // This is necessary because if the timespan is extended too far to the left, the algorithm would erroneously claim equilibrium had been achieved when in fact,
-  // the system hadn't had enough time to start making transitions yet. (That corresponds to the left-hand side of the sigmoidal population occupancy curve).
-  num_points     = (int)((parameters.end_time - parameters.start_time) / parameters.step_size);
-  starting_index = estimate_starting_index_to_scan_for_equilibrium(num_points, eigensystem, parameters);
+  soft_right_bound = soft_bound_for_population_proportion(eigensystem, parameters, parameters.end_index, parameters.end_time, 1);
+  starting_index   = logtime_to_index(parameters, soft_right_bound);
 
-  // starting_index < 0 means that for the delta provided, we can't find a starting position to scan for equilibrium. This usually means the timespan isn't
-  // wide enough.
+  printf("soft_right_bound: %f\n", soft_right_bound);
+
+  while (starting_index >= 0 && index_in_equilibrium_within_window_position(eigensystem, parameters, parameters.end_index, starting_index--)) {}
+
+  printf("starting time for eq. after backtrack: %f\n", index_to_logtime(parameters, starting_index));
+
   if (starting_index < 0) {
-    if (parameters.all_subpop_for_eq) {
-      everything_in_equilibrium = 1;
-
-      // This just makes sure that if the user is looking at all subpopulations, they all are in equilibrium for the time requested.
-      for (i = 0; i < eigensystem.length && everything_in_equilibrium; ++i) {
-        start_probability = probability_at_time(eigensystem, parameters, pow(10, parameters.start_time), parameters.start_index, i);
-        end_probability   = probability_at_time(eigensystem, parameters, pow(10, parameters.end_time),   parameters.start_index, i);
-
-        everything_in_equilibrium = fabs(start_probability - end_probability) < epsilon;
-      }
-    } else {
-      everything_in_equilibrium = 1;
-    }
-
-    // If everything is in equilibrium for the entire time range, we can't compute the equilibrium time and return -Infinity as a result.
-    if (everything_in_equilibrium) {
-      return NEG_INF;
-    }
-  }
-
-  // This is a greedy approach. The outer loop assumes that we are not in eq. and walks along time. The inner loop assumes we are in eq. and walks along the
-  // subcollections represented in the eigensystem. The first time a failure condition is met in the inner loop (i.e. we're not in equilibrium for that window /
-  // subcollection according to the function), the inner loop early terminates after having reflagged the everything_in_equilibrium as false (the returned)
-  // value from the function. The only success condition is every evaluation of the inner loop reassigning everything_in_equilibrium to 1, preserving the bit
-  // and exiting the outer loop. A goto / (do / while) probably would have worked here as well but I don't think those read as well. Then again, this comment
-  // is pretty long so this probably doesn't read that well either.
-  for (i = starting_index; i < num_points - parameters.window_size + 1 && !everything_in_equilibrium; ++i) {
-    if (parameters.all_subpop_for_eq) {
-      everything_in_equilibrium = 1;
-
-      for (j = 0; j < eigensystem.length && everything_in_equilibrium; ++j) {
-        everything_in_equilibrium = index_in_equilibrium_within_window_position(eigensystem, parameters, j, i);
-      }
-    } else {
-      everything_in_equilibrium = index_in_equilibrium_within_window_position(eigensystem, parameters, parameters.end_index, i);
-    }
-  }
-
-  double left_bound  = soft_bound_for_population_proportion(eigensystem, parameters, parameters.start_index, parameters.start_time, -1);
-  double right_bound = soft_bound_for_population_proportion(eigensystem, parameters, parameters.end_index, parameters.end_time, 1);
-
-#ifdef DEBUG
-  printf("eq_index:\t%d\n", i);
-#endif
-
-  if (everything_in_equilibrium) {
-    return pow(10, parameters.start_time + parameters.step_size * i);
+    return NEG_INF;
   } else {
-    return POS_INF;
+    for (i = starting_index; i < logtime_to_index(parameters, parameters.end_time) - parameters.window_size + 1 && !everything_in_equilibrium; ++i) {
+      if (parameters.all_subpop_for_eq) {
+        everything_in_equilibrium = 1;
+
+        for (j = 0; j < eigensystem.length && everything_in_equilibrium; ++j) {
+          everything_in_equilibrium = index_in_equilibrium_within_window_position(eigensystem, parameters, j, i);
+        }
+      } else {
+        everything_in_equilibrium = index_in_equilibrium_within_window_position(eigensystem, parameters, parameters.end_index, i);
+      }
+    }
+
+    if (everything_in_equilibrium) {
+      return pow(10, parameters.start_time + parameters.step_size * i);
+    } else {
+      return POS_INF;
+    }
   }
 }
 
@@ -312,27 +283,16 @@ double soft_bound_for_population_proportion(const EIGENSYSTEM eigensystem, const
     delta = epsilon;
   }
 
-  last_time         = final_time;
-  current_time      = parameters.start_time + (parameters.end_time - parameters.start_time) / 2.0;
-  final_probability = probability_at_time(
-    eigensystem,
-    parameters,
-    pow(10, final_time),
-    parameters.start_index,
-    eigensystem_index
-  );
+  last_time           = final_time;
+  current_time        = parameters.start_time + (parameters.end_time - parameters.start_time) / 2.0;
+  current_probability = probability_at_time(eigensystem, parameters, pow(10, current_time), parameters.start_index, eigensystem_index);
+  final_probability   = probability_at_time(eigensystem, parameters, pow(10, final_time), parameters.start_index, eigensystem_index);
 
   while(fabs(current_time - last_time) > parameters.step_size) {
-    current_probability = probability_at_time(
-      eigensystem,
-      parameters,
-      pow(10, current_time),
-      parameters.start_index,
-      eigensystem_index
-    );
+    current_probability = probability_at_time(eigensystem, parameters, pow(10, current_time), parameters.start_index, eigensystem_index);
 
 #ifdef INSANE_DEBUG
-    printf("current_time:\t%f\tlast_time:\t%f\tcurrent_probability:\t%f\ttarget_probability:\t%f\n", current_time, last_time, current_probability, final_probability);
+    printf("current_time:\t%+f\tlast_time:\t%+f\tp(current):\t%f\tp(target):\t%f\n", current_time, last_time, current_probability, final_probability);
 #endif
 
     temp_time = current_time;
@@ -346,87 +306,11 @@ double soft_bound_for_population_proportion(const EIGENSYSTEM eigensystem, const
     last_time = temp_time;
   }
 
-  return current_time;
-}
-
-int estimate_starting_index_to_scan_for_equilibrium(int num_points, const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
-  // This scans for a good starting position to estimate equilibrium in a "forward / backward" fashion, described below.
-  int i = 0, starting_index = 0;
-  double str_1_start, str_1_current, str_1_end, str_2_start, str_2_current, str_2_end, delta = parameters.delta, epsilon = parameters.equilibrium;
-
-  if (!delta) {
-    delta = epsilon;
-  }
-
-  str_1_start = probability_at_time(eigensystem, parameters, pow(10, parameters.start_time), parameters.start_index, parameters.start_index);
-  str_1_end   = probability_at_time(eigensystem, parameters, pow(10, parameters.end_time),   parameters.start_index, parameters.start_index);
-
-  str_2_start = probability_at_time(eigensystem, parameters, pow(10, parameters.start_time), parameters.start_index, parameters.end_index);
-  str_2_end   = probability_at_time(eigensystem, parameters, pow(10, parameters.end_time),   parameters.start_index, parameters.end_index);
-
-#ifdef DEBUG
-  printf("epsilon:\t%.2e\n",   epsilon);
-  printf("str_1_start:\t%f\n", str_1_start);
-  printf("str_1_end:\t%f\n",   str_1_end);
-  printf("str_2_start:\t%f\n", str_2_start);
-  printf("str_2_end:\t%f\n",   str_2_end);
-#endif
-
-  // The forward part of selecting a starting index first requires ensuring that a solution exists, namely that for the user-requested timespan, the system
-  // (at least for either the population proportion of the starting state or ending state) changes by more than delta overall. If delta is not provided,
-  // epsilon is used instead.
-  if (fabs(str_1_start - str_1_end) > delta || fabs(str_2_start - str_2_end) > delta) {
-    do {
-      str_1_current = probability_at_time(
-                        eigensystem,
-                        parameters,
-                        pow(10, parameters.start_time + parameters.step_size * i),
-                        parameters.start_index,
-                        parameters.start_index
-                      );
-
-      str_2_current = probability_at_time(
-                        eigensystem,
-                        parameters,
-                        pow(10, parameters.start_time + parameters.step_size * i),
-                        parameters.start_index,
-                        parameters.end_index
-                      );
-
 #ifdef INSANE_DEBUG
-      printf("%d\t%f\t%f\n", i, fabs(str_1_current - str_1_end), fabs(str_2_current - str_2_end));
+    printf("Bound found at %+f within %f of requested delta, %f\n", current_time, fabs(current_probability - final_probability), delta);
 #endif
 
-      starting_index = i++;
-      // We continue stepping forward in time in increments of 1 while we're still within the bounds of the timespan and either of the two populations
-      // are still not within delta of their final occupancy probability. This constitutes the forward step.
-    } while (i < num_points - parameters.window_size && (fabs(str_1_current - str_1_end) > delta || fabs(str_2_current - str_2_end) > delta));
-
-    // Since the forward step looks for a position within delta of the *last* user-requested timepoint (to ensure we escape the "warming up" phase), it
-    // is posible that the system has already been in equilibrium for some time. The backward step moves us in reverse to find the first position that
-    // is not in equilbrium within the user-requested window size. This guarantees that we find the first position that satisfies equilibrium, and not
-    // just a position that satisfies (as could happen before, since being within delta of the final position isn't necessarily the first time that you've
-    // been in equilibrium; in other words sometimes the forward step moves too far to the right to ensure that we're outside of any local equilibrium).
-    while (i >= 0 && index_in_equilibrium_within_window_position(eigensystem, parameters, parameters.end_index, i--)) {};
-
-    if (i >= 0 && starting_index != i) {
-      if (parameters.verbose) {
-
-      }
-      printf("Scanned backwards successfully from %d to %d.\n", starting_index, i);
-
-      starting_index = i;
-    }
-  } else {
-    starting_index = -1;
-  }
-
-#ifdef DEBUG
-  printf("starting_index:\t%d\n", starting_index);
-  printf("num_points:\t%d\n", num_points);
-#endif
-
-  return starting_index;
+  return current_time;
 }
 
 int index_in_equilibrium_within_window_position(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, int eigensystem_index, int window_start) {
@@ -464,6 +348,14 @@ int index_in_equilibrium_within_window_position(const EIGENSYSTEM eigensystem, c
   }
 
   return 1;
+}
+
+int logtime_to_index(const POPULATION_PARAMS parameters, double logtime) {
+  return (int)round((logtime - parameters.start_time) / parameters.step_size);
+}
+
+double index_to_logtime(const POPULATION_PARAMS parameters, int index) {
+  return parameters.start_time + index * parameters.step_size;
 }
 
 void print_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {

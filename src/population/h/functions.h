@@ -19,6 +19,8 @@ long double estimate_equilibrium(const EIGENSYSTEM, const POPULATION_PARAMS);
 double soft_bound_for_population_proportion(const EIGENSYSTEM, const POPULATION_PARAMS, int, double, int);
 int estimate_starting_index_to_scan_for_equilibrium(int, const EIGENSYSTEM, const POPULATION_PARAMS);
 int index_in_equilibrium_within_window_position(const EIGENSYSTEM, const POPULATION_PARAMS, int, int);
+int logtime_to_index(const POPULATION_PARAMS, double);
+double index_to_logtime(const POPULATION_PARAMS, int);
 void print_equilibrium(const EIGENSYSTEM, const POPULATION_PARAMS);
 void print_population_proportion(const EIGENSYSTEM, const POPULATION_PARAMS);
 void print_array(char*, double*, int);
