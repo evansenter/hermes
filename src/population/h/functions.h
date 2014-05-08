@@ -16,8 +16,9 @@ void find_key_structure_indices_in_structure_list(POPULATION_PARAMS*, const SOLU
 void serialize_eigensystem(const EIGENSYSTEM, const POPULATION_PARAMS);
 EIGENSYSTEM deserialize_eigensystem(const POPULATION_PARAMS);
 long double estimate_equilibrium(const EIGENSYSTEM, const POPULATION_PARAMS);
+double soft_bound_for_population_proportion(const EIGENSYSTEM, const POPULATION_PARAMS, int, double, int);
 int estimate_starting_index_to_scan_for_equilibrium(int, const EIGENSYSTEM, const POPULATION_PARAMS);
-int is_index_in_equilibrium_within_window_position(const EIGENSYSTEM, const POPULATION_PARAMS, int, int);
+int index_in_equilibrium_within_window_position(const EIGENSYSTEM, const POPULATION_PARAMS, int, int);
 void print_equilibrium(const EIGENSYSTEM, const POPULATION_PARAMS);
 void print_population_proportion(const EIGENSYSTEM, const POPULATION_PARAMS);
 void print_array(char*, double*, int);
