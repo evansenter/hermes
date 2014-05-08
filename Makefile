@@ -33,6 +33,7 @@ RateEq:
 	cp mashup/population_from_rate_matrix/RateEq.out bin/RateEq
 
 clean:
+	rm lib/*
 	cd src/fftbor2d; make clean
 	cd src/mfpt; make clean
 	cd src/population; make clean
