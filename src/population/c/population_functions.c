@@ -244,10 +244,14 @@ long double estimate_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION
   int i, j, starting_index, num_points, everything_in_equilibrium = 0;
   double start_probability, end_probability, epsilon = parameters.equilibrium;
 
+  // estimate_starting_index_to_scan_for_equilibrium does a forward / backward scan to pick the first position to use a sliding window looking for equilibrium.
+  // This is necessary because if the timespan is extended too far to the left, the algorithm would erroneously claim equilibrium had been achieved when in fact,
+  // the system hadn't had enough time to start making transitions yet. (That corresponds to the left-hand side of the sigmoidal population occupancy curve).
   num_points     = (int)((parameters.end_time - parameters.start_time) / parameters.step_size);
   starting_index = estimate_starting_index_to_scan_for_equilibrium(num_points, eigensystem, parameters);
 
-  // starting_index < 0 means that for the delta provided, we can't find a starting position to scan for equilibrium. This usually means the timespan isn't wide enough.
+  // starting_index < 0 means that for the delta provided, we can't find a starting position to scan for equilibrium. This usually means the timespan isn't
+  // wide enough.
   if (starting_index < 0) {
     if (parameters.all_subpop_for_eq) {
       everything_in_equilibrium = 1;
@@ -299,6 +303,7 @@ long double estimate_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION
 }
 
 int estimate_starting_index_to_scan_for_equilibrium(int num_points, const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
+  // This scans for a good starting position to estimate equilibrium in a "forward / backward" fashion, described below.
   int i = 0, starting_index = 0;
   double str_1_start, str_1_current, str_1_end, str_2_start, str_2_current, str_2_end, delta = parameters.delta, epsilon = parameters.equilibrium;
 
@@ -320,7 +325,10 @@ int estimate_starting_index_to_scan_for_equilibrium(int num_points, const EIGENS
   printf("str_2_end:\t%f\n",   str_2_end);
 #endif
 
-  if (fabs(str_1_start - str_1_end) > epsilon || fabs(str_2_start - str_2_end) > epsilon) {
+  // The forward part of selecting a starting index first requires ensuring that a solution exists, namely that for the user-requested timespan, the system
+  // (at least for either the population proportion of the starting state or ending state) changes by more than delta overall. If delta is not provided,
+  // epsilon is used instead.
+  if (fabs(str_1_start - str_1_end) > delta || fabs(str_2_start - str_2_end) > delta) {
     do {
       str_1_current = probability_at_time(
                         eigensystem,
@@ -343,7 +351,25 @@ int estimate_starting_index_to_scan_for_equilibrium(int num_points, const EIGENS
 #endif
 
       starting_index = i++;
+      // We continue stepping forward in time in increments of 1 while we're still within the bounds of the timespan and either of the two populations
+      // are still not within delta of their final occupancy probability. This constitutes the forward step.
     } while (i < num_points - parameters.window_size && (fabs(str_1_current - str_1_end) > delta || fabs(str_2_current - str_2_end) > delta));
+
+    // Since the forward step looks for a position within delta of the *last* user-requested timepoint (to ensure we escape the "warming up" phase), it
+    // is posible that the system has already been in equilibrium for some time. The backward step moves us in reverse to find the first position that
+    // is not in equilbrium within the user-requested window size. This guarantees that we find the first position that satisfies equilibrium, and not
+    // just a position that satisfies (as could happen before, since being within delta of the final position isn't necessarily the first time that you've
+    // been in equilibrium; in other words sometimes the forward step moves too far to the right to ensure that we're outside of any local equilibrium).
+    while (i >= 0 && is_index_in_equilibrium_within_window_position(eigensystem, parameters, parameters.end_index, i--)) {};
+
+    if (i >= 0 && starting_index != i) {
+      if (parameters.verbose) {
+        
+      }
+      printf("Scanned backwards successfully from %d to %d.\n", starting_index, i);
+
+      starting_index = i;
+    }
   } else {
     starting_index = -1;
   }
