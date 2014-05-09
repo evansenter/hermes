@@ -7,5 +7,5 @@ tpl.o: tpl.c tpl.h
 	gcc -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wa,-q tpl.c -o tpl.o
 
 clean:
-	rm tpl.o
-	rm ../../lib/libtpl.a
+	rm -f tpl.o
+	rm -f ../../lib/libtpl.a
