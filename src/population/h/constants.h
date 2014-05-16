@@ -5,7 +5,8 @@
 // #define SUPER_HEAVY_DEBUG 1
 // #define INSANE_DEBUG 1
 
-#define RT (1e-3 * 1.9872041 * (273.15 + 37))
+#define INF 1000000
+#define RT (1e-3 * 1.9872041 * (273.15 + (temperature)))
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 

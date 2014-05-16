@@ -4,9 +4,11 @@
 #include <math.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_eigen.h>
+#include "vienna/functions.h"
 #include "shared/libmfpt_header.h"
 #include "shared/libtpl_header.h"
 #include "constants.h"
+#include "params.h"
 #include "initializers.h"
 #include "functions.h"
 
@@ -154,33 +156,19 @@ double probability_at_logtime(const EIGENSYSTEM eigensystem, const POPULATION_PA
   return cumulative_probability;
 }
 
-void find_key_structure_indices_in_structure_list(POPULATION_PARAMS* parameters, const SOLUTION* all_structures, int num_structures, char* empty_str, char* mfe_str) {
+void find_key_structure_indices_in_structure_list(POPULATION_PARAMS* parameters, const SOLUTION* all_structures, int num_structures) {
   int i;
 
   for (i = 0; i < num_structures; ++i) {
     if (parameters->start_index == -1) {
-      if (parameters->start_structure != NULL) {
-        if (!strcmp(parameters->start_structure, all_structures[i].structure)) {
-          parameters->start_index = i;
-        }
-      } else {
-        if (!strcmp(empty_str, all_structures[i].structure)) {
-          parameters->start_structure = all_structures[i].structure;
-          parameters->start_index     = i;
-        }
+      if (!strcmp(parameters->start_structure, all_structures[i].structure)) {
+        parameters->start_index = i;
       }
     }
 
     if (parameters->end_index == -1) {
-      if (parameters->end_structure != NULL) {
-        if (!strcmp(parameters->end_structure, all_structures[i].structure)) {
-          parameters->end_index = i;
-        }
-      } else {
-        if (!strcmp(mfe_str, all_structures[i].structure)) {
-          parameters->end_structure = all_structures[i].structure;
-          parameters->end_index     = i;
-        }
+      if (!strcmp(parameters->end_structure, all_structures[i].structure)) {
+        parameters->end_index = i;
       }
     }
   }
@@ -238,6 +226,78 @@ EIGENSYSTEM deserialize_eigensystem(const POPULATION_PARAMS parameters) {
   tpl_free(tpl);
 
   return eigensystem;
+}
+
+void ensure_key_structures_and_energies_assigned(POPULATION_PARAMS* parameters) {
+  int i, seq_length = strlen(parameters->sequence);
+
+  if (parameters->start_structure == NULL) {
+    parameters->start_structure = malloc((seq_length + 1) * sizeof(char));
+    for (i = 0; i < seq_length; ++i) {
+      parameters->start_structure[i] = '.';
+    }
+
+    parameters->start_structure[i] = '\0';
+  }
+
+  if (parameters->end_structure == NULL) {
+    set_mfe_str_and_energy(parameters);
+  } else {
+    set_energy_of_target_str(parameters);
+  }
+}
+
+void set_mfe_str_and_energy(POPULATION_PARAMS* parameters) {
+  paramT* vienna_params;
+
+  vienna_params             = init_vienna_params(*parameters);
+  parameters->end_structure = malloc((strlen(parameters->sequence) + 1) * sizeof(char));
+  parameters->target_energy = (double)fold_par(parameters->sequence, parameters->end_structure, vienna_params, 0, 0);
+}
+
+void set_energy_of_target_str(POPULATION_PARAMS* parameters) {
+  paramT* vienna_params;
+
+  vienna_params             = init_vienna_params(*parameters);
+  parameters->target_energy = (double)energy_of_struct_par(parameters->sequence, parameters->end_structure, vienna_params, 0);
+}
+
+SOLUTION* sample_structures(const POPULATION_PARAMS parameters) {
+  double energy_cap;
+  paramT* vienna_params;
+
+  vienna_params = init_vienna_params(parameters);
+  energy_cap    = parameters.energy_cap ? (int)round(parameters.energy_cap * 100) : INF;
+
+  return subopt_par(parameters.sequence, parameters.start_structure, vienna_params, energy_cap, 0, 0, NULL);
+}
+
+double boltzmann_probability(const POPULATION_PARAMS parameters) {
+  pf_paramT* vienna_pf_params;
+  double boltzmann_factor, ensemble_energy, partition_function;
+
+  vienna_pf_params = init_vienna_pf_params(parameters);
+
+  boltzmann_factor   = exp(-parameters.target_energy / RT);
+  ensemble_energy    = pf_fold_par(parameters.sequence, NULL, vienna_pf_params, 0, 0, 0);
+  partition_function = exp(-ensemble_energy / RT);
+
+  if (parameters.verbose) {
+    printf("Boltzmann factor from ViennaRNA: %f\n", boltzmann_factor);
+    printf("Partition function from pf_fold_par: %f\n", partition_function);
+    printf("Boltzmann probability using pf_fold_par: %f\n", boltzmann_factor / partition_function);
+  }
+
+  return boltzmann_factor / partition_function;
+}
+
+double compute_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
+  double equilibrium_time, probability;
+
+  probability      = boltzmann_probability(parameters);
+  equilibrium_time = eigensystem.values[parameters.start_index] * log(probability / eigensystem.vectors[parameters.end_index]);
+
+  return equilibrium_time;
 }
 
 double estimate_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
@@ -318,7 +378,7 @@ double soft_bound_for_population_proportion(const EIGENSYSTEM eigensystem, const
 
 int index_in_equilibrium_within_window(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, int eigensystem_index, double logtime) {
   int i;
-  double current_proportion, future_proportion, epsilon = parameters.equilibrium;
+  double current_proportion, future_proportion;
 
   current_proportion = probability_at_logtime(
                          eigensystem,
@@ -344,11 +404,11 @@ int index_in_equilibrium_within_window(const EIGENSYSTEM eigensystem, const POPU
       logtime + parameters.step_size * i,
       eigensystem_index,
       fabs(current_proportion - future_proportion),
-      fabs(current_proportion - future_proportion) < epsilon ? "yes" : "no"
+      fabs(current_proportion - future_proportion) < parameters.epsilon ? "yes" : "no"
     );
 #endif
 
-    if (fabs(current_proportion - future_proportion) > epsilon) {
+    if (fabs(current_proportion - future_proportion) > parameters.epsilon) {
       return 0;
     }
   }
@@ -359,7 +419,19 @@ int index_in_equilibrium_within_window(const EIGENSYSTEM eigensystem, const POPU
 void print_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
   double equilibrium_time;
 
-  equilibrium_time = estimate_equilibrium(eigensystem, parameters);
+  if (parameters.equilibrium && !parameters.epsilon && parameters.target_energy != INF) {
+    if (parameters.verbose) {
+      printf("Computing equilibrium.\n");
+    }
+
+    equilibrium_time = compute_equilibrium(eigensystem, parameters);
+  } else {
+    if (parameters.verbose) {
+      printf("Estimating equilibrium.\n");
+    }
+
+    equilibrium_time = estimate_equilibrium(eigensystem, parameters);
+  }
 
   if (equilibrium_time == NEG_INF(parameters)) {
     printf("-Infinity\n");

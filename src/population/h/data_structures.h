@@ -12,11 +12,13 @@ typedef struct {
   int start_index;
   int end_index;
   int serialize;
+  double target_energy;
   double temperature;
   double start_time;
   double end_time;
   double step_size;
-  double equilibrium;
+  short equilibrium;
+  double epsilon;
   double delta;
   int window_size;
   int all_subpop_for_eq;
