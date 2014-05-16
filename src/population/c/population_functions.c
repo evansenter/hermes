@@ -419,7 +419,7 @@ int index_in_equilibrium_within_window(const EIGENSYSTEM eigensystem, const POPU
 void print_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
   double equilibrium_time;
 
-  if (parameters.equilibrium && !parameters.epsilon && parameters.target_energy != INF) {
+  if (parameters.equilibrium && !parameters.epsilon && parameters.sequence != NULL && parameters.target_energy != INF) {
     if (parameters.verbose) {
       printf("Computing equilibrium.\n");
     }
