@@ -80,4 +80,59 @@ typedef struct {
   
 } paramT;
 
+/**
+ *  \brief  The datastructure that contains temperature scaled Boltzmann weights of the energy parameters.
+ */
+typedef struct{
+  int     id;
+  double  expstack[NBPAIRS+1][NBPAIRS+1];
+  double  exphairpin[31];
+  double  expbulge[MAXLOOP+1];
+  double  expinternal[MAXLOOP+1];
+  double  expmismatchExt[NBPAIRS+1][5][5];
+  double  expmismatchI[NBPAIRS+1][5][5];
+  double  expmismatch23I[NBPAIRS+1][5][5];
+  double  expmismatch1nI[NBPAIRS+1][5][5];
+  double  expmismatchH[NBPAIRS+1][5][5];
+  double  expmismatchM[NBPAIRS+1][5][5];
+  double  expdangle5[NBPAIRS+1][5];
+  double  expdangle3[NBPAIRS+1][5];
+  double  expint11[NBPAIRS+1][NBPAIRS+1][5][5];
+  double  expint21[NBPAIRS+1][NBPAIRS+1][5][5][5];
+  double  expint22[NBPAIRS+1][NBPAIRS+1][5][5][5][5];
+  double  expninio[5][MAXLOOP+1];
+  double  lxc;
+  double  expMLbase;
+  double  expMLintern[NBPAIRS+1];
+  double  expMLclosing;
+  double  expTermAU;
+  double  expDuplexInit;
+  double  exptetra[40];
+  double  exptri[40];
+  double  exphex[40];
+  char    Tetraloops[1401];
+  double  expTriloop[40];
+  char    Triloops[241];
+  char    Hexaloops[1801];
+  double  expTripleC;
+  double  expMultipleCA;
+  double  expMultipleCB;
+  double  expgquad[VRNA_GQUAD_MAX_STACK_SIZE + 1]
+                  [3*VRNA_GQUAD_MAX_LINKER_LENGTH + 1];
+
+  double  kT;
+  double  pf_scale;     /**<  \brief    Scaling factor to avoid over-/underflows */
+
+  double  temperature;  /**<  \brief    Temperature used for loop contribution scaling */
+  double  alpha;        /**<  \brief    Scaling factor for the thermodynamic temperature
+                              \details  This allows for temperature scaling in Boltzmann
+                                        factors independently from the energy contributions.
+                                        The resulting Boltzmann factors are then computed by
+                                        \f$ e^{-E/(\alpha \cdot K \cdot T)} \f$
+                        */
+
+  model_detailsT model_details; /**<  \brief  Model details to be used in the recursions */
+
+}  pf_paramT;
+
 #endif
