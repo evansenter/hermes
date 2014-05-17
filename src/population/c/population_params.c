@@ -17,13 +17,13 @@ POPULATION_PARAMS init_population_params() {
     .start_index       = -1,
     .end_index         = -1,
     .serialize         = 0,
-    .target_energy     = 0,
+    .target_energy     = INF,
     .temperature       = 37.,
     .start_time        = -10,
     .end_time          = 10,
     .step_size         = 1e-3,
     .equilibrium       = 0,
-    .epsilon           = 0,
+    .epsilon           = 1e-4,
     .delta             = 1e-3,
     .window_size       = 5,
     .all_subpop_for_eq = 0,
@@ -307,11 +307,6 @@ int population_error_handling(const POPULATION_PARAMS parameters) {
 
   if (parameters.window_size < 2) {
     fprintf(stderr, "Error: the window size is exclusive, and must be larger than 2.\n");
-    error++;
-  }
-
-  if (parameters.all_subpop_for_eq && !parameters.epsilon) {
-    fprintf(stderr, "Error: -h doesn't do anything unless we're estimating the equilibrium with -e specified.\n");
     error++;
   }
 

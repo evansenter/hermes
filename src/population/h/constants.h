@@ -10,7 +10,7 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-#define POS_INF(parameters) (parameters.end_time + 1)
-#define NEG_INF(parameters) (parameters.start_time - 1)
+#define POS_INF(parameters) ((parameters).end_time + 1)
+#define NEG_INF(parameters) ((parameters).start_time - 1)
 
 #endif

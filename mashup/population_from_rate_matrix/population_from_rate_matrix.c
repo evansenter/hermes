@@ -11,26 +11,24 @@ int main(int argc, char** argv) {
   MFPT_PARAMS mfpt_params;
   POPULATION_PARAMS population_params;
   TRANSITION_MATRIX transition_matrix;
-  
+
   char* subparams[] = { "mfpt", "population" };
   params            = split_args(argc, argv, subparams, 2);
-  
+
   mfpt_params       = init_mfpt_params();
   mfpt_params.input = 0;
-  
+
   parse_mfpt_args(&mfpt_params, params[0].argc, params[0].argv);
-  
+
   klp_matrix        = klp_matrix_from_file(mfpt_params);
   transition_matrix = transition_matrix_from_klp_matrix(&klp_matrix, mfpt_params);
-  
-  population_params             = init_population_params();
-  population_params.input       = 0;
-  population_params.step_size   = 1e-2;
-  population_params.equilibrium = 1e-4;
-  
+
+  population_params       = init_population_params();
+  population_params.input = 0;
+
   parse_population_args(&population_params, params[1].argc, params[1].argv);
-  
-  population_from_row_ordered_transition_matrix(population_params, transition_matrix);
-  
+
+  population_from_row_ordered_transition_matrix(&population_params, transition_matrix);
+
   return 0;
 }

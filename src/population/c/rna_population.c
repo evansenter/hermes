@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
     print_eigenvalues(eigensystem);
     exit(0);
   } else if (parameters.equilibrium) {
-    print_equilibrium(eigensystem, parameters);
+    print_equilibrium(eigensystem, &parameters);
 
     if (parameters.benchmark) {
       gettimeofday(&stop, NULL);

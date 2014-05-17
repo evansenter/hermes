@@ -12,11 +12,11 @@
 #include "initializers.h"
 #include "functions.h"
 
-void population_from_row_ordered_transition_matrix(const POPULATION_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
-  if (parameters.equilibrium) {
+void population_from_row_ordered_transition_matrix(POPULATION_PARAMS* parameters, TRANSITION_MATRIX row_transition_matrix) {
+  if (parameters->equilibrium) {
     equilibrium_from_row_ordered_transition_matrix(parameters, row_transition_matrix);
   } else {
-    population_proportion_from_row_ordered_transition_matrix(parameters, row_transition_matrix);
+    population_proportion_from_row_ordered_transition_matrix(*parameters, row_transition_matrix);
   }
 }
 
@@ -38,7 +38,7 @@ void population_proportion_from_row_ordered_transition_matrix(const POPULATION_P
   print_population_proportion(eigensystem, parameters);
 }
 
-void equilibrium_from_row_ordered_transition_matrix(const POPULATION_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
+void equilibrium_from_row_ordered_transition_matrix(POPULATION_PARAMS* parameters, TRANSITION_MATRIX row_transition_matrix) {
   EIGENSYSTEM eigensystem;
 
   eigensystem = eigensystem_from_row_ordered_transition_matrix(row_transition_matrix);
@@ -77,6 +77,7 @@ TRANSITION_MATRIX convert_structures_to_transition_matrix(const SOLUTION* all_st
 }
 
 EIGENSYSTEM convert_transition_matrix_to_eigenvectors(TRANSITION_MATRIX transition_matrix) {
+  // Generates right eigenvectors from a column-ordered transition rate matrix, and saves them in a one-dimensional column-ordered array (eigensystem.vectors).
   int i, j;
   EIGENSYSTEM eigensystem;
   eigensystem                             = init_eigensystem(transition_matrix.row_length);
@@ -295,7 +296,7 @@ double compute_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAM
   double equilibrium_time, probability;
 
   probability      = boltzmann_probability(parameters);
-  equilibrium_time = eigensystem.values[parameters.start_index] * log(probability / eigensystem.vectors[parameters.end_index]);
+  equilibrium_time = eigensystem.values[parameters.start_index] * log(probability / E_COL_ORDER(eigensystem.vectors, parameters.start_index, parameters.end_index, eigensystem.length));
 
   return equilibrium_time;
 }
@@ -370,7 +371,7 @@ double soft_bound_for_population_proportion(const EIGENSYSTEM eigensystem, const
   }
 
 #ifdef INSANE_DEBUG
-    printf("Bounded at %+f within %f of requested delta, %f\n", current_time, fabs(current_probability - final_probability), parameters.delta);
+  printf("Bounded at %+f within %f of requested delta, %f\n", current_time, fabs(current_probability - final_probability), parameters.delta);
 #endif
 
   return round(current_time / parameters.step_size) * parameters.step_size;
@@ -416,26 +417,30 @@ int index_in_equilibrium_within_window(const EIGENSYSTEM eigensystem, const POPU
   return 1;
 }
 
-void print_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
+void print_equilibrium(const EIGENSYSTEM eigensystem, POPULATION_PARAMS* parameters) {
   double equilibrium_time;
 
-  if (parameters.equilibrium && !parameters.epsilon && parameters.sequence != NULL && parameters.target_energy != INF) {
-    if (parameters.verbose) {
+  if (parameters->sequence != NULL && parameters->end_structure != NULL) {
+    if (parameters->target_energy == INF) {
+      set_energy_of_target_str(parameters);
+    }
+
+    if (parameters->verbose) {
       printf("Computing equilibrium.\n");
     }
 
-    equilibrium_time = compute_equilibrium(eigensystem, parameters);
+    equilibrium_time = compute_equilibrium(eigensystem, *parameters);
   } else {
-    if (parameters.verbose) {
+    if (parameters->verbose) {
       printf("Estimating equilibrium.\n");
     }
 
-    equilibrium_time = estimate_equilibrium(eigensystem, parameters);
+    equilibrium_time = estimate_equilibrium(eigensystem, *parameters);
   }
 
-  if (equilibrium_time == NEG_INF(parameters)) {
+  if (equilibrium_time == NEG_INF(*parameters)) {
     printf("-Infinity\n");
-  } else if (equilibrium_time == POS_INF(parameters)) {
+  } else if (equilibrium_time == POS_INF(*parameters)) {
     printf("Infinity\n");
   } else {
     printf("%f\n", equilibrium_time);
