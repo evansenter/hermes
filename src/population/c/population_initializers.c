@@ -35,18 +35,18 @@ void init_vienna_global_params(const POPULATION_PARAMS parameters) {
 
 paramT* init_vienna_params(const POPULATION_PARAMS parameters) {
   paramT* vienna_params;
-
+  
   init_vienna_global_params(parameters);
   vienna_params = scale_parameters();
-
+  
   return vienna_params;
 }
 
 pf_paramT* init_vienna_pf_params(const POPULATION_PARAMS parameters) {
   pf_paramT* vienna_pf_params;
-
+  
   init_vienna_global_params(parameters);
   vienna_pf_params = get_scaled_pf_parameters();
-
+  
   return vienna_pf_params;
 }
