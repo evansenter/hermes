@@ -36,6 +36,12 @@ typedef struct {
   int length;
 } EIGENSYSTEM;
 
+typedef struct {
+  EIGENSYSTEM eigensystem;
+  POPULATION_PARAMS parameters;
+  double boltzmann_probability;
+} EQUILIBRIUM_SOLVER_PARAMS;
+
 #define SERIALIZING(params) (params.serialize == 1)
 #define DESERIALIZING(params) (params.serialize == -1)
 #define E_ROW_ORDER(m, i, j, n) ((m)[((i) * (n)) + (j)])

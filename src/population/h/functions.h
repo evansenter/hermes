@@ -20,6 +20,7 @@ void set_mfe_str_and_energy(POPULATION_PARAMS*);
 void set_energy_of_target_str(POPULATION_PARAMS*);
 SOLUTION* sample_structures(const POPULATION_PARAMS);
 double boltzmann_probability(const POPULATION_PARAMS);
+double gsl_equilibrium_root_solver(double logtime, void* params);
 double estimate_equilibrium(const EIGENSYSTEM, const POPULATION_PARAMS);
 double soft_bound_for_population_proportion(const EIGENSYSTEM, const POPULATION_PARAMS, int, double, int);
 int estimate_starting_index_to_scan_for_equilibrium(int, const EIGENSYSTEM, const POPULATION_PARAMS);
