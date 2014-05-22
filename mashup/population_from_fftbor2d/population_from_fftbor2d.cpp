@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
   
   parse_population_args(&population_params, params[2].argc, params[2].argv);
   
-  population_from_row_ordered_transition_matrix(&population_params, transition_matrix);
+  population_from_row_ordered_transition_matrix(population_params, transition_matrix);
   
   return 0;
 }

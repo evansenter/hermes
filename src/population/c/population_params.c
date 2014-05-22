@@ -17,7 +17,6 @@ POPULATION_PARAMS init_population_params() {
     .start_index       = -1,
     .end_index         = -1,
     .serialize         = 0,
-    .target_energy     = INF,
     .temperature       = 37.,
     .start_time        = -10,
     .end_time          = 10,

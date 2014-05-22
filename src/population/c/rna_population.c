@@ -50,7 +50,6 @@ int main(int argc, char** argv) {
       printf("sequence:\t%s\n", sequence);
       printf("start:\t\t%s\t%+.2f kcal/mol\t(%d)\n", all_structures[parameters.start_index].structure, all_structures[parameters.start_index].energy, parameters.start_index);
       printf("stop:\t\t%s\t%+.2f kcal/mol\t(%d)\n", all_structures[parameters.end_index].structure, all_structures[parameters.end_index].energy, parameters.end_index);
-      printf("mfe energy:\t%+.2f\n", parameters.target_energy);
       printf("num str:\t%d\n\n", num_structures);
       
       for (i = 0; i < num_structures; ++i) {
@@ -110,7 +109,7 @@ int main(int argc, char** argv) {
     print_eigenvalues(eigensystem);
     exit(0);
   } else if (parameters.equilibrium) {
-    print_equilibrium(eigensystem, &parameters);
+    print_equilibrium(eigensystem, parameters);
     
     if (parameters.benchmark) {
       gettimeofday(&stop, NULL);
