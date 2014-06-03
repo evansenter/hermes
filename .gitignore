@@ -17,3 +17,6 @@
 *.out
 *.app
 bin/*
+
+# Vienna stuff
+*.ps
