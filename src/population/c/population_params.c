@@ -22,6 +22,7 @@ POPULATION_PARAMS init_population_params() {
     .end_time          = 10,
     .step_size         = 1e-3,
     .equilibrium       = 0,
+    .soft_bounds       = 1,
     .epsilon           = 1e-4,
     .delta             = 1e-3,
     .window_size       = 5,
@@ -38,7 +39,7 @@ POPULATION_PARAMS init_population_params() {
 void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv) {
   int c;
   
-  while ((c = getopt(argc, argv, "OoGgBbHhVvQqA:a:Z:z:S:s:K:k:L:l:I:i:J:j:P:p:E::e::D:d:W:w:T:t:C:c:R:r:F:f:")) != -1) {
+  while ((c = getopt(argc, argv, "OoGgBbHhNnVvQqA:a:Z:z:S:s:K:k:L:l:I:i:J:j:P:p:E::e::D:d:W:w:T:t:C:c:R:r:F:f:")) != -1) {
     switch (c) {
       case 'O':
       case 'o':
@@ -58,6 +59,11 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv)
       case 'H':
       case 'h':
         parameters->all_subpop_for_eq = 1;
+        break;
+        
+      case 'N':
+      case 'n':
+        parameters->soft_bounds = 0;
         break;
         
       case 'V':
@@ -334,6 +340,7 @@ void debug_population_parameters(const POPULATION_PARAMS parameters) {
   printf("(q) equilibrium\t\t\t%s\n",           parameters.equilibrium ? "Yes" : "No");
   printf("(e) epsilon\t\t\t%.2e\n",             parameters.epsilon);
   printf("(d) delta\t\t\t%.2e\n",               parameters.delta);
+  printf("(n) soft bounds\t\t\t%s\n",           parameters.soft_bounds ? "Yes" : "No");
   printf("(h) all subpop.\t\t\t%s\n",           parameters.all_subpop_for_eq ? "Yes" : "No");
   printf("(w) window size\t\t\t%d\n",           parameters.window_size);
   printf("(g) eigen_only\t\t\t%s\n",            parameters.eigen_only ? "Yes" : "No");
@@ -357,6 +364,7 @@ void population_usage() {
   fprintf(stderr, "-J/j\tend time,              natrual log of the ending time for computing population proportion.\n");
   fprintf(stderr, "-K/k\tstarting structure,    structure for which the probability at time 0 is equal to 1. If not provided, the empty structure is used / inferred.\n");
   fprintf(stderr, "-L/l\tending structure,      structure of interest for detailed population proportion values. If not provided, the MFE structure is used / inferred.\n");
+  fprintf(stderr, "-N/n\t(n)o soft bounds,      default is disabled. When enabled, the population proportion / equilibrium time will not use soft bounds computed with the -d delta value, and instead will compute population proportion / equilibrium over the entire timespan (timespan can be adjusted with -i and -j).\n");
   fprintf(stderr, "-O/o\tl(o)nely basepairs,    default is disabled. When enabled, RNAsubopt will sample structures containing lonely basepairs.\n");
   fprintf(stderr, "-P/p\tste(p) size,           natrual log of the step size for computing population proportion (start_time < start_time + step_size <= end_time).\n");
   fprintf(stderr, "-Q/q\te(q)uilibrium,         Compute the equilibrium time for the target state. By default uses an exact method that requires a target structure. If the -e flag is passed as well, uses an aproximation technique suitable for any probability rate matrix.\n");

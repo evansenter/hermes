@@ -35,6 +35,7 @@ void population_proportion_from_row_ordered_transition_matrix(const POPULATION_P
   EIGENSYSTEM eigensystem;
   
   eigensystem = eigensystem_from_row_ordered_transition_matrix(row_transition_matrix);
+  
   print_population_proportion(eigensystem, parameters);
 }
 
@@ -311,34 +312,38 @@ double estimate_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARA
 double soft_bound_for_population_proportion(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, int eigensystem_index, double final_time, int sign) {
   double current_probability, final_probability, current_time, temp_time, last_time = final_time;
   
-  last_time           = final_time;
-  current_time        = parameters.start_time + (parameters.end_time - parameters.start_time) / 2.0;
-  current_probability = probability_at_logtime(eigensystem, parameters, current_time, parameters.start_index, eigensystem_index);
-  final_probability   = probability_at_logtime(eigensystem, parameters, final_time, parameters.start_index, eigensystem_index);
-  
-  while (fabs(current_time - last_time) > parameters.step_size) {
+  if (parameters.soft_bounds) {
+    last_time           = final_time;
+    current_time        = parameters.start_time + (parameters.end_time - parameters.start_time) / 2.0;
     current_probability = probability_at_logtime(eigensystem, parameters, current_time, parameters.start_index, eigensystem_index);
+    final_probability   = probability_at_logtime(eigensystem, parameters, final_time, parameters.start_index, eigensystem_index);
     
+    while (fabs(current_time - last_time) > parameters.step_size) {
+      current_probability = probability_at_logtime(eigensystem, parameters, current_time, parameters.start_index, eigensystem_index);
+      
 #ifdef INSANE_DEBUG
-    printf("current_time: %+f, last_time: %+f, p(current): %f, p(target): %f\n", current_time, last_time, current_probability, final_probability);
+      printf("current_time: %+f, last_time: %+f, p(current): %f, p(target): %f\n", current_time, last_time, current_probability, final_probability);
 #endif
-    
-    temp_time = current_time;
-    
-    if (fabs(current_probability - final_probability) > parameters.delta) {
-      current_time += sign * fabs(last_time - current_time) / 2.0;
-    } else {
-      current_time -= sign * fabs(last_time - current_time) / 2.0;
+      
+      temp_time = current_time;
+      
+      if (fabs(current_probability - final_probability) > parameters.delta) {
+        current_time += sign * fabs(last_time - current_time) / 2.0;
+      } else {
+        current_time -= sign * fabs(last_time - current_time) / 2.0;
+      }
+      
+      last_time = temp_time;
     }
     
-    last_time = temp_time;
-  }
-  
 #ifdef INSANE_DEBUG
-  printf("Bounded at %+f within %f of requested delta, %f\n", current_time, fabs(current_probability - final_probability), parameters.delta);
+    printf("Bounded at %+f within %f of requested delta, %f\n", current_time, fabs(current_probability - final_probability), parameters.delta);
 #endif
-  
-  return round(current_time / parameters.step_size) * parameters.step_size;
+    
+    return round(current_time / parameters.step_size) * parameters.step_size;
+  } else {
+    return final_time;
+  }
 }
 
 int index_in_equilibrium_within_window(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, int eigensystem_index, double logtime) {

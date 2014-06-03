@@ -17,6 +17,7 @@ typedef struct {
   double end_time;
   double step_size;
   short equilibrium;
+  short soft_bounds;
   double epsilon;
   double delta;
   int window_size;
