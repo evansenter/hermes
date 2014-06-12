@@ -38,7 +38,7 @@ RateEq:
 	cp mashup/population_from_rate_matrix/RateEq.out bin/RateEq
 
 clean:
-	rm lib/libfftbor2d.a lib/libmfpt.a lib/libmulti_param.a lib/libpopulation.a lib/libtpl.a
+	rm -f lib/libfftbor2d.a lib/libmfpt.a lib/libmulti_param.a lib/libpopulation.a lib/libtpl.a
 	$(SUB_MAKE) src/tpl clean
 	$(SUB_MAKE) src/fftbor2d clean
 	$(SUB_MAKE) src/mfpt clean
@@ -47,4 +47,4 @@ clean:
 	$(SUB_MAKE) mashup/mfpt_from_fftbor2d clean
 	$(SUB_MAKE) mashup/population_from_fftbor2d clean
 	$(SUB_MAKE) mashup/population_from_rate_matrix clean
-	rm bin/RNAmfpt bin/RNAeq bin/FFTbor2D bin/FFTmfpt bin/FFTeq bin/RateEq
+	rm -f bin/RNAmfpt bin/RNAeq bin/FFTbor2D bin/FFTmfpt bin/FFTeq bin/RateEq
