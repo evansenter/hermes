@@ -1,5 +1,3 @@
-# Base Makefile
-
 include Makefile.inc
 
 all: tpl FFTbor2D RNAmfpt RNAeq MultiParam FFTmfpt FFTeq RateEq

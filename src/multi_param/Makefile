@@ -1,8 +1,8 @@
 include ../../Makefile.inc
 
-GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) $(GLOBAL_HEADERS)
 HEADER   = h
 CODE     = c
+GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) $(GLOBAL_HEADERS)
 
 ifeq "$(GCC_GTEQ_4.6.0)" "1"
 	GCCFLAGS += -Ofast -march=native

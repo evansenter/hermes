@@ -1,9 +1,9 @@
 include ../../Makefile.inc
 
-GXXFLAGS = -c -std=c++11 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wno-write-strings -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) $(GLOBAL_HEADERS) `gsl-config --cflags`
-LDFLAGS  = -L . -L $(LIB) -L ~/lib $(GLOBAL_LIBS) -L /usr/local/include -lfftw3 -lgomp -llapack `gsl-config --libs` -lRNA
 HEADER   = h
 CODE     = cpp
+GXXFLAGS = -c -std=c++11 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wno-write-strings -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) $(GLOBAL_HEADERS) `gsl-config --cflags`
+LDFLAGS  = -L . -L $(LIB) -L ~/lib $(GLOBAL_LIBS) -L /usr/local/include -lfftw3 -lgomp -llapack `gsl-config --libs` -lRNA
 
 ifeq "$(GXX_GTEQ_4.6.0)" "1"
 	GXXFLAGS += -Ofast -march=native
