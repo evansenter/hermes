@@ -1,7 +1,7 @@
 include ../../Makefile.inc
 
-GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) $(GLOBAL_HEADERS) `pkg-config --cflags gsl`
-LDFLAGS  = -L . -L $(LIB) -L ~/lib $(GLOBAL_LIBS) -L /usr/local/include -lgomp -llapack `pkg-config --libs gsl` -ltpl -lmfpt -lRNA
+GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) $(GLOBAL_HEADERS) `gsl-config --cflags`
+LDFLAGS  = -L . -L $(LIB) -L ~/lib $(GLOBAL_LIBS) -L /usr/local/include -lgomp -llapack `gsl-config --libs` -ltpl -lmfpt -lRNA
 HEADER   = h
 CODE     = c
 
