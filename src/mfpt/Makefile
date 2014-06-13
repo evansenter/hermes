@@ -2,8 +2,8 @@ include ../../Makefile.inc
 
 HEADER   = h
 CODE     = c
-GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) $(GLOBAL_HEADERS) `gsl-config --cflags`
-LDFLAGS  = -L . -L $(LIB) -L ~/lib $(GLOBAL_LIBS) -L /usr/local/include -lgomp -llapack `gsl-config --libs`
+GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) $(GLOBAL_HEADERS)
+LDFLAGS  = -L . -L $(LIB) $(GLOBAL_LIBS) -llapack
 
 ifeq "$(GCC_GTEQ_4.6.0)" "1"
 	GCCFLAGS += -Ofast -march=native
