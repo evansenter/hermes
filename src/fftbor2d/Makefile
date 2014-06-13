@@ -1,7 +1,7 @@
 include ../../Makefile.inc
 
-GXXFLAGS = -c -std=c++11 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wno-write-strings -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) `pkg-config --cflags gsl`
-LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lfftw3 -lgomp -llapack `pkg-config --libs gsl` -lRNA
+GXXFLAGS = -c -std=c++11 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wno-write-strings -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) $(GLOBAL_HEADERS) `pkg-config --cflags gsl`
+LDFLAGS  = -L . -L $(LIB) -L ~/lib $(GLOBAL_LIBS) -L /usr/local/include -lfftw3 -lgomp -llapack `pkg-config --libs gsl` -lRNA
 HEADER   = h
 CODE     = cpp
 
