@@ -1,7 +1,7 @@
 include ../../Makefile.inc
 
 GXXFLAGS = -c -std=c++11 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wno-write-strings -Wa,-q -I $(HEADER) -I $(SHARED_HEADER)
-LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lfftw3 -lgomp -llapack -lgslcblas -lgsl -lfftbor2d -lmfpt -lmulti_param -lRNA -o
+LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lfftw3 -lgomp -llapack -lgsl -lgslcblas -lfftbor2d -lmfpt -lmulti_param -lRNA -o
 
 ifeq "$(GXX_GTEQ_4.6.0)" "1"
 	GXXFLAGS += -Ofast -march=native

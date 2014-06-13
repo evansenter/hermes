@@ -1,7 +1,7 @@
 include ../../Makefile.inc
 
 GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wno-write-strings -Wa,-q -I $(HEADER) -I $(SHARED_HEADER)
-LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lfftw3 -lgomp -llapack -lgslcblas -lgsl -lmfpt -lpopulation -lmulti_param -ltpl -lRNA -o
+LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lfftw3 -lgomp -llapack -lgsl -lgslcblas -lmfpt -lpopulation -lmulti_param -ltpl -lRNA -o
 
 ifeq "$(GGCC_GTEQ_4.6.0)" "1"
 	GCCFLAGS += -Ofast -march=native

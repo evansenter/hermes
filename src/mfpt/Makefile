@@ -1,7 +1,7 @@
 include ../../Makefile.inc
 
 GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER)
-LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lm -lgomp -llapack -lgslcblas -lgsl -o
+LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lm -lgomp -llapack -lgsl -lgslcblas -o
 HEADER   = h
 CODE     = c
 
