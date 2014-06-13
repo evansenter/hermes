@@ -1,7 +1,7 @@
 include ../../Makefile.inc
 
-GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER)
-LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lm -lgomp -llapack -lgsl -lgslcblas -o
+GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) `pkg-config --cflags gsl`
+LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lgomp -llapack `pkg-config --libs gsl`
 HEADER   = h
 CODE     = c
 
@@ -16,7 +16,7 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 endif
 
 RNAmfpt.out: $(CODE)/csv_mfpt.o $(CODE)/mfpt_params.o $(CODE)/mfpt_functions.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_initializers.o
-	$(GCC) $(CODE)/csv_mfpt.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_params.o $(CODE)/mfpt_functions.o $(CODE)/mfpt_initializers.o $(LDFLAGS) RNAmfpt.out
+	$(GCC) -o RNAmfpt.out $(CODE)/csv_mfpt.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_params.o $(CODE)/mfpt_functions.o $(CODE)/mfpt_initializers.o $(LDFLAGS)
 	ar cr $(LIB)/libmfpt.a $(CODE)/mfpt_functions.o $(CODE)/mfpt_params.o $(CODE)/mfpt_parser.o $(CODE)/mfpt_initializers.o
 
 $(CODE)/csv_mfpt.o: $(CODE)/csv_mfpt.c $(HEADER)/parser.h $(HEADER)/functions.h $(HEADER)/constants.h $(HEADER)/params.h $(HEADER)/initializers.h

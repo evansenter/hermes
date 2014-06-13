@@ -1,7 +1,7 @@
 include ../../Makefile.inc
 
-GXXFLAGS = -c -std=c++11 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER)
-LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lfftw3 -lgomp -llapack -lgsl -lgslcblas -lRNA -o
+GXXFLAGS = -c -std=c++11 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wno-write-strings -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) `pkg-config --cflags gsl`
+LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lfftw3 -lgomp -llapack `pkg-config --libs gsl` -lRNA
 HEADER   = h
 CODE     = cpp
 
@@ -16,7 +16,7 @@ ifeq "$(GXX_GTEQ_4.9.0)" "1"
 endif
 
 FFTbor2D.out: $(CODE)/fftbor2d_functions.o $(CODE)/fftbor2d_initializers.o $(CODE)/fftbor2d_params.o $(CODE)/fftbor2d.o
-	$(GXX) $(CODE)/fftbor2d_functions.o $(CODE)/fftbor2d_initializers.o $(CODE)/fftbor2d_params.o $(CODE)/fftbor2d.o $(LDFLAGS) FFTbor2D.out
+	$(GXX) -o FFTbor2D.out $(CODE)/fftbor2d_functions.o $(CODE)/fftbor2d_initializers.o $(CODE)/fftbor2d_params.o $(CODE)/fftbor2d.o $(LDFLAGS)
 	ar cr $(LIB)/libfftbor2d.a $(CODE)/fftbor2d_functions.o $(CODE)/fftbor2d_params.o $(CODE)/fftbor2d_initializers.o
 
 $(CODE)/fftbor2d.o: $(CODE)/fftbor2d.cpp $(HEADER)/functions.h $(HEADER)/params.h $(HEADER)/initializers.h

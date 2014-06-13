@@ -1,7 +1,7 @@
 include ../../Makefile.inc
 
-GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) -I ~/local/include
-LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lm -lgomp -llapack -lgsl -lgslcblas -ltpl -lmfpt -lRNA -o
+GCCFLAGS = -c -std=gnu99 -pedantic -fopenmp -funroll-loops -Wall -Wextra -Wa,-q -I $(HEADER) -I $(SHARED_HEADER) `pkg-config --cflags gsl`
+LDFLAGS  = -L . -L $(LIB) -L ~/lib -L ~/local/lib -L /usr/local/include -lgomp -llapack `pkg-config --libs gsl` -ltpl -lmfpt -lRNA
 HEADER   = h
 CODE     = c
 
@@ -16,8 +16,8 @@ ifeq "$(GCC_GTEQ_4.9.0)" "1"
 endif
 
 RNAeq.out: $(CODE)/rna_population.o $(CODE)/population_params.o $(CODE)/population_functions.o $(CODE)/population_initializers.o
-	cd ../mfpt; make
-	$(GCC) $(CODE)/rna_population.o $(CODE)/population_params.o $(CODE)/population_functions.o $(CODE)/population_initializers.o $(LDFLAGS) RNAeq.out
+	$(MAKE) -C ../mfpt
+	$(GCC) -o RNAeq.out $(CODE)/rna_population.o $(CODE)/population_params.o $(CODE)/population_functions.o $(CODE)/population_initializers.o $(LDFLAGS)
 	ar cr $(LIB)/libpopulation.a $(CODE)/population_functions.o $(CODE)/population_params.o $(CODE)/population_initializers.o
 
 $(CODE)/rna_population.o: $(CODE)/rna_population.c $(SHARED_HEADER)/vienna/data_structures.h $(HEADER)/functions.h $(HEADER)/params.h $(HEADER)/constants.h $(HEADER)/initializers.h
