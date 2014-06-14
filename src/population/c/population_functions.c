@@ -7,10 +7,10 @@
 #include "vienna/functions.h"
 #include "shared/libmfpt_header.h"
 #include "shared/libtpl_header.h"
-#include "constants.h"
-#include "params.h"
-#include "initializers.h"
-#include "functions.h"
+#include "population_constants.h"
+#include "population_params.h"
+#include "population_initializers.h"
+#include "population_functions.h"
 
 void population_from_row_ordered_transition_matrix(const POPULATION_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
   if (parameters.equilibrium) {

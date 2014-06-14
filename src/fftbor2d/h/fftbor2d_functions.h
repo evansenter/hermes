@@ -1,8 +1,7 @@
 #ifndef FFTBOR2D_FUNCTIONS_H
 #define FFTBOR2D_FUNCTIONS_H
 
-#include "data_structures.h"
-#include "mfpt/data_structures.h"
+#include "fftbor2d_data_structures.h"
 
 FFTBOR2D_DATA fftbor2d_from_params(FFTBOR2D_PARAMS&);
 void   precalculate_energies(FFTBOR2D_DATA&);

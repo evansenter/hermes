@@ -4,7 +4,7 @@
 #define MIN2(A, B) ((A) < (B) ? (A) : (B))
 #define MAX2(A, B) ((A) > (B) ? (A) : (B))
 
-#include "data_structures.h"
+#include "fftbor2d_data_structures.h"
 
 FFTBOR2D_DATA init_fftbor2d_data(const FFTBOR2D_PARAMS);
 void free_fftbor2d_data(FFTBOR2D_DATA&);

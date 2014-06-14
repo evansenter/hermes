@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "multi_param/multi_param.h"
+#include "../../src/multi_param/multi_param.h"
 
 #ifdef __cplusplus
 }

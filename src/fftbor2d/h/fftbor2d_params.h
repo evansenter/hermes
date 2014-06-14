@@ -1,7 +1,7 @@
 #ifndef FFTBOR2D_PARAMS_H
 #define FFTBOR2D_PARAMS_H
 
-#include "data_structures.h"
+#include "fftbor2d_data_structures.h"
 
 FFTBOR2D_PARAMS init_fftbor2d_params();
 void free_fftbor2d_params(FFTBOR2D_PARAMS);

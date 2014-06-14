@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#include "tpl/tpl.h"
+#include "../../src/tpl/tpl.h"
 
 #ifdef __cplusplus
 }

@@ -1,7 +1,7 @@
 #ifndef POPULATION_INITIALIZERS_H
 #define POPULATION_INITIALIZERS_H
 
-#include "data_structures.h"
+#include "population_data_structures.h"
 
 extern double temperature;
 extern int dangles;

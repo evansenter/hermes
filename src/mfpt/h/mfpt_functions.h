@@ -1,7 +1,7 @@
 #ifndef MFPT_ENERGY_GRID_H
 #define MFPT_ENERGY_GRID_H
 
-#include "data_structures.h"
+#include "mfpt_data_structures.h"
 
 #ifdef __cplusplus
 extern "C" {
