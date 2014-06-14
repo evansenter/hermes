@@ -3,6 +3,17 @@ cmake_minimum_required(VERSION 2.6)
 SET(CMAKE_C_COMPILER gcc)
 SET(CMAKE_CXX_COMPILER g++)
 
+execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GXX_VERSION)
+
+if (GCC_VERSION VERSION_LESS 4.8)
+  message(FATAL_ERROR "gcc version < 4.8")
+endif()
+
+if (GXX_VERSION VERSION_LESS 4.8)
+  message(FATAL_ERROR "g++ version < 4.8")
+endif()
+
 project(HERMES)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules/cmake-modules/")
