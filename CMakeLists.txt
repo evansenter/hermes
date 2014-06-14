@@ -16,7 +16,7 @@ endif()
 
 project(HERMES)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/modules/")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -pedantic -funroll-loops -Wall -Wextra -Ofast -march=native -Wa,-q")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pedantic -funroll-loops -Wall -Wextra -Ofast -march=native -Wa,-q")
 
