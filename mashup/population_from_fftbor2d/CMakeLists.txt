@@ -1,0 +1,32 @@
+find_package(OpenMP REQUIRED)
+find_package(FFTW REQUIRED)
+find_package(LAPACK REQUIRED)
+find_package(GSL REQUIRED)
+find_library(RNA libRNA.a PATHS)
+
+include_directories(c)
+include_directories(h)
+include_directories(${HERMES_SOURCE_DIR}/h)
+include_directories(${FFTW_INCLUDES})
+include_directories(${GSL_INCLUDES})
+
+link_directories(${HERMES_SOURCE_DIR}/src/tpl)
+link_directories(${HERMES_SOURCE_DIR}/src/multi_param)
+link_directories(${HERMES_SOURCE_DIR}/src/fftbor2d)
+link_directories(${HERMES_SOURCE_DIR}/src/mfpt)
+link_directories(${HERMES_SOURCE_DIR}/src/population)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -Wno-write-strings")
+
+add_executable(FFTeq population_from_fftbor2d.cpp)
+target_link_libraries(FFTeq ${FFTW_LIBRARIES})
+target_link_libraries(FFTeq ${LAPACK_LIBRARIES})
+target_link_libraries(FFTeq ${GSL_LIBRARIES})
+target_link_libraries(FFTeq ${RNA})
+target_link_libraries(FFTeq tpl)
+target_link_libraries(FFTeq multi_param)
+target_link_libraries(FFTeq fftbor)
+target_link_libraries(FFTeq mfpt)
+target_link_libraries(FFTeq population)
+
+install(TARGETS FFTeq DESTINATION ${HERMES_SOURCE_DIR}/bin)
