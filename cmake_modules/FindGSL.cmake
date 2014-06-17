@@ -14,7 +14,7 @@ endif (GSL_INCLUDES)
 find_path (GSL_INCLUDES gsl/gsl_math.h)
 
 find_library (GSL_LIB NAMES gsl)
-find_library (GSL_LIB NAMES gslcblas)
+find_library (GSL_CBLAS_LIB NAMES gslcblas)
 
 set (GSL_CBLAS_LIB "" CACHE FILEPATH "If your program fails to link
 (usually because GSL is not automatically linking a CBLAS and no other
