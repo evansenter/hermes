@@ -4,7 +4,6 @@
 #include <math.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_eigen.h>
-#include "vienna/functions.h"
 #include "shared/libmfpt_header.h"
 #include "shared/libtpl_header.h"
 #include "population_constants.h"

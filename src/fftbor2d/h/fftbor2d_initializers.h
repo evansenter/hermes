@@ -14,9 +14,4 @@ FFTBOR2D_THREADED_DATA* init_fftbor2d_threaded_data(FFTBOR2D_PARAMS&, const FFTB
 void free_fftbor2d_threaded_data(FFTBOR2D_THREADED_DATA*, int);
 int j_paired_to(int, int, int*);
 
-extern "C" {
-  void read_parameter_file(const char*);
-  paramT* scale_parameters(void);
-}
-
 #endif

@@ -4,7 +4,6 @@
 #include <math.h>
 #include <sys/time.h>
 #include "population_constants.h"
-#include "vienna/functions.h"
 #include "population_functions.h"
 #include "population_params.h"
 #include "population_initializers.h"

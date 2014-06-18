@@ -1,7 +1,7 @@
 #ifndef POPULATION_DATA_STRUCTURES_H
 #define POPULATION_DATA_STRUCTURES_H
 
-#include "vienna/data_structures.h"
+#include "vienna/externs.h"
 
 typedef struct {
   short verbose;

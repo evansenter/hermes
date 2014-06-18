@@ -3,11 +3,6 @@
 
 #include "population_data_structures.h"
 
-extern double temperature;
-extern int dangles;
-extern int noLonelyPairs;
-extern int subopt_sorted;
-
 EIGENSYSTEM init_eigensystem(int);
 void free_eigensystem(EIGENSYSTEM);
 void print_eigensystem(const EIGENSYSTEM);

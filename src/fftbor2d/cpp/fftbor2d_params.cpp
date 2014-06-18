@@ -14,8 +14,6 @@
 #define MAX_LENGTH 1024
 #define TRIEQUALS(x, y, z) ((x == y) && (y == z)) /* Transitivity (BOOM) */
 
-extern double temperature;
-
 FFTBOR2D_PARAMS init_fftbor2d_params() {
   FFTBOR2D_PARAMS parameters = {
     NULL,                                  // sequence

@@ -13,8 +13,6 @@
 // #define OPENMP_DEBUG  1
 // #define SINGLE_THREAD 1
 
-extern double temperature;
-
 FFTBOR2D_DATA init_fftbor2d_data(const FFTBOR2D_PARAMS parameters) {
   int i, j;
 

@@ -22,9 +22,4 @@ void   initialize_base_pair_count_matrix(int**, const int*, int);
 double hairpin_loop_energy(FFTBOR2D_DATA&, int, int, int, short, short, char*);
 double interior_loop_energy(FFTBOR2D_DATA&, int, int, int, int, int, int, short, short, short, short);
 
-extern "C" {
-  int* get_iindx(unsigned int seq_length);
-  unsigned int* maximumMatchingConstraint(const char* sequence, short* vienna_bp);
-}
-
 #endif

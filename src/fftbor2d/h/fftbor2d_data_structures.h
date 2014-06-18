@@ -1,7 +1,8 @@
 #ifndef FFTBOR2D_DATA_STRUCTURES_H
 #define FFTBOR2D_DATA_STRUCTURES_H
 
-#include "vienna/data_structures.h"
+#include "vienna/externs.h"
+
 #include <complex>
 typedef std::complex<double> dcomplex;
 
