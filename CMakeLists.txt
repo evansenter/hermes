@@ -23,6 +23,16 @@ enable_language(Fortran)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules")
 
+foreach(include_path ${ADDITIONAL_INCLUDE_PATHS})
+  message(STATUS "Adding include path: ${include_path}")
+  include_directories(${include_path})
+endforeach(include_path ${ADDITIONAL_INCLUDE_PATHS})
+
+foreach(library_path ${ADDITIONAL_LIBRARY_PATHS})
+  message(STATUS "Adding library path: ${library_path}")
+  link_directories(${library_path})
+endforeach(library_path ${ADDITIONAL_LIBRARY_PATHS})
+
 macro(c_compiler_flag_test flag_name flag fallback_flag)
   check_c_compiler_flag(${flag} ${flag_name})
   if(${flag_name})
