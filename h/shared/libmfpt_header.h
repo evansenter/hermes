@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include "../../src/mfpt/h/mfpt_data_structures.h"
 #include "../../src/mfpt/h/mfpt_params.h"
 #include "../../src/mfpt/h/mfpt_parser.h"
 #include "../../src/mfpt/h/mfpt_initializers.h"

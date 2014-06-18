@@ -33,6 +33,8 @@ foreach(library_path ${ADDITIONAL_LIBRARY_PATHS})
   link_directories(${library_path})
 endforeach(library_path ${ADDITIONAL_LIBRARY_PATHS})
 
+include_directories(${HERMES_SOURCE_DIR}/h)
+
 macro(c_compiler_flag_test flag_name flag fallback_flag)
   check_c_compiler_flag(${flag} ${flag_name})
   if(${flag_name})

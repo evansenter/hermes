@@ -5,7 +5,6 @@ find_library(RNA libRNA.a PATHS)
 
 include_directories(c)
 include_directories(h)
-include_directories(${HERMES_SOURCE_DIR}/h)
 include_directories(${FFTW_INCLUDES})
 
 link_directories(${HERMES_SOURCE_DIR}/src/multi_param)

@@ -5,6 +5,7 @@
 extern "C" {
 #endif
 
+#include "../../src/population/h/population_data_structures.h"
 #include "../../src/population/h/population_params.h"
 #include "../../src/population/h/population_initializers.h"
 #include "../../src/population/h/population_functions.h"

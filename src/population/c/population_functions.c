@@ -58,7 +58,7 @@ TRANSITION_MATRIX convert_structures_to_transition_matrix(const SOLUTION* all_st
     for (j = 0; j < num_structures; ++j) {
       if (i != j) {
         T_COL_ORDER(transition_matrix, i, j) = \
-                                               MIN(1, exp(-((double)all_structures[j].energy - (double)all_structures[i].energy) / RT));
+                                               MIN(1, exp(-((double)all_structures[j].energy - (double)all_structures[i].energy) / VIENNA_RT));
 
         col_sum += T_COL_ORDER(transition_matrix, i, j);
 #ifdef INSANE_DEBUG

@@ -4,7 +4,6 @@ find_package(GSL REQUIRED)
 
 include_directories(c)
 include_directories(h)
-include_directories(${HERMES_SOURCE_DIR}/h)
 include_directories(${GSL_INCLUDES})
 
 link_directories(${HERMES_SOURCE_DIR}/src/tpl)

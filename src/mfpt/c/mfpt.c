@@ -4,7 +4,7 @@
 #include "mfpt_parser.h"
 #include "mfpt_initializers.h"
 #include "mfpt_functions.h"
-#include "mfpt_constants.h"
+#include "shared/constants.h"
 
 int main(int argc, char** argv) {
   double mfpt;
