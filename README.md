@@ -24,3 +24,5 @@ Useful CMake flags:
     -DCMAKE_INSTALL_PREFIX:PATH=/install/path/prefix
     -DADDITIONAL_INCLUDE_PATHS:PATH=~/additional/headers
     -DADDITIONAL_LIBRARY_PATHS:PATH="~/additional/libraries;/separated/by/semicolons;/and/quoted"
+    -DCMAKE_C_COMPILER=/path/to/c/compiler
+    -DCMAKE_CXX_COMPILER=/path/to/c++/compiler
