@@ -22,7 +22,9 @@ Installation:
 
 Useful CMake flags:
     -DCMAKE_INSTALL_PREFIX:PATH=/install/path/prefix
-    -DADDITIONAL_INCLUDE_PATHS:PATH=~/additional/headers
-    -DADDITIONAL_LIBRARY_PATHS:PATH="~/additional/libraries;/separated/by/semicolons;/and/quoted"
     -DCMAKE_C_COMPILER=/path/to/c/compiler
     -DCMAKE_CXX_COMPILER=/path/to/c++/compiler
+    -DCMAKE_INCLUDE_PATH:PATH=~/additional/headers
+    -DCMAKE_LIBRARY_PATH:PATH="~/additional/libraries;/separated/by/semicolons;/and/quoted"
+
+    (cd .. && git pull) && rm -rf * && cmake .. -DCMAKE_C_COMPILER:PATH=/cluster/home/evansenter/bin/gcc-4.8.1/bin/gcc -DCMAKE_CXX_COMPILER:PATH=/cluster/home/evansenter/bin/gcc-4.8.1/bin/g++ -DCMAKE_LIBRARY_PATH:PATH="/cluster/home/evansenter/lib;/cluster/home/evansenter/local/lib" -DCMAKE_INCLUDE_PATH:PATH=/cluster/home/evansenter/local/include && make

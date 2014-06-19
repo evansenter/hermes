@@ -12,16 +12,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${HERMES_SOURCE_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${HERMES_SOURCE_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${HERMES_SOURCE_DIR}/lib)
 
-foreach(include_path ${ADDITIONAL_INCLUDE_PATHS})
-  message(STATUS "Adding include path: ${include_path}")
-  include_directories(${include_path})
-endforeach(include_path ${ADDITIONAL_INCLUDE_PATHS})
-
-foreach(library_path ${ADDITIONAL_LIBRARY_PATHS})
-  message(STATUS "Adding library path: ${library_path}")
-  link_directories(${library_path})
-endforeach(library_path ${ADDITIONAL_LIBRARY_PATHS})
-
 include_directories(${HERMES_SOURCE_DIR}/h)
 
 macro(c_compiler_flag_test flag_name flag fallback_flag required)
