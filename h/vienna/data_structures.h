@@ -73,11 +73,11 @@ typedef struct {
   int     MultipleCB;
   int     gquad [VRNA_GQUAD_MAX_STACK_SIZE + 1]
   [3 * VRNA_GQUAD_MAX_LINKER_LENGTH + 1];
-
+  
   double  temperature;            /**<  \brief  Temperature used for loop contribution scaling */
-
+  
   model_detailsT model_details;   /**<  \brief  Model details to be used in the recursions */
-
+  
 } paramT;
 
 /**
@@ -119,10 +119,10 @@ typedef struct {
   double  expMultipleCB;
   double  expgquad[VRNA_GQUAD_MAX_STACK_SIZE + 1]
   [3 * VRNA_GQUAD_MAX_LINKER_LENGTH + 1];
-
+  
   double  kT;
   double  pf_scale;     /**<  \brief    Scaling factor to avoid over-/underflows */
-
+  
   double  temperature;  /**<  \brief    Temperature used for loop contribution scaling */
   double  alpha;        /**<  \brief    Scaling factor for the thermodynamic temperature
                               \details  This allows for temperature scaling in Boltzmann
@@ -132,7 +132,7 @@ typedef struct {
                         */
 
   model_detailsT model_details; /**<  \brief  Model details to be used in the recursions */
-
+  
 }  pf_paramT;
 
 #endif
