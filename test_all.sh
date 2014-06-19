@@ -32,6 +32,6 @@ echo "Result:"
 ./bin/FFTeq --fftbor2d-i GGGGGCCCCC --fftbor2d-j ".........." --fftbor2d-k "(((....)))" --population-i 2 --population-j 3 --population-p 1
 
 echo "Testing RateEq, expecting:
-3.235000"
+3.312000"
 echo "Result:"
-./bin/RateEq --mfpt-c ./mashup/population_from_rate_matrix/all_structures_for_gggaaaccc__19_5_rate_move_without_hastings.csv --population-a 19 --population-z 5 --population-e 1e-4
+./bin/RateEq --mfpt-c ./mashup/population_from_rate_matrix/all_structures_for_gggaaaccc__19_5_rate_move_without_hastings.csv --population-a 19 --population-z 5 --population-q
