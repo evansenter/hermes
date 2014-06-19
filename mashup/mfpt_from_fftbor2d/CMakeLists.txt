@@ -5,10 +5,6 @@ find_library(RNA libRNA.a PATHS)
 
 include_directories(${FFTW_INCLUDES})
 
-link_directories(${HERMES_SOURCE_DIR}/src/multi_param)
-link_directories(${HERMES_SOURCE_DIR}/src/fftbor2d)
-link_directories(${HERMES_SOURCE_DIR}/src/mfpt)
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -Wno-write-strings")
 
 add_executable(FFTmfpt mfpt_from_fftbor2d.cpp)

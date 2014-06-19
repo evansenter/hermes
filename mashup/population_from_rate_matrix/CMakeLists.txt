@@ -6,11 +6,6 @@ include_directories(c)
 include_directories(h)
 include_directories(${GSL_INCLUDES})
 
-link_directories(${HERMES_SOURCE_DIR}/src/tpl)
-link_directories(${HERMES_SOURCE_DIR}/src/multi_param)
-link_directories(${HERMES_SOURCE_DIR}/src/mfpt)
-link_directories(${HERMES_SOURCE_DIR}/src/population)
-
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_CXX_FLAGS} -Wno-write-strings")
 
 add_executable(RateEq population_from_rate_matrix.c)

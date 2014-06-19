@@ -9,9 +9,6 @@ include_directories(h)
 include_directories(${FFTW_INCLUDES})
 include_directories(${GSL_INCLUDES})
 
-link_directories(${HERMES_SOURCE_DIR}/src/tpl)
-link_directories(${HERMES_SOURCE_DIR}/src/mfpt)
-
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 
 add_library(population_static STATIC c/population_params.c c/population_initializers.c c/population_functions.c)

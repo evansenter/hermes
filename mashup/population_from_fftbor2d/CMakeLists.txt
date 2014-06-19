@@ -9,12 +9,6 @@ include_directories(h)
 include_directories(${FFTW_INCLUDES})
 include_directories(${GSL_INCLUDES})
 
-link_directories(${HERMES_SOURCE_DIR}/src/tpl)
-link_directories(${HERMES_SOURCE_DIR}/src/multi_param)
-link_directories(${HERMES_SOURCE_DIR}/src/fftbor2d)
-link_directories(${HERMES_SOURCE_DIR}/src/mfpt)
-link_directories(${HERMES_SOURCE_DIR}/src/population)
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -Wno-write-strings")
 
 add_executable(FFTeq population_from_fftbor2d.cpp)
