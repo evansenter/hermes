@@ -14,12 +14,13 @@ link_directories(${HERMES_SOURCE_DIR}/src/population)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_CXX_FLAGS} -Wno-write-strings")
 
 add_executable(RateEq population_from_rate_matrix.c)
+
 target_link_libraries(RateEq ${LAPACK_LIBRARIES})
 target_link_libraries(RateEq ${GSL_LIBRARIES})
 target_link_libraries(RateEq ${RNA})
-target_link_libraries(RateEq tpl)
-target_link_libraries(RateEq multi_param)
-target_link_libraries(RateEq mfpt)
-target_link_libraries(RateEq population)
+target_link_libraries(RateEq tpl_shared)
+target_link_libraries(RateEq multi_param_shared)
+target_link_libraries(RateEq mfpt_shared)
+target_link_libraries(RateEq population_shared)
 
 install(TARGETS RateEq DESTINATION ${HERMES_SOURCE_DIR}/bin)

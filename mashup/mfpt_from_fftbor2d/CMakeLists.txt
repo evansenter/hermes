@@ -12,9 +12,10 @@ link_directories(${HERMES_SOURCE_DIR}/src/mfpt)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -Wno-write-strings")
 
 add_executable(FFTmfpt mfpt_from_fftbor2d.cpp)
-target_link_libraries(FFTmfpt multi_param)
-target_link_libraries(FFTmfpt fftbor)
-target_link_libraries(FFTmfpt mfpt)
+
+target_link_libraries(FFTmfpt multi_param_shared)
+target_link_libraries(FFTmfpt fftbor_shared)
+target_link_libraries(FFTmfpt mfpt_shared)
 target_link_libraries(FFTmfpt ${FFTW_LIBRARIES})
 target_link_libraries(FFTmfpt ${LAPACK_LIBRARIES})
 target_link_libraries(FFTmfpt ${RNA})
