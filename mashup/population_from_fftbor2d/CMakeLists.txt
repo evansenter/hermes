@@ -23,4 +23,4 @@ target_link_libraries(FFTeq fftbor_shared)
 target_link_libraries(FFTeq mfpt_shared)
 target_link_libraries(FFTeq population_shared)
 
-install(TARGETS FFTeq DESTINATION ${HERMES_SOURCE_DIR}/bin)
+install(TARGETS FFTeq DESTINATION bin)

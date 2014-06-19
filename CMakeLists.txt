@@ -22,6 +22,9 @@ endif()
 enable_language(Fortran)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${HERMES_SOURCE_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${HERMES_SOURCE_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${HERMES_SOURCE_DIR}/lib)
 
 foreach(include_path ${ADDITIONAL_INCLUDE_PATHS})
   message(STATUS "Adding include path: ${include_path}")

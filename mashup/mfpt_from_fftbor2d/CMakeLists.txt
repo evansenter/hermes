@@ -16,4 +16,4 @@ target_link_libraries(FFTmfpt ${FFTW_LIBRARIES})
 target_link_libraries(FFTmfpt ${LAPACK_LIBRARIES})
 target_link_libraries(FFTmfpt ${RNA})
 
-install(TARGETS FFTmfpt DESTINATION ${HERMES_SOURCE_DIR}/bin)
+install(TARGETS FFTmfpt DESTINATION bin)

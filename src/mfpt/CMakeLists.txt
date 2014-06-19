@@ -11,6 +11,6 @@ target_link_libraries(RNAmfpt ${LAPACK_LIBRARIES})
 
 target_link_libraries(mfpt_shared ${LAPACK_LIBRARIES})
 
-install(TARGETS RNAmfpt DESTINATION ${HERMES_SOURCE_DIR}/bin)
-install(TARGETS mfpt_static DESTINATION ${HERMES_SOURCE_DIR}/lib)
-install(TARGETS mfpt_shared DESTINATION ${HERMES_SOURCE_DIR}/lib)
+install(TARGETS RNAmfpt DESTINATION bin)
+install(TARGETS mfpt_static DESTINATION lib)
+install(TARGETS mfpt_shared DESTINATION lib)

@@ -16,3 +16,11 @@ All your kinetics are belong to us.
 Note--this project uses the following commands:
 
     astyle --style=google --indent=spaces=2 --indent-switches --indent-cases --indent-namespaces --indent-labels --indent-col1-comments --break-blocks --pad-oper --pad-header --unpad-paren --fill-empty-lines --align-pointer=type --add-brackets --convert-tabs --recursive *.cpp *.c *.h
+
+Installation:
+    cd build && cmake .. && make
+
+Useful CMake flags:
+    -DCMAKE_INSTALL_PREFIX:PATH=/install/path/prefix
+    -DADDITIONAL_INCLUDE_PATHS:PATH=~/additional/headers
+    -DADDITIONAL_LIBRARY_PATHS:PATH="~/additional/libraries;/separated/by/semicolons;/and/quoted"

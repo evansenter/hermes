@@ -18,4 +18,4 @@ target_link_libraries(RateEq multi_param_shared)
 target_link_libraries(RateEq mfpt_shared)
 target_link_libraries(RateEq population_shared)
 
-install(TARGETS RateEq DESTINATION ${HERMES_SOURCE_DIR}/bin)
+install(TARGETS RateEq DESTINATION bin)
