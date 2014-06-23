@@ -1,0 +1,18 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}
+\contentsline {section}{\numberline {2}Installation}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}Quick Start}{2}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Dependencies}{2}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Compilation}{3}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Troubleshooting}{3}{subsection.2.4}
+\contentsline {section}{\numberline {3}Software Organization}{4}{section.3}
+\contentsline {subsection}{\numberline {3.1}General Principles}{4}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}multi\_param Overview}{5}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}multi\_param Details}{5}{subsection.3.3}
+\contentsline {section}{\numberline {4}Core Programs}{6}{section.4}
+\contentsline {subsection}{\numberline {4.1}FFTbor2D}{6}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}RNAmfpt}{6}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}RNAeq}{6}{subsection.4.3}
+\contentsline {section}{\numberline {5}Mashups}{6}{section.5}
+\contentsline {subsection}{\numberline {5.1}FFTmfpt}{6}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}FFTeq}{6}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}RateEq}{6}{subsection.5.3}

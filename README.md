@@ -13,18 +13,18 @@ All your kinetics are belong to us.
     FFTeq                   ([--fftbor2d --mfpt --population] Approximate population proportion and equilibrium using 2D energy landscape from FFTbor2D)
     RateEq                  ([--mfpt --population] Population proportion and equilibrium using row-ordered rate matrix in CSV (i, j, x) format)
 
-Note--this project uses the following commands:
-
-    astyle --style=google --indent=spaces=2 --indent-switches --indent-cases --indent-namespaces --indent-labels --indent-col1-comments --break-blocks --pad-oper --pad-header --unpad-paren --fill-empty-lines --align-pointer=type --add-brackets --convert-tabs --recursive *.cpp *.c *.h
-
 Installation:
+
     cd build && cmake .. && make
 
-Useful CMake flags:
-    -DCMAKE_INSTALL_PREFIX:PATH=/install/path/prefix
+Useful CMake configuration flags:
+
     -DCMAKE_C_COMPILER=/path/to/c/compiler
     -DCMAKE_CXX_COMPILER=/path/to/c++/compiler
-    -DCMAKE_INCLUDE_PATH:PATH=~/additional/headers
-    -DCMAKE_LIBRARY_PATH:PATH="~/additional/libraries;/separated/by/semicolons;/and/quoted"
+    -DCMAKE_INCLUDE_PATH=~/additional/headers
+    -DCMAKE_LIBRARY_PATH="~/additional/libraries;/separated/by/semicolons;/and/quoted"
+    -DCMAKE_INSTALL_PREFIX=/make/install/path/prefix
 
-    (cd .. && git pull) && rm -rf * && cmake .. -DCMAKE_C_COMPILER:PATH=/cluster/home/evansenter/bin/gcc-4.8.1/bin/gcc -DCMAKE_CXX_COMPILER:PATH=/cluster/home/evansenter/bin/gcc-4.8.1/bin/g++ -DCMAKE_LIBRARY_PATH:PATH="/cluster/home/evansenter/lib;/cluster/home/evansenter/local/lib" -DCMAKE_INCLUDE_PATH:PATH=/cluster/home/evansenter/local/include && make
+Note--this project uses the following commands to maintain homogenous styling:
+
+    astyle --style=google --indent=spaces=2 --indent-switches --indent-cases --indent-namespaces --indent-labels --indent-col1-comments --break-blocks --pad-oper --pad-header --unpad-paren --fill-empty-lines --align-pointer=type --add-brackets --convert-tabs --recursive *.cpp *.c *.h
