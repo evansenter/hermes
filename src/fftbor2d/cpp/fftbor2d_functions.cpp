@@ -3,9 +3,9 @@
 #include <string.h>
 #include <math.h>
 #include <fftw3.h>
-#include "params.h"
-#include "initializers.h"
-#include "functions.h"
+#include "fftbor2d_params.h"
+#include "fftbor2d_initializers.h"
+#include "fftbor2d_functions.h"
 
 #ifdef _OPENMP
 #include <omp.h>

@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
-#include "constants.h"
-#include "initializers.h"
-#include "functions.h"
+#include "mfpt_initializers.h"
+#include "mfpt_functions.h"
+#include "shared/constants.h"
 
 #define ONE_BP_MOVE(i, j) ((int)abs(klp_matrix.k[(i)] - klp_matrix.k[(j)]) == 1 && (int)abs(klp_matrix.l[(i)] - klp_matrix.l[(j)]) == 1)
 #define NONZERO_TO_NONZERO_PROB(i, j) (klp_matrix.p[(i)] > 0 && klp_matrix.p[(j)] > 0)

@@ -4,13 +4,12 @@
 #include <math.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_eigen.h>
-#include "vienna/functions.h"
 #include "shared/libmfpt_header.h"
 #include "shared/libtpl_header.h"
-#include "constants.h"
-#include "params.h"
-#include "initializers.h"
-#include "functions.h"
+#include "population_constants.h"
+#include "population_params.h"
+#include "population_initializers.h"
+#include "population_functions.h"
 
 void population_from_row_ordered_transition_matrix(const POPULATION_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
   if (parameters.equilibrium) {
@@ -59,7 +58,7 @@ TRANSITION_MATRIX convert_structures_to_transition_matrix(const SOLUTION* all_st
     for (j = 0; j < num_structures; ++j) {
       if (i != j) {
         T_COL_ORDER(transition_matrix, i, j) = \
-                                               MIN(1, exp(-((double)all_structures[j].energy - (double)all_structures[i].energy) / RT));
+                                               MIN(1, exp(-((double)all_structures[j].energy - (double)all_structures[i].energy) / VIENNA_RT));
                                                
         col_sum += T_COL_ORDER(transition_matrix, i, j);
 #ifdef INSANE_DEBUG

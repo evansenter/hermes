@@ -4,8 +4,8 @@
 #include <math.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "constants.h"
-#include "params.h"
+#include "population_constants.h"
+#include "population_params.h"
 
 POPULATION_PARAMS init_population_params() {
   POPULATION_PARAMS parameters = {

@@ -1,7 +1,6 @@
 #include <stdlib.h>
-#include "initializers.h"
-#include "functions.h"
-#include "vienna/functions.h"
+#include "population_initializers.h"
+#include "population_functions.h"
 #include "shared/libmfpt_header.h"
 
 EIGENSYSTEM init_eigensystem(int length) {

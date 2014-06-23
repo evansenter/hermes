@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "initializers.h"
+#include "mfpt_initializers.h"
 
 KLP_MATRIX init_klp_matrix(int length) {
   KLP_MATRIX klp_matrix = {

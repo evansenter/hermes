@@ -5,10 +5,11 @@
 extern "C" {
 #endif
 
-#include "mfpt/params.h"
-#include "mfpt/parser.h"
-#include "mfpt/initializers.h"
-#include "mfpt/functions.h"
+#include "../../src/mfpt/h/mfpt_data_structures.h"
+#include "../../src/mfpt/h/mfpt_params.h"
+#include "../../src/mfpt/h/mfpt_parser.h"
+#include "../../src/mfpt/h/mfpt_initializers.h"
+#include "../../src/mfpt/h/mfpt_functions.h"
 
 #ifdef __cplusplus
 }

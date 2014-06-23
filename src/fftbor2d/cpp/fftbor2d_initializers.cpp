@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <limits>
-#include "functions.h"
-#include "initializers.h"
+#include "fftbor2d_functions.h"
+#include "fftbor2d_initializers.h"
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -12,8 +12,6 @@
 #define ROW_ORDER(expression_1, expression_2, n) ((expression_1) * (n) + (expression_2))
 // #define OPENMP_DEBUG  1
 // #define SINGLE_THREAD 1
-
-extern double temperature;
 
 FFTBOR2D_DATA init_fftbor2d_data(const FFTBOR2D_PARAMS parameters) {
   int i, j;

@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "params.h"
-#include "parser.h"
-#include "initializers.h"
+#include "mfpt_params.h"
+#include "mfpt_parser.h"
+#include "mfpt_initializers.h"
 
 KLP_MATRIX klp_matrix_from_file(const MFPT_PARAMS parameters) {
   int line_count;

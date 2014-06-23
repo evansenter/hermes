@@ -4,7 +4,7 @@
 #include <math.h>
 #include <unistd.h>
 #include <ctype.h>
-#include "params.h"
+#include "mfpt_params.h"
 
 MFPT_PARAMS init_mfpt_params() {
   MFPT_PARAMS parameters = {
