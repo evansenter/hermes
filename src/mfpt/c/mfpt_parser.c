@@ -48,7 +48,6 @@ int count_lines(char* file_path) {
   int line_count = 0;
 
   if (file == NULL) {
-    fclose(file);
     return 0;
   }
 

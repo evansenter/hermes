@@ -16,7 +16,6 @@ int main(int argc, char** argv) {
   POPULATION_PARAMS population_params;
   TRANSITION_MATRIX transition_matrix;
 
-
   params = split_args(argc, argv, subparams, 2);
 
   mfpt_params       = init_mfpt_params();
