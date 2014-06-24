@@ -9,6 +9,8 @@ endif()
 
 project(HERMES)
 
+enable_language(Fortran)
+
 if (CMAKE_BUILD_TYPE)
   string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
 endif()

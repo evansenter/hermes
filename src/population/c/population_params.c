@@ -36,157 +36,157 @@ POPULATION_PARAMS init_population_params() {
   return parameters;
 }
 
-void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv) {
+void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv, void (*usage)(int)) {
   int c;
-  
+
   while ((c = getopt(argc, argv, "OoGgBbHhNnVvQqA:a:Z:z:S:s:K:k:L:l:I:i:J:j:P:p:E::e::D:d:W:w:T:t:C:c:R:r:F:f:")) != -1) {
     switch (c) {
       case 'O':
       case 'o':
         parameters->lonely_bp = 1;
         break;
-        
+
       case 'G':
       case 'g':
         parameters->eigen_only = 1;
         break;
-        
+
       case 'B':
       case 'b':
         parameters->benchmark = 1;
         break;
-        
+
       case 'H':
       case 'h':
         parameters->all_subpop_for_eq = 1;
         break;
-        
+
       case 'N':
       case 'n':
         parameters->soft_bounds = 0;
         break;
-        
+
       case 'V':
       case 'v':
         parameters->verbose = 1;
         break;
-        
+
       case 'Q':
       case 'q':
         parameters->equilibrium = 1;
         break;
-        
+
       case 'S':
       case 's':
         parameters->sequence = strdup(optarg);
         break;
-        
+
       case 'K':
       case 'k':
         parameters->start_structure = strdup(optarg);
         break;
-        
+
       case 'L':
       case 'l':
         parameters->end_structure = strdup(optarg);
         break;
-        
+
       case 'A':
       case 'a':
         if (!sscanf(optarg, "%d", &parameters->start_index)) {
-          population_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'Z':
       case 'z':
         if (!sscanf(optarg, "%d", &parameters->end_index)) {
-          population_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'I':
       case 'i':
         if (!sscanf(optarg, "%lf", &parameters->start_time)) {
-          population_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'J':
       case 'j':
         if (!sscanf(optarg, "%lf", &parameters->end_time)) {
-          population_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'P':
       case 'p':
         if (!sscanf(optarg, "%lf", &parameters->step_size)) {
-          population_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'E':
       case 'e':
         if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
-          population_usage();
+          (*usage)(0);
         }
-        
+
         parameters->equilibrium = 1;
         break;
-        
+
       case 'D':
       case 'd':
         if (!sscanf(optarg, "%lf", &parameters->delta)) {
-          population_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'W':
       case 'w':
         if (!sscanf(optarg, "%d", &parameters->window_size)) {
-          population_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'T':
       case 't':
         if (!sscanf(optarg, "%lf", &parameters->temperature)) {
-          population_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'C':
       case 'c':
         if (!sscanf(optarg, "%lf", &parameters->energy_cap)) {
-          population_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'R':
       case 'r':
         if (!sscanf(optarg, "%d", &parameters->serialize)) {
-          population_usage();
+          (*usage)(0);
         } else if ((int)abs(parameters->serialize) != 1) {
-          population_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'F':
       case 'f':
         parameters->filename = strdup(optarg);
         break;
-        
+
       case '?':
         switch (optopt) {
           case 'A':
@@ -221,7 +221,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv)
           case 'f':
             fprintf(stderr, "Option -%c requires an argument.\n", optopt);
             break;
-            
+
           default:
             if (isprint(optopt)) {
               fprintf(stderr, "Unknown option `-%c'.\n", optopt);
@@ -229,96 +229,96 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv)
               fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
             }
         }
-        
-        population_usage();
-        
+
+        (*usage)(0);
+
       default:
-        population_usage();
+        (*usage)(0);
     }
   }
-  
+
   if (parameters->verbose) {
     debug_population_parameters(*parameters);
   }
-  
+
   if (population_error_handling(*parameters)) {
-    population_usage();
+    (*usage)(0);
   }
-  
+
   optind = 1;
 }
 
 int population_error_handling(const POPULATION_PARAMS parameters) {
   int error = 0;
-  
+
   if (parameters.input) {
     if (parameters.sequence != NULL && parameters.start_structure != NULL && strlen(parameters.sequence) != strlen(parameters.start_structure)) {
       fprintf(stderr, "Error: the starting structure is not the same length as the provided sequence.\n");
       error++;
     }
-    
+
     if (parameters.sequence != NULL && parameters.end_structure != NULL && strlen(parameters.sequence) != strlen(parameters.end_structure)) {
       fprintf(stderr, "Error: the ending structure is not the same length as the provided sequence.\n");
       error++;
     }
   }
-  
+
   if (parameters.energy_cap < 0) {
     fprintf(stderr, "Error: the energy_cap must be a positive number (in kcal/mol) for the energy range above the MFE to sample structures from.\n");
     error++;
   }
-  
+
   if (parameters.epsilon < 0 || parameters.epsilon > 1) {
     fprintf(stderr, "Error: the equilibrium epsilon (provided as the value for the -e flag) must be the epsilon value for considering a population curve to be stable.\n");
     error++;
   }
-  
+
   if (parameters.delta < 0 || parameters.delta > 1) {
     fprintf(stderr, "Error: the equilibrium delta (provided as the value for the -d flag) must be the delta value for considering a population curve to be approaching stability.\n");
     error++;
   }
-  
+
   if (parameters.step_size < 0 || parameters.step_size > 1) {
     fprintf(stderr, "Error: the step size must be between 0 and 1.\n");
     error++;
   }
-  
+
   if (parameters.serialize == -1 && (parameters.start_index < 0 || parameters.end_index < 0)) {
     fprintf(stderr, "Error: if you're deserializing, the start and end indices (-a, -z) in the serialized transition matrix must be provided.\n");
     error++;
   }
-  
+
   if (parameters.serialize == 1 && parameters.eigen_only) {
     fprintf(stderr, "Error: you can't serialize to a file (-r) and compute only the eigenvalues (-g). This is because the serialized data structure has the inverted eigenvector-matrix in it, which is not computed with the -g flag for performance reasons.\n");
     error++;
   }
-  
+
   if ((parameters.serialize && parameters.filename == NULL) || (!parameters.serialize && parameters.filename != NULL)) {
     fprintf(stderr, "Error: can't serialize (-r) without a filename provided (-f).\n");
     error++;
   }
-  
+
   if (parameters.filename && parameters.serialize) {
     if (parameters.serialize == 1 && access(parameters.filename, F_OK) != -1) {
       fprintf(stderr, "Error: file %s exists, cowering out.\n", parameters.filename);
       error++;
     }
-    
+
     if (parameters.serialize == -1 && access(parameters.filename, R_OK) == -1) {
       fprintf(stderr, "Error: can't read from file %s.\n", parameters.filename);
       error++;
     }
   }
-  
+
   if (parameters.window_size < 2) {
     fprintf(stderr, "Error: the window size is exclusive, and must be larger than 2.\n");
     error++;
   }
-  
+
   if (error) {
     fprintf(stderr, "\n");
   }
-  
+
   return error;
 }
 
@@ -345,13 +345,16 @@ void debug_population_parameters(const POPULATION_PARAMS parameters) {
   printf("(w) window size\t\t\t%d\n",           parameters.window_size);
   printf("(g) eigen_only\t\t\t%s\n",            parameters.eigen_only ? "Yes" : "No");
   printf("(b) benchmark\t\t\t%s\n",             parameters.benchmark ? "Yes" : "No");
-  
+
   printf("\n");
 }
 
-void population_usage() {
-  fprintf(stderr, "RNAeq [options] -s [sequence]\n\n");
-  fprintf(stderr, "Options include the following:\n");
+void population_usage(int flags_only) {
+  if (!flags_only) {
+    fprintf(stderr, "RNAeq [options] -s [sequence]\n\n");
+    fprintf(stderr, "Options include the following:\n");
+  }
+
   fprintf(stderr, "-A/a\tstart state,           default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the starting structure (see options for -k).\n");
   fprintf(stderr, "-B/b\t(b)enchmarking,        default is disabled. When enabled, RNAeq will print benchmarking times for internal function calls.\n");
   fprintf(stderr, "-C/c\tenergy (c)ap,          default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
@@ -371,7 +374,11 @@ void population_usage() {
   fprintf(stderr, "-R/r\tse(r)ialize direction, default is disabled. If passed with the value '1', then the eigensystem and its inversion will be serialized to the file specified by the -f flag. If passed with the value '-1', the file specified by the -f flag will be deserialized and used for computing the data of interest.\n");
   fprintf(stderr, "-S/s\t(s)equence,            sequence of interest for computing population proportions.\n");
   fprintf(stderr, "-T/t\t(t)emperature,         temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
+  fprintf(stderr, "-V/v\t(v)erbose,       default is disabled, presents some debug information at runtime.\n\n");
   fprintf(stderr, "-W/w\t(w)indow size,         default is 5. Specifies the window size (exclusive) for predicting equilibrium. Equilibrium is considered as having been achieved when all indicies (i + 1)..(i + window_size - 1) are within epsilon (-e) of the population proportion at time i.\n");
   fprintf(stderr, "-Z/z\tend state,             default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the ending structure (see options for -l).\n");
-  abort();
+
+  if (!flags_only) {
+    abort();
+  }
 }

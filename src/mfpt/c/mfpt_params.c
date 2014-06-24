@@ -26,111 +26,111 @@ MFPT_PARAMS init_mfpt_params() {
   return parameters;
 }
 
-void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
+void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usage)(int)) {
   int c;
-  
+
   while ((c = getopt(argc, argv, "EeTtPpXxHhRrFfLlVvC:c:A:a:Z:z:N:n:D:d:O:o:")) != -1) {
     switch (c) {
       case 'E':
       case 'e':
         parameters->energy_based = 1;
         break;
-        
+
       case 'T':
       case 't':
         parameters->run_type = TRANSITION_INPUT_FLAG;
         break;
-        
+
       case 'P':
       case 'p':
         parameters->pseudoinverse = 1;
         break;
-        
+
       case 'X':
       case 'x':
         parameters->run_type = DIAG_MOVES_ONLY_FLAG;
         break;
-        
+
       case 'H':
       case 'h':
         parameters->hastings = 1;
         break;
-        
+
       case 'R':
       case 'r':
         parameters->rate_matrix = 1;
         break;
-        
+
       case 'F':
       case 'f':
         parameters->run_type = FULLY_CONNECTED_FLAG;
         break;
-        
+
       case 'L':
       case 'l':
         parameters->all_mfpt = 1;
         break;
-        
+
       case 'V':
       case 'v':
         parameters->verbose = 1;
         break;
-        
+
       case 'C':
       case 'c':
         parameters->input_file = strdup(optarg);
         break;
-        
+
       case 'A':
       case 'a':
         if (!sscanf(optarg, "%d", &parameters->start_state)) {
-          mfpt_usage();
+          (*usage)(0);
         } else if (parameters->start_state < 0) {
-          mfpt_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'Z':
       case 'z':
         if (!sscanf(optarg, "%d", &parameters->end_state)) {
-          mfpt_usage();
+          (*usage)(0);
         } else if (parameters->end_state < 0) {
-          mfpt_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'N':
       case 'n':
         if (!sscanf(optarg, "%d", &parameters->max_dist)) {
-          mfpt_usage();
+          (*usage)(0);
         } else if (parameters->max_dist <= 0) {
-          mfpt_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'D':
       case 'd':
         if (!sscanf(optarg, "%d", &parameters->bp_dist)) {
-          mfpt_usage();
+          (*usage)(0);
         } else if (parameters->bp_dist <= 0) {
-          mfpt_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case 'O':
       case 'o':
         if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
-          mfpt_usage();
+          (*usage)(0);
         } else if (parameters->epsilon <= 1e-16) {
-          mfpt_usage();
+          (*usage)(0);
         }
-        
+
         break;
-        
+
       case '?':
         switch (optopt) {
           case 'C':
@@ -145,7 +145,7 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
           case 'd':
             fprintf(stderr, "Option -%c requires an argument.\n", optopt);
             break;
-            
+
           default:
             if (isprint(optopt)) {
               fprintf(stderr, "Unknown option `-%c'.\n", optopt);
@@ -153,106 +153,106 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv) {
               fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
             }
         }
-        
-        mfpt_usage();
-        
+
+        (*usage)(0);
+
       default:
-        mfpt_usage();
+        (*usage)(0);
     }
   }
-  
+
   if (parameters->input_file == NULL) {
     if (optind + 1 == argc) {
       parameters->input_file = strdup(argv[optind]);
     }
   }
-  
+
   if (parameters->verbose) {
     debug_mfpt_parameters(*parameters);
   }
-  
+
   if (mfpt_error_handling(*parameters)) {
-    mfpt_usage();
+    (*usage)(0);
   }
-  
+
   optind = 1;
 }
 
 int mfpt_error_handling(const MFPT_PARAMS parameters) {
   int error = 0;
-  
+
   if (parameters.input) {
     // Input CSV exists.
     if (parameters.input_file == NULL) {
       fprintf(stderr, "Error: file not provided. Please provide one as the last argument or with the -c flag.\n");
       error++;
     }
-    
+
     // Input CSV is readable check.
     if (access(parameters.input_file, R_OK) == -1) {
       fprintf(stderr, "Error: can't read from file %s.\n", parameters.input_file);
       error++;
     }
   }
-  
+
   // Type of run check.
   if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) + RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG) + RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) != 1) {
     fprintf(stderr, "Error: exactly one of -t, -x or -f must be provided!\n");
     error++;
   }
-  
+
   // Transition matrix input requirements.
   if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) && !(parameters.start_state >= 0 && parameters.end_state >= 0)) {
     fprintf(stderr, "Error: if the -t flag is provided, -a and -z must be explicitly set!\n");
     error++;
   }
-  
+
   // Transition matrix input restrictions.
   if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) && (parameters.hastings || parameters.energy_based)) {
     fprintf(stderr, "Error: if the -t flag is provided, -h and -e are not permitted!\n");
     error++;
   }
-  
+
   // Fully connected graph restrictions.
   if (RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) && (parameters.hastings || parameters.energy_based)) {
     fprintf(stderr, "Error: if the -f flag is provided, -h and -e are not permitted (or -a and -z without -d)!\n");
     error++;
   }
-  
+
   // Extending k/l/p restrictions.
   if (parameters.max_dist && parameters.energy_based) {
     fprintf(stderr, "Error: if the -n flag is provided, -e is not permitted!\n");
     error++;
   }
-  
+
   // If we're extending k/l/p we need to know how the user wants the zero-positions filled.
   if (parameters.max_dist && !parameters.epsilon) {
     fprintf(stderr, "Error: if using the full grid (bounded by -n), -o needs to be specified for populating 0-probability positions!\n");
     error++;
   }
-  
+
   // If we're willing the zero-positions, we need to know the bounding size.
   if (parameters.epsilon && !parameters.max_dist) {
     fprintf(stderr, "Error: if using -o, the full grid (bounded by -n) needs to be specified for populating 0-probability positions!\n");
     error++;
   }
-  
+
   // MFPT will be 0.
   if (parameters.start_state == parameters.end_state && parameters.start_state >= 0) {
     fprintf(stderr, "Error: if the -a and -z flags are identical the MFPT is 0!\n");
     error++;
   }
-  
+
   if (error) {
     fprintf(stderr, "\n");
   }
-  
+
   return error;
 }
 
 void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   char* buffer = calloc(128, sizeof(char));
-  
+
   printf("RNAmfpt parameters\n");
   printf("(c) input_file\t\t\t%s\n",          parameters.input_file);
   printf("(e) energy_based\t\t%s\n",          parameters.energy_based                     ? "Yes" : "No");
@@ -262,37 +262,40 @@ void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   printf("(f) fully_connected\t\t%s\n",       RUN_TYPE(parameters, FULLY_CONNECTED_FLAG)  ? "Yes" : "No");
   printf("(h) hastings\t\t\t%s\n",            parameters.hastings                         ? "Yes" : "No");
   printf("(r) rate_matrix\t\t\t%s\n",         parameters.rate_matrix                      ? "Yes" : "No");
-  
+
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%d", parameters.max_dist);
   printf("(n) max_dist\t\t\t%s\n", parameters.max_dist ? buffer : "N/A");
-  
+
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%d", parameters.bp_dist);
   printf("(d) bp_dist\t\t\t%s\n", parameters.bp_dist ? buffer : "N/A");
-  
+
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%d", parameters.start_state);
   printf("(a) start_state\t\t\t%s\n", parameters.start_state >= 0 ? buffer : "N/A");
-  
+
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%d", parameters.end_state);
   printf("(z) end_state\t\t\t%s\n", parameters.end_state >= 0 ? buffer : "N/A");
-  
+
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%.2e", parameters.epsilon);
   printf("(o) epsilon\t\t\t%s\n", parameters.epsilon >= 0 ? buffer : "N/A");
-  
+
   printf("\n");
 }
 
-void mfpt_usage() {
-  fprintf(stderr, "RNAmfpt [options] input_csv\n\n");
-  fprintf(stderr, "where input_csv is a CSV file (with *no* header) of the format:\n");
-  fprintf(stderr, "k_0,l_0,p_0\n");
-  fprintf(stderr, "...,...,...\n");
-  fprintf(stderr, "k_n,l_n,p_n\n\n");
-  fprintf(stderr, "Options include the following:\n");
+void mfpt_usage(int flags_only) {
+  if (!flags_only) {
+    fprintf(stderr, "RNAmfpt [options] input_csv\n\n");
+    fprintf(stderr, "where input_csv is a CSV file (with *no* header) of the format:\n");
+    fprintf(stderr, "k_0,l_0,p_0\n");
+    fprintf(stderr, "...,...,...\n");
+    fprintf(stderr, "k_n,l_n,p_n\n\n");
+    fprintf(stderr, "Options include the following:\n");
+  }
+
   fprintf(stderr, "-A/a\tstart state,                default is -1 (inferred from input data as the first row in the CSV whose entry in the first column is 0). If provided, should indicate the 0-indexed line in the input CSV file representing the start state.\n");
   fprintf(stderr, "-C/c\t(C)SV input file,           this option is made available to abstain from providing the input CSV as the last command line argument.\n");
   fprintf(stderr, "-D/d\tstart/end (d)istance,       default is disabled. When provided, indicates the base pair distance between the starting / ending structures. This flag is used in conjunction with the -n flag, and is needed in cases when the base pair distance between the two structures can't be inferred from the input grid.\n");
@@ -308,6 +311,9 @@ void mfpt_usage() {
   fprintf(stderr, "-V/v\tverbose,                    default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n");
   fprintf(stderr, "-X/x\tsingle basepair moves,      default is enabled. If this flag is provided, the input must be in the form of an energy grid, and only diagonally adjacent moves are permitted. This option makes the assumption that the input is *not* a transition probability matrix already, and the input energy grid already satisfies the triangle inequality / parity condition.\n");
   fprintf(stderr, "-Z/z\tend state,                  default is -1 (inferred from input data as the first row in the CSV whose entry in the second column is 0). If provided, should indicate the 0-indexed line in the input CSV file representing the end state.\n\n");
-  fprintf(stderr, "\nProgram returns -1 (resp. -2) if the start state (resp. end state) probability is 0. -3 is returned if the distance between the two input structures could not be inferred from the input data (usually also means that one of the states has a 0-probability). Otherwise returns the MFPT as predicted by matrix inversion.\n");
-  abort();
+
+  if (!flags_only) {
+    fprintf(stderr, "\nProgram returns -1 (resp. -2) if the start state (resp. end state) probability is 0. -3 is returned if the distance between the two input structures could not be inferred from the input data (usually also means that one of the states has a 0-probability). Otherwise returns the MFPT as predicted by matrix inversion.\n");
+    abort();
+  }
 }

@@ -6,7 +6,7 @@ include_directories(c)
 include_directories(h)
 include_directories(${GSL_INCLUDES})
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_CXX_FLAGS} -Wno-write-strings")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_CXX_FLAGS} -Wno-unused-parameter -Wno-write-strings")
 
 add_executable(RateEq population_from_rate_matrix.c)
 
