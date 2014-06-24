@@ -8,8 +8,10 @@ add_library(mfpt_shared SHARED c/mfpt_params.c c/mfpt_parser.c c/mfpt_initialize
 add_executable(RNAmfpt c/mfpt.c c/mfpt_params.c c/mfpt_parser.c c/mfpt_initializers.c c/mfpt_functions.c)
 
 target_link_libraries(RNAmfpt ${LAPACK_LIBRARIES})
+target_link_libraries(RNAmfpt m)
 
 target_link_libraries(mfpt_shared ${LAPACK_LIBRARIES})
+target_link_libraries(mfpt_shared m)
 
 install(TARGETS RNAmfpt DESTINATION bin)
 install(TARGETS mfpt_static DESTINATION lib)

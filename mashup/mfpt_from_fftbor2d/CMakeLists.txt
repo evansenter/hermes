@@ -15,5 +15,6 @@ target_link_libraries(FFTmfpt multi_param_static)
 target_link_libraries(FFTmfpt ${FFTW_LIBRARIES})
 target_link_libraries(FFTmfpt ${LAPACK_LIBRARIES})
 target_link_libraries(FFTmfpt ${RNA})
+target_link_libraries(FFTmfpt m)
 
 install(TARGETS FFTmfpt DESTINATION bin)

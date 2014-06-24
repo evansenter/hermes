@@ -14,9 +14,11 @@ add_executable(FFTbor2D cpp/fftbor2d.cpp cpp/fftbor2d_params.cpp cpp/fftbor2d_in
 
 target_link_libraries(FFTbor2D ${FFTW_LIBRARIES})
 target_link_libraries(FFTbor2D ${RNA})
+target_link_libraries(FFTbor2D m)
 
 target_link_libraries(fftbor_shared ${FFTW_LIBRARIES})
 target_link_libraries(fftbor_shared ${RNA})
+target_link_libraries(fftbor_shared m)
 
 install(TARGETS FFTbor2D DESTINATION bin)
 install(TARGETS fftbor_static DESTINATION lib)

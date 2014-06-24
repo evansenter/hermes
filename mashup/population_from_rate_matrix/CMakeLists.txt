@@ -17,5 +17,6 @@ target_link_libraries(RateEq tpl_static)
 target_link_libraries(RateEq ${LAPACK_LIBRARIES})
 target_link_libraries(RateEq ${GSL_LIBRARIES})
 target_link_libraries(RateEq ${RNA})
+target_link_libraries(RateEq m)
 
 install(TARGETS RateEq DESTINATION bin)

@@ -22,5 +22,6 @@ target_link_libraries(FFTeq ${FFTW_LIBRARIES})
 target_link_libraries(FFTeq ${LAPACK_LIBRARIES})
 target_link_libraries(FFTeq ${GSL_LIBRARIES})
 target_link_libraries(FFTeq ${RNA})
+target_link_libraries(FFTeq m)
 
 install(TARGETS FFTeq DESTINATION bin)
