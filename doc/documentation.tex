@@ -10,10 +10,7 @@
 \setlength{\oddsidemargin}{.125in}
 \setlength{\textwidth}{6.25in}
 
-% \obeyspaces
-
 \begin{document}
-
 
 \newcommand{\sectionLabel}[2] {
   \section{#1}
@@ -22,6 +19,17 @@
 \newcommand{\subsectionLabel}[2] {
   \subsection{#1}
   \label{sub:#2}
+}
+\newcommand{\programDetails}[4] {
+  \subsubsection{Applications}
+  \label{subsub:#1app}
+  #2
+  \subsubsection{Example Usage}
+  \label{subsub:#1ex}
+  #3
+  \subsubsection{Options}
+  \label{subsub:#1opt}
+  #4
 }
 \newcommand{\fixedWidthInList}[4] {
 	\item[\texttt{#1} \textnormal{#2} \url{#3}] \hfill \\
@@ -37,7 +45,7 @@
 \newcommand{\ffteq}{\ttt{FFTeq}}
 \newcommand{\rateeq}{\ttt{RateEq}}
 
-\title{Hermes Documentation}
+\title{Hermes Documentation (add references!)}
 \author{Evan Senter}
 
 \maketitle
@@ -70,20 +78,20 @@ If you encounter errors in configuring or compiling the software, we recommend c
   \fixedWidthInList{\textnormal{OpenMP support}}{}{http://openmp.org/wp/}{ \\
     OpenMP support comes by default in most modern compilers, and is required for loop-optimization in \fft.}
   \fixedWidthInList{LAPACK}{($\geq$ 3.4.2)}{http://www.netlib.org/lapack/}{ \\
-    Various LAPACK coutines are used in \rnamfpt to compute the inverse, or pseudoinverse, of a transition probability matrix.}
+    Various LAPACK routines are used in \rnamfpt to compute the inverse, or pseudoinverse, of a transition probability matrix.}
   \fixedWidthInList{GSL}{($\geq$ 1.15, tested through 1.16)}{http://www.gnu.org/software/gsl/}{ \\
     GSL is required to compute the eigendecomposition of a (possibly) non-symmetric transition rate matrix for \rnaeq.}
   \fixedWidthInList{FFTW3}{($\geq$ 3.3.4)}{http://www.fftw.org/}{ \\
     FFTW3 functions are used to compute the inverse discrete Fourier transform in \fft.}
   \fixedWidthInList{libRNA.a}{($\geq$ 2.0.7, tested through 2.1.7)}{http://www.tbi.univie.ac.at/RNA/}{ \\
-    Various ViennaRNA functions and data structures are leveraged for homogenous energy model support, as well as \ttt{fold\_par}, \ttt{pf\_fold\_par}, and \ttt{subopt\_par}. We additionally make use of ViennaRNA functions to compute the maximum base pair distance between two structures, required for bounding the polynomial size in \fft.}
+    Various ViennaRNA functions and data structures are leveraged for homogenous energy model support, as well as \ttt{fold\_par}, \ttt{pf\_fold\_par}, and \ttt{subopt\_par}. We additionally make use of ViennaRNA functions to compute the necessary polynomial size for \fft, determined in the following fashion. Parameters $K$ (resp. $L$) are defined to be the sum of the number of base pairs in reference structure $A$ (resp. reference structure $B$) plus the number of base pairs in the maximum matching (Nussinov) structure which contains no base pair of $A$ (resp. $B$).}
 \end{description}
 
 \subsectionLabel{Compilation}{compile}
 
 \begin{description}
   \item[{\tt cd build \&\& cmake ..}] \hfill \\
-    First, ensure that your system has the dependencies outlined above (the presence of CMake can be verified with \ttt{cmake --version}). While not required, is is widely considered {\em best practice} to perform an out-of-source build, where the compilation of the code happens in a separate directory from the location of the source itself. To this end, \hermes provides an empty \ttt{build} directory that can be used for compiling the code. From \ttt{hermes/build} execute \ttt{cmake} with the path to \ttt{hermes/CMakeLists.txt} (\ttt{..}) provided as argument.
+    First, ensure that your system has the dependencies outlined above (the presence of CMake can be verified with \ttt{cmake --version}). While not required, is widely considered {\em best practice} to perform an out-of-source build, where the compilation of the code happens in a separate directory from the location of the source itself. To this end, \hermes provides an empty \ttt{build} directory that can be used for compiling the code. From \ttt{hermes/build} execute \ttt{cmake} with the path to \ttt{hermes/CMakeLists.txt} (\ttt{..}) provided as argument.
   \item[{\tt make}] \hfill \\
     Compiles the code, and generates binary executables for \fft, \rnamfpt, \rnaeq, \fftmfpt, \ffteq, and \rateeq. Additionally generates both static and shared libraries for \fft, \rnamfpt, and \rnaeq. The output directory for binaries is \ttt{hermes/bin} and output directory for libraries is \ttt{hermes/lib}.
   \item[\ttt{make install} \textnormal{(optional)}] \hfill \\
@@ -113,12 +121,19 @@ While we have done the utmost to try and ensure that CMake is able to infer loca
         Same as above.
   \end{description}
 
+  \item I'm getting a compile-time error indicating undefined symbols for \ttt{\_get\_iindx}, \\ \ttt{\_maximumMatchingConstraint} or something similar.
+  \begin{description}
+    \item[CMAKE\_LIBRARY\_PATH] \hfill \\
+      i.e. {\tt cmake -DCMAKE\_LIBRARY\_PATH=/dir/for/libRNA-2.0.7+/ ..} \hfill \\
+      \begin{spacing}{.5}
+      \end{spacing}
+        These are \ttt{libRNA.a} symbols specific to the $2.0+$ release of ViennaRNA. In all cases identified thus far, this error means that the version of \ttt{libRNA.a} found by CMake is not out of date, and can be resolved by explicitly providing the library path to a $2.0+$ ViennaRNA static library using the \ttt{CMAKE\_LIBRARY\_PATH} flag.
+  \end{description}
+
   \item Libraries required by Hermes are not installed in a location visible by the linker (in LD\_LIBRARY\_PATH), and CMake is unable to validate their existence.
   \begin{description}
     \item[CMAKE\_LIBRARY\_PATH] \hfill \\
       i.e. {\tt cmake -DCMAKE\_LIBRARY\_PATH="/more/libraries;/even/more/libraries" ..} \hfill \\
-      \begin{spacing}{.5}
-      \end{spacing}
         In the case when libraries required by Hermes are not visible to CMake, or the global library is an out-of-date version, it is possible to provide hints to the build tool for additional directories to search. Directories specified by the CMAKE\_LIBRARY\_PATH flag will be prepended onto the linker search path, and thus override global matches (handling the case where default libraries aren't sufficiently up to date). When desiring to provide multiple locations to search for libraries, CMake uses the semicolon (;) character as a separator and the entire string should be quoted to escape the shell environment.
   \end{description}
 
@@ -162,7 +177,7 @@ To achieve these goals, the library \multiParam was developed. This library simp
 
 \subsectionLabel{multi\_param Details}{mpdetails}
 
-In example from \ttt{hermes/mashup/mfpt\_from\_fftbor2d/mfpt\_from\_fftbor2d.cpp}:
+An example from \ttt{hermes/mashup/mfpt\_from\_fftbor2d/mfpt\_from\_fftbor2d.cpp}:
 
 \begin{verbatim}
 PARAM_CONTAINER* params;
@@ -198,6 +213,13 @@ Leveraging the example from \ref{sub:mpoverview} a final time, the variable \ttt
 \sectionLabel{Core Programs}{coreprogs}
 
 \subsectionLabel{FFTbor2D}{fft}
+\programDetails{fftbor}{
+TEST
+}{
+TEST2
+}{
+TEST3
+}
 
 \subsectionLabel{RNAmfpt}{rnamfpt}
 
@@ -210,5 +232,7 @@ Leveraging the example from \ref{sub:mpoverview} a final time, the variable \ttt
 \subsectionLabel{FFTeq}{ffteq}
 
 \subsectionLabel{RateEq}{rateeq}
+
+\sectionLabel{References}{ref}
 
 \end{document}
