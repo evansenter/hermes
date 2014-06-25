@@ -5,14 +5,14 @@
 #include "mfpt_parser.h"
 #include "mfpt_initializers.h"
 
-KLP_MATRIX klp_matrix_from_file(const MFPT_PARAMS parameters, void (*usage)(int)) {
+KLP_MATRIX klp_matrix_from_file(const MFPT_PARAMS parameters, void (*usage)()) {
   int line_count;
   KLP_MATRIX klp_matrix;
 
   line_count = count_lines(parameters.input_file);
 
   if (!line_count) {
-    (*usage)(0);
+    (*usage)();
   }
 
   klp_matrix = init_klp_matrix(line_count);

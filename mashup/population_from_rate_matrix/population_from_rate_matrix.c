@@ -5,7 +5,7 @@
 #include "shared/libmfpt_header.h"
 #include "shared/libpopulation_header.h"
 
-void population_from_rate_matrix_usage(int);
+void population_from_rate_matrix_usage();
 
 char* subparams[] = { "mfpt", "population" };
 
@@ -36,10 +36,10 @@ int main(int argc, char** argv) {
   return 0;
 }
 
-void population_from_rate_matrix_usage(int _) {
+void population_from_rate_matrix_usage() {
   fprintf(stderr, "RateEq --mfpt-c <path/to/rate_matrix.csv> --population-a <starting index in matrix> --population-z <ending index in matrix> [additional options]\n\n");
   print_valid_multi_params_prefixes(subparams, 2);
-  print_available_subflag_header("RNAmfpt", subparams[0], &mfpt_usage);
-  print_available_subflag_header("RNAeq", subparams[1], &population_usage);
+  print_available_subflags("RNAmfpt", subparams[0], &mfpt_flags);
+  print_available_subflags("RNAeq", subparams[1], &population_flags);
   abort();
 }

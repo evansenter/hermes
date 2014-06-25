@@ -26,7 +26,7 @@ MFPT_PARAMS init_mfpt_params() {
   return parameters;
 }
 
-void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usage)(int)) {
+void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
   int c;
 
   while ((c = getopt(argc, argv, "EeTtPpXxHhRrFfLlVvC:c:A:a:Z:z:N:n:D:d:O:o:")) != -1) {
@@ -84,9 +84,9 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usag
       case 'A':
       case 'a':
         if (!sscanf(optarg, "%d", &parameters->start_state)) {
-          (*usage)(0);
+          (*usage)();
         } else if (parameters->start_state < 0) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -94,9 +94,9 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usag
       case 'Z':
       case 'z':
         if (!sscanf(optarg, "%d", &parameters->end_state)) {
-          (*usage)(0);
+          (*usage)();
         } else if (parameters->end_state < 0) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -104,9 +104,9 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usag
       case 'N':
       case 'n':
         if (!sscanf(optarg, "%d", &parameters->max_dist)) {
-          (*usage)(0);
+          (*usage)();
         } else if (parameters->max_dist <= 0) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -114,9 +114,9 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usag
       case 'D':
       case 'd':
         if (!sscanf(optarg, "%d", &parameters->bp_dist)) {
-          (*usage)(0);
+          (*usage)();
         } else if (parameters->bp_dist <= 0) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -124,9 +124,9 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usag
       case 'O':
       case 'o':
         if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
-          (*usage)(0);
+          (*usage)();
         } else if (parameters->epsilon <= 1e-16) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -154,10 +154,10 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usag
             }
         }
 
-        (*usage)(0);
+        (*usage)();
 
       default:
-        (*usage)(0);
+        (*usage)();
     }
   }
 
@@ -172,7 +172,7 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usag
   }
 
   if (mfpt_error_handling(*parameters)) {
-    (*usage)(0);
+    (*usage)();
   }
 
   optind = 1;
@@ -286,16 +286,19 @@ void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   printf("\n");
 }
 
-void mfpt_usage(int flags_only) {
-  if (!flags_only) {
-    fprintf(stderr, "RNAmfpt [options] input_csv\n\n");
-    fprintf(stderr, "where input_csv is a CSV file (with *no* header) of the format:\n");
-    fprintf(stderr, "k_0,l_0,p_0\n");
-    fprintf(stderr, "...,...,...\n");
-    fprintf(stderr, "k_n,l_n,p_n\n\n");
-    fprintf(stderr, "Options include the following:\n");
-  }
+void mfpt_usage() {
+  fprintf(stderr, "RNAmfpt [options] input_csv\n\n");
+  fprintf(stderr, "where input_csv is a CSV file (with *no* header) of the format:\n");
+  fprintf(stderr, "k_0,l_0,p_0\n");
+  fprintf(stderr, "...,...,...\n");
+  fprintf(stderr, "k_n,l_n,p_n\n\n");
+  fprintf(stderr, "Options include the following:\n");
+  mfpt_flags();
+  fprintf(stderr, "Program returns -1 (resp. -2) if the start state (resp. end state) probability is 0. -3 is returned if the distance between the two input structures could not be inferred from the input data (usually also means that one of the states has a 0-probability). Otherwise returns the MFPT as predicted by matrix inversion.\n");
+  abort();
+}
 
+void mfpt_flags() {
   fprintf(stderr, "-A/a\tstart state,                default is -1 (inferred from input data as the first row in the CSV whose entry in the first column is 0). If provided, should indicate the 0-indexed line in the input CSV file representing the start state.\n");
   fprintf(stderr, "-C/c\t(C)SV input file,           this option is made available to abstain from providing the input CSV as the last command line argument.\n");
   fprintf(stderr, "-D/d\tstart/end (d)istance,       default is disabled. When provided, indicates the base pair distance between the starting / ending structures. This flag is used in conjunction with the -n flag, and is needed in cases when the base pair distance between the two structures can't be inferred from the input grid.\n");
@@ -311,9 +314,4 @@ void mfpt_usage(int flags_only) {
   fprintf(stderr, "-V/v\tverbose,                    default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n");
   fprintf(stderr, "-X/x\tsingle basepair moves,      default is enabled. If this flag is provided, the input must be in the form of an energy grid, and only diagonally adjacent moves are permitted. This option makes the assumption that the input is *not* a transition probability matrix already, and the input energy grid already satisfies the triangle inequality / parity condition.\n");
   fprintf(stderr, "-Z/z\tend state,                  default is -1 (inferred from input data as the first row in the CSV whose entry in the second column is 0). If provided, should indicate the 0-indexed line in the input CSV file representing the end state.\n\n");
-
-  if (!flags_only) {
-    fprintf(stderr, "\nProgram returns -1 (resp. -2) if the start state (resp. end state) probability is 0. -3 is returned if the distance between the two input structures could not be inferred from the input data (usually also means that one of the states has a 0-probability). Otherwise returns the MFPT as predicted by matrix inversion.\n");
-    abort();
-  }
 }

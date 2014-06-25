@@ -36,7 +36,7 @@ POPULATION_PARAMS init_population_params() {
   return parameters;
 }
 
-void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv, void (*usage)(int)) {
+void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
   int c;
 
   while ((c = getopt(argc, argv, "OoGgBbHhNnVvQqA:a:Z:z:S:s:K:k:L:l:I:i:J:j:P:p:E::e::D:d:W:w:T:t:C:c:R:r:F:f:")) != -1) {
@@ -94,7 +94,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'A':
       case 'a':
         if (!sscanf(optarg, "%d", &parameters->start_index)) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -102,7 +102,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'Z':
       case 'z':
         if (!sscanf(optarg, "%d", &parameters->end_index)) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -110,7 +110,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'I':
       case 'i':
         if (!sscanf(optarg, "%lf", &parameters->start_time)) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -118,7 +118,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'J':
       case 'j':
         if (!sscanf(optarg, "%lf", &parameters->end_time)) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -126,7 +126,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'P':
       case 'p':
         if (!sscanf(optarg, "%lf", &parameters->step_size)) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -134,7 +134,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'E':
       case 'e':
         if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
-          (*usage)(0);
+          (*usage)();
         }
 
         parameters->equilibrium = 1;
@@ -143,7 +143,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'D':
       case 'd':
         if (!sscanf(optarg, "%lf", &parameters->delta)) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -151,7 +151,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'W':
       case 'w':
         if (!sscanf(optarg, "%d", &parameters->window_size)) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -159,7 +159,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'T':
       case 't':
         if (!sscanf(optarg, "%lf", &parameters->temperature)) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -167,7 +167,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'C':
       case 'c':
         if (!sscanf(optarg, "%lf", &parameters->energy_cap)) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -175,9 +175,9 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'R':
       case 'r':
         if (!sscanf(optarg, "%d", &parameters->serialize)) {
-          (*usage)(0);
+          (*usage)();
         } else if ((int)abs(parameters->serialize) != 1) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -230,10 +230,10 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
             }
         }
 
-        (*usage)(0);
+        (*usage)();
 
       default:
-        (*usage)(0);
+        (*usage)();
     }
   }
 
@@ -242,7 +242,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
   }
 
   if (population_error_handling(*parameters)) {
-    (*usage)(0);
+    (*usage)();
   }
 
   optind = 1;
@@ -349,12 +349,14 @@ void debug_population_parameters(const POPULATION_PARAMS parameters) {
   printf("\n");
 }
 
-void population_usage(int flags_only) {
-  if (!flags_only) {
-    fprintf(stderr, "RNAeq [options] -s [sequence]\n\n");
-    fprintf(stderr, "Options include the following:\n");
-  }
+void population_usage() {
+  fprintf(stderr, "RNAeq [options] -s [sequence]\n\n");
+  fprintf(stderr, "Options include the following:\n");
+  population_flags();
+  abort();
+}
 
+void population_flags() {
   fprintf(stderr, "-A/a\tstart state,           default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the starting structure (see options for -k).\n");
   fprintf(stderr, "-B/b\t(b)enchmarking,        default is disabled. When enabled, RNAeq will print benchmarking times for internal function calls.\n");
   fprintf(stderr, "-C/c\tenergy (c)ap,          default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
@@ -376,9 +378,5 @@ void population_usage(int flags_only) {
   fprintf(stderr, "-T/t\t(t)emperature,         temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
   fprintf(stderr, "-V/v\t(v)erbose,       default is disabled, presents some debug information at runtime.\n\n");
   fprintf(stderr, "-W/w\t(w)indow size,         default is 5. Specifies the window size (exclusive) for predicting equilibrium. Equilibrium is considered as having been achieved when all indicies (i + 1)..(i + window_size - 1) are within epsilon (-e) of the population proportion at time i.\n");
-  fprintf(stderr, "-Z/z\tend state,             default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the ending structure (see options for -l).\n");
-
-  if (!flags_only) {
-    abort();
-  }
+  fprintf(stderr, "-Z/z\tend state,             default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the ending structure (see options for -l).\n\n");
 }

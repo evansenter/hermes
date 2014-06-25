@@ -7,7 +7,7 @@
 #include "shared/libpopulation_header.h"
 
 KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA);
-void population_from_fftbor2d_usage(int);
+void population_from_fftbor2d_usage();
 
 char* subparams[] = { "fftbor2d", "mfpt", "population" };
 
@@ -69,11 +69,11 @@ KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA fftbor2d_da
   return klp_matrix;
 }
 
-void population_from_fftbor2d_usage(int _) {
+void population_from_fftbor2d_usage() {
   fprintf(stderr, "FFTeq --fftbor2d-i <sequence> --fftbor2d-j <structure_1> --fftbor2d-k <structure_2> [additional options]\n\n");
   print_valid_multi_params_prefixes(subparams, 3);
-  print_available_subflag_header("FFTbor2D", subparams[0], &fftbor2d_usage);
-  print_available_subflag_header("RNAmfpt", subparams[1], &mfpt_usage);
-  print_available_subflag_header("RNAeq", subparams[2], &population_usage);
+  print_available_subflags("FFTbor2D", subparams[0], &fftbor2d_flags);
+  print_available_subflags("RNAmfpt", subparams[1], &mfpt_flags);
+  print_available_subflags("RNAeq", subparams[2], &population_flags);
   abort();
 }

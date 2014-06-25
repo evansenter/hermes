@@ -107,9 +107,9 @@ void match_for_subparam(char** subparam_order, char* subparam, int subparam_coun
   match->index = NO_MATCH;
 }
 
-void print_available_subflag_header(char* program, char* prefix, void (*usage)(int)) {
+void print_available_subflags(char* program, char* prefix, void (*flags)()) {
   fprintf(stderr, "Available %s flags (prefixed with --%s-) are:\n\n", program, prefix);
-  (*usage)(1);
+  (*flags)();
 }
 
 void print_valid_multi_params_prefixes(char** subparam_order, int subparam_count) {

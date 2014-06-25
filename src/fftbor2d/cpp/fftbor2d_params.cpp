@@ -37,7 +37,7 @@ void free_fftbor2d_params(FFTBOR2D_PARAMS parameters) {
   free(parameters.energy_file);
 }
 
-void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, void (*usage)(int)) {
+void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, void (*usage)()) {
   int c;
 
   while ((c = getopt(argc, argv, "VvBbMmSsCcT:t:E:e:I:i:J:j:K:k:P:p:")) != -1) {
@@ -70,7 +70,7 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, voi
       case 'T':
       case 't':
         if (!sscanf(optarg, "%lf", &temperature)) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -78,9 +78,9 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, voi
       case 'P':
       case 'p':
         if (!sscanf(optarg, "%d", &parameters.precision)) {
-          (*usage)(0);
+          (*usage)();
         } else if (parameters.precision < 0 || parameters.precision > std::numeric_limits<double>::digits) {
-          (*usage)(0);
+          (*usage)();
         }
 
         break;
@@ -132,16 +132,16 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, voi
             }
         }
 
-        (*usage)(0);
+        (*usage)();
 
       default:
-        (*usage)(0);
+        (*usage)();
     }
   }
 
   if (parameters.sequence == NULL || parameters.structure_1 == NULL || parameters.structure_2 == NULL) {
     if (optind == argc) {
-      (*usage)(0);
+      (*usage)();
     } else {
       parse_fftbor2d_sequence_data(argc, argv, optind, parameters, &fftbor2d_usage);
     }
@@ -152,13 +152,13 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, voi
   }
 
   if (fftbor2d_error_handling(parameters)) {
-    (*usage)(0);
+    (*usage)();
   }
 
   optind = 1;
 }
 
-void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARAMS& parameters, void (*usage)(int)) {
+void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARAMS& parameters, void (*usage)()) {
   int i, char_index = 0;
   FILE* file;
   char line[MAX_LENGTH];
@@ -168,7 +168,7 @@ void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARA
     /* Input is not a file */
     /* argv[argp] should be sequence and argv[argp + 1], argv[argp + 2] should be structures */
     if (argc <= argp + 2) {
-      (*usage)(0);
+      (*usage)();
     }
 
     parameters.seq_length  = strlen(argv[argp]);
@@ -192,7 +192,7 @@ void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARA
     }
 
     if (line == NULL) {
-      (*usage)(0);
+      (*usage)();
     }
 
     // This was a tricky bug to catch, fgets (perhaps obviously) reads a line in, including \n character,
@@ -282,19 +282,22 @@ void debug_fftbor2d_parameters(const FFTBOR2D_PARAMS parameters) {
   printf("\n");
 }
 
-void fftbor2d_usage(int flags_only) {
-  if (!flags_only) {
-    fprintf(stderr, "FFTbor2D [options] sequence structure_1 structure_2\n\n");
-    fprintf(stderr, "FFTbor2D [options] -i sequence -j structure_1 -k structure_2\n\n");
-    fprintf(stderr, "FFTbor2D [options] filename\n");
-    fprintf(stderr, "where filename is a file of format:\n");
-    fprintf(stderr, "\t>comment (optional line)\n");
-    fprintf(stderr, "\tsequence (max length: %d)\n", MAX_LENGTH);
-    fprintf(stderr, "\tsecondary structure (1)\n");
-    fprintf(stderr, "\tsecondary structure (2)\n\n");
-    fprintf(stderr, "Options include the following:\n");
-  }
+void fftbor2d_usage() {
+  fprintf(stderr, "FFTbor2D [options] sequence structure_1 structure_2\n\n");
+  fprintf(stderr, "FFTbor2D [options] -i sequence -j structure_1 -k structure_2\n\n");
+  fprintf(stderr, "FFTbor2D [options] filename\n");
+  fprintf(stderr, "where filename is a file of format:\n");
+  fprintf(stderr, "\t>comment (optional line)\n");
+  fprintf(stderr, "\tsequence (max length: %d)\n", MAX_LENGTH);
+  fprintf(stderr, "\tsecondary structure (1)\n");
+  fprintf(stderr, "\tsecondary structure (2)\n\n");
+  fprintf(stderr, "Options include the following:\n");
+  fftbor2d_flags();
+  fprintf(stderr, "Note: output formatting flags (C/c, M/m, S/s) are mutually exclusive. If more than one is provided, *only* last flag will be honored.\n");
+  abort();
+}
 
+void fftbor2d_flags() {
   fprintf(stderr, "-B/b\t(b)enchmark,     default is off. If on, benchmarking data will print alongside normal results.\n");
   fprintf(stderr, "-C/c\t(C)SV output,    default is disabled, presents output in CSV format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z).\n");
   fprintf(stderr, "-E/e\t(e)nergyfile,    default is rna_turner2004.par in this current directory. Must be name of a file with all energy parameters (in same format as used in Vienna RNA). Energy file lookup first checks current directory, and then iterates through PATH shell variable until a matching file is found. If no file is found, default ViennaRNA parameters are used and a warning is presented to user. If -E switch is explicitly provided, that file is used in lieu of searching for rna_turner2004.par file.\n");
@@ -306,9 +309,4 @@ void fftbor2d_usage(int flags_only) {
   fprintf(stderr, "-S/s\t(s)imple output, default is disabled, presents output in column format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z), -RTln(Z_{k,l})).\n");
   fprintf(stderr, "-T/t\t(t)emperature,   default is 37 degrees Celsius (unless an energyfile with parameters for a different temperature is used.\n");
   fprintf(stderr, "-V/v\t(v)erbose,       default is disabled, presents some debug information at runtime.\n\n");
-
-  if (!flags_only) {
-    fprintf(stderr, "Note: output formatting flags (C/c, M/m, S/s) are mutually exclusive. If more than one is provided, *only* last flag will be honored.\n");
-    abort();
-  }
 }
