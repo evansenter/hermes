@@ -4,38 +4,28 @@
 \usepackage{xspace}
 \usepackage{setspace}
 \usepackage{paralist}
+\usepackage{amsmath}
 
-\setlength{\topmargin}{-.5in}
-\setlength{\textheight}{9in}
-\setlength{\oddsidemargin}{.125in}
-\setlength{\textwidth}{6.25in}
+\setlength{
+\topmargin}{-.5in} \setlength{
+\textheight}{9in} \setlength{
+\oddsidemargin}{.125in} \setlength{
+\textwidth}{6.25in}
 
 \begin{document}
 
-\newcommand{\sectionLabel}[2] {
-  \section{#1}
-  \label{sec:#2}
-}
-\newcommand{\subsectionLabel}[2] {
-  \subsection{#1}
-  \label{sub:#2}
-}
-\newcommand{\programDetails}[4] {
-  \subsubsection{Applications}
-  \label{subsub:#1app}
-  #2
-  \subsubsection{Example Usage}
-  \label{subsub:#1ex}
-  #3
-  \subsubsection{Options}
-  \label{subsub:#1opt}
-  #4
-}
+\newcommand{
+\sectionLabel}[2] {
+\section{#1} \label{sec:#2} }
+\newcommand{
+\subsectionLabel}[2] {
+\subsection{#1} \label{sub:#2} }
 \newcommand{\fixedWidthInList}[4] {
-	\item[\texttt{#1} \textnormal{#2} \url{#3}] \hfill \\
-	#4
-}
-\newcommand{\ttt}[1]{{\tt #1\xspace}}
+\item[\texttt{#1} \textnormal{#2} \url{#3}] \hfill \\
+#4 }
+\newcommand{\optionListItem}[2] {\item[\optionFlag{#1}] #2}
+\newcommand{\optionFlag}[1] {\ttt{-#1/-\MakeUppercase{#1}}}
+\newcommand{\ttt}[1]{{\tt #1}\xspace}
 \newcommand{\hermes}{\ttt{hermes}}
 \newcommand{\multiParam}{\ttt{multi\_param}}
 \newcommand{\fft}{\ttt{FFTbor2D}}
@@ -44,13 +34,15 @@
 \newcommand{\fftmfpt}{\ttt{FFTmfpt}}
 \newcommand{\ffteq}{\ttt{FFTeq}}
 \newcommand{\rateeq}{\ttt{RateEq}}
+\newcommand{\s}{$s$\xspace}
+\newcommand{\A}{$A$\xspace}
+\newcommand{\B}{$B$\xspace}
 
 \title{Hermes Documentation (add references!)}
 \author{Evan Senter}
 
 \maketitle
-\tableofcontents
-\clearpage
+\tableofcontents \clearpage
 
 \sectionLabel{Introduction}{intro}
 
@@ -67,93 +59,89 @@ From the root directory of Hermes, execute the following command:
 If you encounter errors in configuring or compiling the software, we recommend checking out section \ref{sub:faq} on common troubleshooting solutions.
 
 \subsectionLabel{Dependencies}{dependencies}
-
 \begin{description}
-  \fixedWidthInList{cmake}{($\geq$ 2.6-patch 4, tested through 3.0.0)}{http://www.cmake.org/}{ \\
-    CMake is used as the build system for Hermes.}
-  \fixedWidthInList{\textnormal{GNU99 compiler:}}{}{}{ \\
-    Most C compilers should support the \ttt{-std=gnu99} flag, which is required for GNU library extensions, particularly \ttt{unistd.h}}
-  \fixedWidthInList{\textnormal{C++11 compiler:}}{}{}{ \\
-    C++11 support (included in \ttt{g++} $\geq$ 4.7) is necessary for proper struct initialization in \fft.}
-  \fixedWidthInList{\textnormal{OpenMP support}}{}{http://openmp.org/wp/}{ \\
-    OpenMP support comes by default in most modern compilers, and is required for loop-optimization in \fft.}
-  \fixedWidthInList{LAPACK}{($\geq$ 3.4.2)}{http://www.netlib.org/lapack/}{ \\
-    Various LAPACK routines are used in \rnamfpt to compute the inverse, or pseudoinverse, of a transition probability matrix.}
-  \fixedWidthInList{GSL}{($\geq$ 1.15, tested through 1.16)}{http://www.gnu.org/software/gsl/}{ \\
-    GSL is required to compute the eigendecomposition of a (possibly) non-symmetric transition rate matrix for \rnaeq.}
-  \fixedWidthInList{FFTW3}{($\geq$ 3.3.4)}{http://www.fftw.org/}{ \\
-    FFTW3 functions are used to compute the inverse discrete Fourier transform in \fft.}
-  \fixedWidthInList{libRNA.a}{($\geq$ 2.0.7, tested through 2.1.7)}{http://www.tbi.univie.ac.at/RNA/}{ \\
-    Various ViennaRNA functions and data structures are leveraged for homogenous energy model support, as well as \ttt{fold\_par}, \ttt{pf\_fold\_par}, and \ttt{subopt\_par}. We additionally make use of ViennaRNA functions to compute the necessary polynomial size for \fft, determined in the following fashion. Parameters $K$ (resp. $L$) are defined to be the sum of the number of base pairs in reference structure $A$ (resp. reference structure $B$) plus the number of base pairs in the maximum matching (Nussinov) structure which contains no base pair of $A$ (resp. $B$).}
+	\fixedWidthInList{cmake}{($\geq$ 2.6-patch 4, tested through 3.0.0)}{http://www.cmake.org/}{ \\
+	CMake is used as the build system for Hermes.} \fixedWidthInList{\textnormal{GNU99 compiler:}}{}{}{ \\
+	Most C compilers should support the \ttt{-std=gnu99} flag, which is required for GNU library extensions, particularly \ttt{unistd.h}} \fixedWidthInList{\textnormal{C++11 compiler:}}{}{}{ \\
+	C++11 support (included in \ttt{g++} $\geq$ 4.7) is necessary for proper struct initialization in \fft.} \fixedWidthInList{\textnormal{OpenMP support}}{}{http://openmp.org/wp/}{ \\
+	OpenMP support comes by default in most modern compilers, and is required for loop-optimization in \fft.} \fixedWidthInList{LAPACK}{($\geq$ 3.4.2)}{http://www.netlib.org/lapack/}{ \\
+	Various LAPACK routines are used in \rnamfpt to compute the inverse, or pseudoinverse, of a transition probability matrix.} \fixedWidthInList{GSL}{($\geq$ 1.15, tested through 1.16)}{http://www.gnu.org/software/gsl/}{ \\
+	GSL is required to compute the eigendecomposition of a (possibly) non-symmetric transition rate matrix for \rnaeq.} \fixedWidthInList{FFTW3}{($\geq$ 3.3.4)}{http://www.fftw.org/}{ \\
+	FFTW3 functions are used to compute the inverse discrete Fourier transform in \fft.} \fixedWidthInList{libRNA.a}{($\geq$ 2.0.7, tested through 2.1.7)}{http://www.tbi.univie.ac.at/RNA/}{ \\
+	Various ViennaRNA functions and data structures are leveraged for homogenous energy model support, as well as \ttt{fold\_par}, \ttt{pf\_fold\_par}, and \ttt{subopt\_par}. We additionally make use of ViennaRNA functions to compute the necessary polynomial size for \fft, determined in the following fashion. Parameters $K$ (resp. $L$) are defined to be the sum of the number of base pairs in reference structure $A$ (resp. reference structure $B$) plus the number of base pairs in the maximum matching (Nussinov) structure which contains no base pair of $A$ (resp. $B$).}
 \end{description}
 
 \subsectionLabel{Compilation}{compile}
-
 \begin{description}
-  \item[{\tt cd build \&\& cmake ..}] \hfill \\
-    First, ensure that your system has the dependencies outlined above (the presence of CMake can be verified with \ttt{cmake --version}). While not required, is widely considered {\em best practice} to perform an out-of-source build, where the compilation of the code happens in a separate directory from the location of the source itself. To this end, \hermes provides an empty \ttt{build} directory that can be used for compiling the code. From \ttt{hermes/build} execute \ttt{cmake} with the path to \ttt{hermes/CMakeLists.txt} (\ttt{..}) provided as argument.
-  \item[{\tt make}] \hfill \\
-    Compiles the code, and generates binary executables for \fft, \rnamfpt, \rnaeq, \fftmfpt, \ffteq, and \rateeq. Additionally generates both static and shared libraries for \fft, \rnamfpt, and \rnaeq. The output directory for binaries is \ttt{hermes/bin} and output directory for libraries is \ttt{hermes/lib}.
-  \item[\ttt{make install} \textnormal{(optional)}] \hfill \\
-    Installs the executables built with \ttt{make} to \ttt{\$DESTDIR/bin} and copies libraries / archives to \ttt{\$DESTDIR/lib} (on *nix systems, \ttt{\$DESTDIR} defaults to \ttt{/usr/local}).
+	\item[{\tt cd build \&\& cmake ..}] \hfill \\
+	First, ensure that your system has the dependencies outlined above (the presence of CMake can be verified with \ttt{cmake --version}). While not required, is widely considered {\em best practice} to perform an out-of-source build, where the compilation of the code happens in a separate directory from the location of the source itself. To this end, \hermes provides an empty \ttt{build} directory that can be used for compiling the code. From \ttt{hermes/build} execute \ttt{cmake} with the path to \ttt{hermes/CMakeLists.txt} (\ttt{..}) provided as argument.
+	\item[{\tt make}] \hfill \\
+	Compiles the code, and generates binary executables for \fft, \rnamfpt, \rnaeq, \fftmfpt, \ffteq, and \rateeq. Additionally generates both static and shared libraries for \fft, \rnamfpt, and \rnaeq. The output directory for binaries is \ttt{hermes/bin} and output directory for libraries is \ttt{hermes/lib}.
+	\item[\ttt{make install} \textnormal{(optional)}] \hfill \\
+	Installs the executables built with \ttt{make} to \ttt{\$DESTDIR/bin} and copies libraries / archives to \ttt{\$DESTDIR/lib} (on *nix systems, \ttt{\$DESTDIR} defaults to \ttt{/usr/local}).
 \end{description}
 
 \subsectionLabel{Troubleshooting}{faq}
 
 While we have done the utmost to try and ensure that CMake is able to infer locations of third-party libraries and add compiler-appropriate flags in an automated fashion, due to the diversity of build environments possible, it is possible that you will need to specify additional command-line flags to \ttt{cmake} when generating the Makefiles in order to successfully build Hermes. The following are five useful flags for CMake, and a brief explanation of when they may need to be employed:
-
 \begin{itemize}
-  \item The default compiler I'd like to use for C code is installed in a non-standard location, or not the globally default C compiler.
-  \begin{description}
-    \item[CMAKE\_C\_COMPILER] \hfill \\
-      i.e. {\tt cmake -DCMAKE\_C\_COMPILER=/path/to/c/compiler ..} \hfill \\
-      \begin{spacing}{.5}
-      \end{spacing}
-        This variable sets the path to the compiler to use for configuration and subsequent compiliation via \ttt{make}. This is the compiler that will be used by CMake to test for the presence of various flags, i.e. \ttt{-O3} and \ttt{-Wall}.
-  \end{description}
+	\item The default compiler I'd like to use for C code is installed in a non-standard location, or not the globally default C compiler.
+	\begin{description}
+		\item[CMAKE\_C\_COMPILER] \hfill \\
+		i.e. {\tt cmake -DCMAKE\_C\_COMPILER=/path/to/c/compiler ..} \hfill \\
+		\begin{spacing}
+			{.5}
+		\end{spacing}
+		This variable sets the path to the compiler to use for configuration and subsequent compilation via \ttt{make}. This is the compiler that will be used by CMake to test for the presence of various flags, i.e. \ttt{-O3} and \ttt{-Wall}.
+	\end{description}
 
-  \item The default compiler I'd like to use for C++ code is installed in a non-standard location, or not the globally default C++ compiler.
-  \begin{description}
-    \item[CMAKE\_CXX\_COMPILER] \hfill \\
-      i.e. {\tt cmake -DCMAKE\_CXX\_COMPILER=/path/to/cxx/compiler ..} \hfill \\
-      \begin{spacing}{.5}
-      \end{spacing}
-        Same as above.
-  \end{description}
+	\item The default compiler I'd like to use for C++ code is installed in a non-standard location, or not the globally default C++ compiler.
+	\begin{description}
+		\item[CMAKE\_CXX\_COMPILER] \hfill \\
+		i.e. {\tt cmake -DCMAKE\_CXX\_COMPILER=/path/to/cxx/compiler ..} \hfill \\
+		\begin{spacing}
+			{.5}
+		\end{spacing}
+		Same as above.
+	\end{description}
 
-  \item I'm getting a compile-time error indicating undefined symbols for \ttt{\_get\_iindx}, \\ \ttt{\_maximumMatchingConstraint} or something similar.
-  \begin{description}
-    \item[CMAKE\_LIBRARY\_PATH] \hfill \\
-      i.e. {\tt cmake -DCMAKE\_LIBRARY\_PATH=/dir/for/libRNA-2.0.7+/ ..} \hfill \\
-      \begin{spacing}{.5}
-      \end{spacing}
-        These are \ttt{libRNA.a} symbols specific to the $2.0+$ release of ViennaRNA. In all cases identified thus far, this error means that the version of \ttt{libRNA.a} found by CMake is not out of date, and can be resolved by explicitly providing the library path to a $2.0+$ ViennaRNA static library using the \ttt{CMAKE\_LIBRARY\_PATH} flag.
-  \end{description}
+	\item I'm getting a compile-time error indicating undefined symbols for \ttt{\_get\_iindx}, \\
+	\ttt{\_maximumMatchingConstraint} or something similar.
+	\begin{description}
+		\item[CMAKE\_LIBRARY\_PATH] \hfill \\
+		i.e. {\tt cmake -DCMAKE\_LIBRARY\_PATH=/dir/for/libRNA-2.0.7+/ ..} \hfill \\
+		\begin{spacing}
+			{.5}
+		\end{spacing}
+		These are \ttt{libRNA.a} symbols specific to the $2.0+$ release of ViennaRNA. In all cases identified thus far, this error means that the version of \ttt{libRNA.a} found by CMake is not out of date, and can be resolved by explicitly providing the library path to a $2.0+$ ViennaRNA static library using the \ttt{CMAKE\_LIBRARY\_PATH} flag.
+	\end{description}
 
-  \item Libraries required by Hermes are not installed in a location visible by the linker (in LD\_LIBRARY\_PATH), and CMake is unable to validate their existence.
-  \begin{description}
-    \item[CMAKE\_LIBRARY\_PATH] \hfill \\
-      i.e. {\tt cmake -DCMAKE\_LIBRARY\_PATH="/more/libraries;/even/more/libraries" ..} \hfill \\
-        In the case when libraries required by Hermes are not visible to CMake, or the global library is an out-of-date version, it is possible to provide hints to the build tool for additional directories to search. Directories specified by the CMAKE\_LIBRARY\_PATH flag will be prepended onto the linker search path, and thus override global matches (handling the case where default libraries aren't sufficiently up to date). When desiring to provide multiple locations to search for libraries, CMake uses the semicolon (;) character as a separator and the entire string should be quoted to escape the shell environment.
-  \end{description}
+	\item Libraries required by Hermes are not installed in a location visible by the linker (in LD\_LIBRARY\_PATH), and CMake is unable to validate their existence.
+	\begin{description}
+		\item[CMAKE\_LIBRARY\_PATH] \hfill \\
+		i.e. {\tt cmake -DCMAKE\_LIBRARY\_PATH="/more/libraries;/even/more/libraries" ..} \hfill \\
+		In the case when libraries required by Hermes are not visible to CMake, or the global library is an out-of-date version, it is possible to provide hints to the build tool for additional directories to search. Directories specified by the CMAKE\_LIBRARY\_PATH flag will be prepended onto the linker search path, and thus override global matches (handling the case where default libraries aren't sufficiently up to date). When desiring to provide multiple locations to search for libraries, CMake uses the semicolon (;) character as a separator and the entire string should be quoted to escape the shell environment.
+	\end{description}
 
-  \item Headers required by Hermes are not installed in a location visible by the compiler (in CPATH or a derivative), and as a result I'm seeing \ttt{undefined reference to} errors.
-  \begin{description}
-    \item[CMAKE\_INCLUDE\_PATH] \hfill \\
-      i.e. {\tt cmake -DCMAKE\_INCLUDE\_PATH="/more/includes;/even/more/includes" ..} \hfill \\
-      \begin{spacing}{.5}
-      \end{spacing}
-        It is generally likely that the CMAKE\_LIBRARY\_PATH and CMAKE\_INCLUDE\_PATH will both be necessary, when either one is required. This flag operates in a fashion identical to CMAKE\_LIBRARY\_PATH described above, and uses the same syntax. Alternatively a user can update their \ttt{CPATH} environment variable, but this may have unpredictable results when headers are found, but out of date.
-  \end{description}
+	\item Headers required by Hermes are not installed in a location visible by the compiler (in CPATH or a derivative), and as a result I'm seeing \ttt{undefined reference to} errors.
+	\begin{description}
+		\item[CMAKE\_INCLUDE\_PATH] \hfill \\
+		i.e. {\tt cmake -DCMAKE\_INCLUDE\_PATH="/more/includes;/even/more/includes" ..} \hfill \\
+		\begin{spacing}
+			{.5}
+		\end{spacing}
+		It is generally likely that the CMAKE\_LIBRARY\_PATH and CMAKE\_INCLUDE\_PATH will both be necessary, when either one is required. This flag operates in a fashion identical to CMAKE\_LIBRARY\_PATH described above, and uses the same syntax. Alternatively a user can update their \ttt{CPATH} environment variable, but this may have unpredictable results when headers are found, but out of date.
+	\end{description}
 
-  \item I don't have permissions to \ttt{make install} to the default location (generally \ttt{/usr/local} for *nix) on my system.
-  \begin{description}
-    \item[CMAKE\_INSTALL\_PREFIX] \hfill \\
-      i.e. {\tt cmake -DCMAKE\_INSTALL\_PREFIX=/make/install/path/prefix ..} \hfill \\
-      \begin{spacing}{.5}
-      \end{spacing}
-        This variable sets the destination directory of the \ttt{make install} command. Binaries will be placed in the \ttt{bin} subdirectory and libraries will be placed in the \ttt{lib} subdirectory. This is analogous to \ttt{./configure --prefix=/make/install/path/prefix} in Autotools and can also be achieved by setting the \ttt{DESTDIR} environment variable.
-  \end{description}
+	\item I don't have permissions to \ttt{make install} to the default location (generally \ttt{/usr/local} for *nix) on my system.
+	\begin{description}
+		\item[CMAKE\_INSTALL\_PREFIX] \hfill \\
+		i.e. {\tt cmake -DCMAKE\_INSTALL\_PREFIX=/make/install/path/prefix ..} \hfill \\
+		\begin{spacing}
+			{.5}
+		\end{spacing}
+		This variable sets the destination directory of the \ttt{make install} command. Binaries will be placed in the \ttt{bin} subdirectory and libraries will be placed in the \ttt{lib} subdirectory. This is analogous to \ttt{./configure --prefix=/make/install/path/prefix} in Autotools and can also be achieved by setting the \ttt{DESTDIR} environment variable.
+	\end{description}
 \end{itemize}
 
 \sectionLabel{Software Organization}{organization}
@@ -162,15 +150,17 @@ While we have done the utmost to try and ensure that CMake is able to infer loca
 
 The Hermes code is organized into two major directories, \ttt{hermes/src} and \ttt{hermes/mashup}. The conceptual difference between these two directories is that \ttt{hermes/src} code (\fft, \rnamfpt, \rnaeq) are all stand-alone pieces of software which achieve specific goals (computing energy grids, hitting time, and equilibrium time respectively). Alternatively, code residing in \ttt{hermes/mashup} aims to leverage general concepts across the Hermes package to provide a means to ask even more specific questions. In example, \fft allows an investigator to compute the 2D energy grid correspondent to an input RNA sequence $s$ and two structures $A, B$. \rnaeq can estimate the population occupancy of $A, B$ for $s$ by either sampling suboptimal structures or exhaustive structural enumeration, but these approaches aren't tractable for non-trivial RNAs.
 
-\ffteq, located in \ttt{hermes/mashup/population\_from\_fftbor2d} uses functions from \\ \ttt{libfftbor\_static.a} (derived from \fft) to compute the energy landscape and functions from \ttt{librnaeq\_static.a} (derived from \rnaeq) to estimate population occupancy for $s, A, B$ without requiring an investigator to copy pieces of individual packages to achieve their goals, instead using the static libraries automatically produced for all \ttt{hermes/src} software, shared headers made available in \ttt{hermes/h} and \ttt{libmulti\_param.a} (from \ttt{hermes/src/multi\_param}) to dispatch command-line arguments to the appropriate underlying function. The result? The entirety of \ffteq is 67 lines of C++ code, and uses native binary data structures the entire way through; there is no command-line funneling of \fft into \rnaeq.
+\ffteq, located in \ttt{hermes/mashup/population\_from\_fftbor2d} uses functions from \\
+\ttt{libfftbor\_static.a} (derived from \fft) to compute the energy landscape and functions from \ttt{librnaeq\_static.a} (derived from \rnaeq) to estimate population occupancy for $s, A, B$ without requiring an investigator to copy pieces of individual packages to achieve their goals, instead using the static libraries automatically produced for all \ttt{hermes/src} software, shared headers made available in \ttt{hermes/h} and \ttt{libmulti\_param.a} (from \ttt{hermes/src/multi\_param}) to dispatch command-line arguments to the appropriate underlying function. The result? The entirety of \ffteq is 67 lines of C++ code, and uses native binary data structures the entire way through; there is no command-line funneling of \fft into \rnaeq.
 
 \subsectionLabel{multi\_param Overview}{mpoverview}
 
 All of \fft, \rnamfpt, and \rnaeq present a wide selection of command-line arguments to meet the diverse demands of end users. When we moved on to developing {\em mashup} software between these three programs, there were a number of requirements that we came up with to make both implementing and using these programs as easy as possible. We decided that
-\begin{inparaenum}[\itshape a\upshape)]
-\item the developer should not have to reimplement command-line parsing for mashups
-\item all existing flags for underlying libraries (i.e. \fft, \rnamfpt, \rnaeq) would be supported, and
-\item flags would be namespaced to have deterministic targets.
+\begin{inparaenum}
+	[\itshape a\upshape)]
+	\item the developer should not have to reimplement command-line parsing for mashups
+	\item all existing flags for underlying libraries (i.e. \fft, \rnamfpt, \rnaeq) would be supported, and
+	\item flags would be namespaced to have deterministic targets.
 \end{inparaenum}
 
 To achieve these goals, the library \multiParam was developed. This library simply takes a collection of command line arguments and re-dispatches them to the appropriate underlying library. Given a set of command-line flags such as \ttt{--all-v --fftbor2d-i GGGAAACCC --fftbor2d-j `.........' --fftbor2d-k `(((...)))' --mfpt-x --mfpt-h}, the code ensures that \fft is passed \ttt{-v -i GGGAAACCC -j `.........' -k `(((...)))'} as options in \ttt{argv} and \rnamfpt is passed \ttt{-v -x -h} as options in \ttt{argv}.
@@ -178,7 +168,6 @@ To achieve these goals, the library \multiParam was developed. This library simp
 \subsectionLabel{multi\_param Details}{mpdetails}
 
 An example from \ttt{hermes/mashup/mfpt\_from\_fftbor2d/mfpt\_from\_fftbor2d.cpp}:
-
 \begin{verbatim}
 PARAM_CONTAINER* params;
 FFTBOR2D_PARAMS fftbor2d_params;
@@ -186,52 +175,109 @@ FFTBOR2D_PARAMS fftbor2d_params;
 /* ...omitted for clarity... */
 
 char* subparams[] = { "fftbor2d", "mfpt" };
-params            = split_args(argc, argv, subparams, 2);
+params = split_args(argc, argv, subparams, 2);
 
 fftbor2d_params = init_fftbor2d_params();
-parse_fftbor2d_args(fftbor2d_params, params[0].argc, params[0].argv);
+parse_fftbor2d_args(
+  fftbor2d_params,
+  params[0].argc,
+  params[0].argv,
+  &mfpt_from_fftbor2d_usage
+);
 \end{verbatim}
 
 The way this code works is by first declaring which packages can be used by the mashups, out of \ttt{fftbor2d}, \ttt{mfpt}, or \ttt{population}. In the snippet above the selection is saved in the variable \ttt{subparams}. All of the \fft, \rnamfpt, and \rnaeq libraries have \ttt{init\_*\_params} functions available, which return an object with the default parameters for that package. They also all have \ttt{parse\_*\_args} functions, which take three arguments,
-\begin{inparaenum}[\itshape 1\upshape)]
-\item a pointer to the parameters object
-\item \ttt{argc}, and
-\item \ttt{argv}
-\end{inparaenum}.
+\begin{inparaenum}
+	[\itshape 1\upshape)]
+	\item a pointer to the parameters object
+	\item \ttt{argc}, and
+	\item \ttt{argv}
+\end{inparaenum}
+.
 
 \ttt{split\_args} takes the prefixed command-line arguments (see the example in \ref{sub:mpoverview}) and bins them by their prefix, with the special \ttt{--all} prefix being supplied to all declared subparams. The prefixes are then removed and the grouped arguments are returned from the function in a \ttt{PARAM\_CONTAINER} array, with the same order as the subparams were passed to the function. It is then trivial to call the \ttt{parse\_*\_args} functions with the corresponding subarrays from \ttt{PARAM\_CONTAINER} to get a final parameters object.
 
 Leveraging the example from \ref{sub:mpoverview} a final time, the variable \ttt{params} would look as follows after invoking \ttt{split\_args}:
-
 \begin{verbatim}
 [
-  { argv: ["-v", "-i", "GGGAAACCC", "-j", ".........", "-k", "(((...)))"], argc: 7 },
-  { argv: ["-v", "-x", "-h"], argc: 3 }
+  {
+    argv: ["-v", "-i", "GGGAAACCC", "-j", ".........", "-k", "(((...)))"],
+    argc: 7
+  }, {
+    argv: ["-v", "-x", "-h"],
+    argc: 3
+  }
 ]
 \end{verbatim}
 
 \sectionLabel{Core Programs}{coreprogs}
 
-\subsectionLabel{FFTbor2D}{fft}
-\programDetails{fftbor}{
-TEST
-}{
-TEST2
-}{
-TEST3
-}
+\subsectionLabel{{\tt FFTbor2D}}{fft}
 
-\subsectionLabel{RNAmfpt}{rnamfpt}
+\subsubsection{Applications} \label{subsub:fftborapp}
 
-\subsectionLabel{RNAeq}{rnaeq}
+\fft computes the 2D energy landscape of an arbitrary but fixed sequence \s, parameterized by base pair distance from input structures \A and \B.
+
+\subsubsection{Example Usage} \label{subsub:fftborex}
+
+\begin{verbatim}
+FFTbor2D -m -i GGGAAACCC -j '.........' -k '(((...)))' -e ./misc/rna_turner2004.par
+
++0.00000000	+0.00000000	+0.00000000	+0.10047371	+0.00000000	+0.00000000	+0.000000000
++0.00000000	+0.00000000	+0.00019384	+0.00000000	+0.00181492	+0.00000000	+0.000000000
++0.00000000	+0.02666435	+0.00000000	+0.00036362	+0.00000000	+0.16642614	+0.000000000
++0.70406341	+0.00000000	+0.00000000	+0.00000000	+0.00000000	+0.00000000	+0.000000000
++0.00000000	+0.00000000	+0.00000000	+0.00000000	+0.00000000	+0.00000000	+0.000000000
++0.00000000	+0.00000000	+0.00000000	+0.00000000	+0.00000000	+0.00000000	+0.000000000
++0.00000000	+0.00000000	+0.00000000	+0.00000000	+0.00000000	+0.00000000	+0.000000000
+\end{verbatim}
+
+In the above example, position $(0, 0)$ is located in the upper-left of the output matrix, and base pair distance from \A (resp. \B) moves along the rows (resp. columns). This can be verified using the \optionFlag{c} flag for CSV output instead of matrix formatting (using \optionFlag{m}):
+
+\begin{verbatim}
+FFTbor2D -c -i GGGAAACCC -j '.........' -k '(((...)))' -e ./misc/rna_turner2004.par
+
+0,3,+0.10047371
+1,2,+0.00019384
+1,4,+0.00181492
+2,1,+0.02666435
+2,3,+0.00036362
+2,5,+0.16642614
+3,0,+0.70406341
+\end{verbatim}
+
+\subsubsection{Options} \label{subsub:fftboropt}
+
+  % fprintf(stderr, "-T/t\t(t)emperature,   default is 37 degrees Celsius (unless an energyfile with parameters for a different temperature is used.\n");
+
+\begin{itemize}
+  \optionListItem{i}{The RNA sequence \s to be used by \fft.}
+  \optionListItem{j}{The first structure \A to be used by \fft. Any base pairs in \A incompatible with \s (i.e. not a Watson-Crick or GU wobble) are ignored by \fft.}
+  \optionListItem{k}{The second structure \B to be used by \fft. The same restrictions apply as with \optionFlag{j}.}
+  \optionListItem{t}{The temperature at which the energy landscape is computed. The provided value is used both in computing Boltzmann factors ($\beta = -1/RT$) and for energy table lookups. The default is $37^{\circ}$C.}
+  \optionListItem{e}{The energy file to be used by \fft, in the Vienna 2.0 format. The default is \ttt{rna\_turner2004.par} located in the same directory as the \fft executable.}
+  \optionListItem{p}{The precision $m$ of the probabilities output by \fft, in base 2 format. The default is system specific (you can call \fft with no parameters to see the precision range available on your platform), and using $0$ disables any precision control---not recommended. The default is 27, which corresponds to 8 decimal places of precision.}
+  \optionListItem{b}{Enables the output of performance related benchmarking for all major subroutines in \fft.}
+  \optionListItem{v}{Enables verbose output.}
+  \item[Output formatting flags (mutually exclusive):] \hfill
+    \begin{itemize}
+      \optionListItem{c}{CSV-formatted output, where only non-zero positions are emitted. The first (resp. second) column corresponds to base pair distance from \A (resp. \B), and the final column is the Boltzmann probability ($p(Z_{k,l}/Z)$) for that position.}
+      \optionListItem{m}{Output formatted as a matrix, where $(0, 0)$ is in the lop-left and base pair distance from \A (resp. \B) moves along the rows (resp. columns).}
+      \optionListItem{s}{Output formatted in the same fashion as \optionFlag{c}, but delimited with tab characters. The rightmost column is the ensemble free energy ($-RT\log(Z_{k,l})$) in \footnotesize$\dfrac{kcal}{mol}$.}
+    \end{itemize}
+\end{itemize}
+
+\subsectionLabel{{\tt RNAmfpt}}{rnamfpt}
+
+\subsectionLabel{{\tt RNAeq}}{rnaeq}
 
 \sectionLabel{Mashups}{mashupprogs}
 
-\subsectionLabel{FFTmfpt}{fftmfpt}
+\subsectionLabel{{\tt FFTmfpt}}{fftmfpt}
 
-\subsectionLabel{FFTeq}{ffteq}
+\subsectionLabel{{\tt FFTeq}}{ffteq}
 
-\subsectionLabel{RateEq}{rateeq}
+\subsectionLabel{{\tt RateEq}}{rateeq}
 
 \sectionLabel{References}{ref}
 
