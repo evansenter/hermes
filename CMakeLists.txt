@@ -1,3 +1,5 @@
+# TODO: Install energy files from misc to bin.
+
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
