@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  26 JUN 2014 14:42
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  26 JUN 2014 16:08
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -357,6 +357,20 @@ Underfull \hbox (badness 10000) in paragraph at lines 139--142
  []
 
 [4]
+Overfull \hbox (4.0746pt too wide) in paragraph at lines 152--153
+\OT1/cmr/m/n/10.95 con-cep-tual dif-fer-ence be-tween these two di-rec-to-ries 
+is that \OT1/cmtt/m/n/10.95 hermes/src \OT1/cmr/m/n/10.95 code (\OT1/cmtt/m/n/1
+0.95 FFTbor2D\OT1/cmr/m/n/10.95 , \OT1/cmtt/m/n/10.95 RNAmfpt\OT1/cmr/m/n/10.95
+ ,
+ []
+
+
+Overfull \hbox (7.65479pt too wide) in paragraph at lines 152--153
+\OT1/cmr/m/n/10.95 grids, hit-ting time, and equi-lib-rium time re-spec-tively)
+. Al-ter-na-tively, code re-sid-ing in \OT1/cmtt/m/n/10.95 hermes/ext
+ []
+
+
 Overfull \hbox (6.96118pt too wide) in paragraph at lines 167--168
 \OT1/cmtt/m/n/10.95 --fftbor2d-j `.........' --fftbor2d-k `(((...)))' --mfpt-x 
 --mfpt-h\OT1/cmr/m/n/10.95 , the code en-
@@ -447,17 +461,17 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 375.
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 375.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 375.
 Package rerunfilecheck Info: File `documentation.out' has not changed.
-(rerunfilecheck)             Checksum: E570C3BD8D0066D2517CAF88B5268187;1506.
+(rerunfilecheck)             Checksum: 997BA67128DAC63C68227073D60F7683;1509.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 375.
  ) 
 Here is how much of TeX's memory you used:
  5037 strings out of 493488
- 73505 string characters out of 3141326
- 157787 words of memory out of 3000000
+ 73502 string characters out of 3141326
+ 157790 words of memory out of 3000000
  8285 multiletter control sequences out of 15000+200000
  11756 words of font info for 43 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
- 29i,6n,32p,1068b,457s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 29i,6n,32p,1062b,457s stack positions out of 5000i,500n,10000p,200000b,50000s
 </usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
@@ -476,7 +490,7 @@ ve/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/
 texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2012/t
 exmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2012/te
 xmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
-Output written on documentation.pdf (10 pages, 235449 bytes).
+Output written on documentation.pdf (10 pages, 235124 bytes).
 PDF statistics:
  282 PDF objects out of 1000 (max. 8388607)
  249 compressed objects within 3 object streams

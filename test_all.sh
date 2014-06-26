@@ -34,4 +34,4 @@ echo "Result:"
 echo "Testing RateEq, expecting:
 3.235000"
 echo "Result:"
-./bin/RateEq --mfpt-c ./mashup/population_from_rate_matrix/all_structures_for_gggaaaccc__19_5_rate_move_without_hastings.csv --population-a 19 --population-z 5 --population-q
+./bin/RateEq --mfpt-c ./ext/population_from_rate_matrix/all_structures_for_gggaaaccc__19_5_rate_move_without_hastings.csv --population-a 19 --population-z 5 --population-q

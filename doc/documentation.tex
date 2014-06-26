@@ -47,7 +47,7 @@
 
 \sectionLabel{Introduction}{intro}
 
-This documentation aims to outline the basic dependencies, installation, and usage of the Hermes RNA software suite, as well as provide extended commentary on the flags and options available to code. Particular attention is payed to the invocation style of mashup programs (using \multiParam) to dispatch flags to the appropriate submodules. To get started as quickly as possible, see the quickstart one-liner in \ref{sub:quickstart}. Should you still have questions, you can reach the main author of the source code at \href{mailto:evansenter@gmail.com}{evansenter@gmail.com}.
+This documentation aims to outline the basic dependencies, installation, and usage of the Hermes RNA software suite, as well as provide extended commentary on the flags and options available to code. Particular attention is payed to the invocation style of extension programs (using \multiParam) to dispatch flags to the appropriate submodules. To get started as quickly as possible, see the quickstart one-liner in \ref{sub:quickstart}. Should you still have questions, you can reach the main author of the source code at \href{mailto:evansenter@gmail.com}{evansenter@gmail.com}.
 
 \sectionLabel{Installation}{install}
 
@@ -149,17 +149,17 @@ While we have done the utmost to try and ensure that CMake is able to infer loca
 
 \subsectionLabel{General Principles}{principles}
 
-The Hermes code is organized into two major directories, \ttt{hermes/src} and \ttt{hermes/mashup}. The conceptual difference between these two directories is that \ttt{hermes/src} code (\fft, \rnamfpt, \rnaeq) are all stand-alone pieces of software which achieve specific goals (computing energy grids, hitting time, and equilibrium time respectively). Alternatively, code residing in \ttt{hermes/mashup} aims to leverage general concepts across the Hermes package to provide a means to ask even more specific questions. In example, \fft allows an investigator to compute the 2D energy grid correspondent to an input RNA sequence $s$ and two structures $A, B$. \rnaeq can estimate the population occupancy of $A, B$ for $s$ by either sampling suboptimal structures or exhaustive structural enumeration, but these approaches aren't tractable for non-trivial RNAs.
+The Hermes code is organized into two major directories, \ttt{hermes/src} and \ttt{hermes/ext}. The conceptual difference between these two directories is that \ttt{hermes/src} code (\fft, \rnamfpt, \rnaeq) are all stand-alone pieces of software which achieve specific goals (computing energy grids, hitting time, and equilibrium time respectively). Alternatively, code residing in \ttt{hermes/ext} aims to leverage general concepts across the Hermes package to provide a means to ask even more specific questions. In example, \fft allows an investigator to compute the 2D energy grid correspondent to an input RNA sequence $s$ and two structures $A, B$. \rnaeq can estimate the population occupancy of $A, B$ for $s$ by either sampling suboptimal structures or exhaustive structural enumeration, but these approaches aren't tractable for non-trivial RNAs.
 
-\ffteq, located in \ttt{hermes/mashup/population\_from\_fftbor2d} uses functions from \\
+\ffteq, located in \ttt{hermes/ext/population\_from\_fftbor2d} uses functions from \\
 \ttt{libfftbor\_static.a} (derived from \fft) to compute the energy landscape and functions from \ttt{librnaeq\_static.a} (derived from \rnaeq) to estimate population occupancy for $s, A, B$ without requiring an investigator to copy pieces of individual packages to achieve their goals, instead using the static libraries automatically produced for all \ttt{hermes/src} software, shared headers made available in \ttt{hermes/h} and \ttt{libmulti\_param.a} (from \ttt{hermes/src/multi\_param}) to dispatch command-line arguments to the appropriate underlying function. The result? The entirety of \ffteq is 67 lines of C++ code, and uses native binary data structures the entire way through; there is no command-line funneling of \fft into \rnaeq.
 
 \subsectionLabel{multi\_param Overview}{mpoverview}
 
-All of \fft, \rnamfpt, and \rnaeq present a wide selection of command-line arguments to meet the diverse demands of end users. When we moved on to developing {\em mashup} software between these three programs, there were a number of requirements that we came up with to make both implementing and using these programs as easy as possible. We decided that
+All of \fft, \rnamfpt, and \rnaeq present a wide selection of command-line arguments to meet the diverse demands of end users. When we moved on to developing {\em extension} software between these three programs, there were a number of requirements that we came up with to make both implementing and using these programs as easy as possible. We decided that
 \begin{inparaenum}
   [\itshape a\upshape)]
-  \item the developer should not have to reimplement command-line parsing for mashups
+  \item the developer should not have to reimplement command-line parsing for extensions
   \item all existing flags for underlying libraries (i.e. \fft, \rnamfpt, \rnaeq) would be supported, and
   \item flags would be namespaced to have deterministic targets.
 \end{inparaenum}
@@ -168,7 +168,7 @@ To achieve these goals, the library \multiParam was developed. This library simp
 
 \subsectionLabel{multi\_param Details}{mpdetails}
 
-An example from \ttt{hermes/mashup/mfpt\_from\_fftbor2d/mfpt\_from\_fftbor2d.cpp}:
+An example from \ttt{hermes/ext/mfpt\_from\_fftbor2d/mfpt\_from\_fftbor2d.cpp}:
 \begin{verbatim}
 PARAM_CONTAINER* params;
 FFTBOR2D_PARAMS fftbor2d_params;
@@ -187,7 +187,7 @@ parse_fftbor2d_args(
 );
 \end{verbatim}
 
-The way this code works is by first declaring which packages can be used by the mashups, out of \ttt{fftbor2d}, \ttt{mfpt}, or \ttt{population}. In the snippet above the selection is saved in the variable \ttt{subparams}. All of the \fft, \rnamfpt, and \rnaeq libraries have \ttt{init\_*\_params} functions available, which return an object with the default parameters for that package. They also all have \ttt{parse\_*\_args} functions, which take three arguments,
+The way this code works is by first declaring which packages can be used by the extensions, out of \ttt{fftbor2d}, \ttt{mfpt}, or \ttt{population}. In the snippet above the selection is saved in the variable \ttt{subparams}. All of the \fft, \rnamfpt, and \rnaeq libraries have \ttt{init\_*\_params} functions available, which return an object with the default parameters for that package. They also all have \ttt{parse\_*\_args} functions, which take three arguments,
 \begin{inparaenum}
   [\itshape 1\upshape)]
   \item a pointer to the parameters object
@@ -362,7 +362,7 @@ In the above example, the value output by \rnamfpt is the approximate hitting ti
   % fprintf(stderr, "-Z/z\tend state,             default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the ending structure (see options for -l).\n\n");
 
 
-\sectionLabel{Mashups}{mashupprogs}
+\sectionLabel{Extensions}{extprogs}
 
 \subsectionLabel{{\tt FFTmfpt}}{fftmfpt}
 
