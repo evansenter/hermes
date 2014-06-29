@@ -17,9 +17,12 @@
 \contentsline {subsubsection}{\numberline {4.2.1}Applications}{8}{subsubsection.4.2.1}
 \contentsline {subsubsection}{\numberline {4.2.2}Example Usage}{8}{subsubsection.4.2.2}
 \contentsline {subsubsection}{\numberline {4.2.3}Options}{9}{subsubsection.4.2.3}
-\contentsline {subsection}{\numberline {4.3}{\tt RNAeq}}{10}{subsection.4.3}
-\contentsline {section}{\numberline {5}Extensions}{10}{section.5}
-\contentsline {subsection}{\numberline {5.1}{\tt FFTmfpt}}{10}{subsection.5.1}
-\contentsline {subsection}{\numberline {5.2}{\tt FFTeq}}{10}{subsection.5.2}
-\contentsline {subsection}{\numberline {5.3}{\tt RateEq}}{10}{subsection.5.3}
-\contentsline {section}{\numberline {6}References}{10}{section.6}
+\contentsline {subsection}{\numberline {4.3}{\tt RNAeq}}{11}{subsection.4.3}
+\contentsline {subsubsection}{\numberline {4.3.1}Applications}{11}{subsubsection.4.3.1}
+\contentsline {subsubsection}{\numberline {4.3.2}Example Usage}{11}{subsubsection.4.3.2}
+\contentsline {subsubsection}{\numberline {4.3.3}Options}{12}{subsubsection.4.3.3}
+\contentsline {section}{\numberline {5}Extensions}{14}{section.5}
+\contentsline {subsection}{\numberline {5.1}{\tt FFTmfpt}}{14}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}{\tt FFTeq}}{14}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}{\tt RateEq}}{14}{subsection.5.3}
+\contentsline {section}{\numberline {6}References}{14}{section.6}

@@ -37,7 +37,13 @@
 \newcommand{\s}{$s$\xspace}
 \newcommand{\A}{$A$\xspace}
 \newcommand{\B}{$B$\xspace}
-\newcommand{\req}{{\em requried}}
+\newcommand{\req}{{\em (requried)}\xspace}
+\newcommand{\kcalMol}{{\footnotesize $\dfrac{\text{kcal}}{\text{mol}}$}\xspace}
+\newcommand{\rt}{\text{RT}}
+\newcommand{\logt}{\ensuremath{\log_{10} t}}
+\newcommand{\logtime}{$\log_{10}$-time\xspace}
+\newcommand{\tStart}{\ensuremath{t_{\text{start}}}\xspace}
+\newcommand{\tStop}{\ensuremath{t_{\text{stop}}}\xspace}
 
 \title{Hermes Documentation}
 \author{Evan Senter}
@@ -57,18 +63,25 @@ From the root directory of Hermes, execute the following command:
 
 {\tt cd build \&\& cmake .. \&\& make}
 
-If you encounter errors in configuring or compiling the software, we recommend checking out section \ref{sub:faq} on common troubleshooting solutions.
+If you encounter errors in configuring or compiling the software, we recommend checking section \ref{sub:faq} for common troubleshooting solutions.
 
 \subsectionLabel{Dependencies}{dependencies}
 \begin{description}
   \fixedWidthInList{cmake}{($\geq$ 2.6-patch 4, tested through 3.0.0)}{http://www.cmake.org/}{ \\
-  CMake is used as the build system for Hermes.} \fixedWidthInList{\textnormal{GNU99 compiler:}}{}{}{ \\
-  Most C compilers should support the \ttt{-std=gnu99} flag, which is required for GNU library extensions, particularly \ttt{unistd.h}} \fixedWidthInList{\textnormal{C++11 compiler:}}{}{}{ \\
-  C++11 support (included in \ttt{g++} $\geq$ 4.7) is necessary for proper struct initialization in \fft.} \fixedWidthInList{\textnormal{OpenMP support}}{}{http://openmp.org/wp/}{ \\
-  OpenMP support comes by default in most modern compilers, and is required for loop-optimization in \fft.} \fixedWidthInList{LAPACK}{($\geq$ 3.4.2)}{http://www.netlib.org/lapack/}{ \\
-  Various LAPACK routines are used in \rnamfpt to compute the inverse, or pseudoinverse, of a transition probability matrix.} \fixedWidthInList{GSL}{($\geq$ 1.15, tested through 1.16)}{http://www.gnu.org/software/gsl/}{ \\
-  GSL is required to compute the eigendecomposition of a (possibly) non-symmetric transition rate matrix for \rnaeq.} \fixedWidthInList{FFTW3}{($\geq$ 3.3.4)}{http://www.fftw.org/}{ \\
-  FFTW3 functions are used to compute the inverse discrete Fourier transform in \fft.} \fixedWidthInList{libRNA.a}{($\geq$ 2.0.7, tested through 2.1.7)}{http://www.tbi.univie.ac.at/RNA/}{ \\
+  CMake is used as the build system for Hermes.}
+  \fixedWidthInList{\textnormal{GNU99 compiler:}}{}{}{ \\
+  Most C compilers should support the \ttt{-std=gnu99} flag, which is required for GNU library extensions, particularly \ttt{unistd.h}}
+  \fixedWidthInList{\textnormal{C++11 compiler:}}{}{}{ \\
+  C++11 support (included in \ttt{g++} $\geq$ 4.7) is necessary for proper struct initialization in \fft.}
+  \fixedWidthInList{\textnormal{OpenMP support}}{}{http://openmp.org/wp/}{ \\
+  OpenMP support comes by default in most modern compilers, and is required for loop-optimization in \fft.}
+  \fixedWidthInList{LAPACK}{($\geq$ 3.4.2)}{http://www.netlib.org/lapack/}{ \\
+  Various LAPACK routines are used in \rnamfpt to compute the inverse, or pseudoinverse, of a transition probability matrix. LAPACK comes with in implicit dependency on having a valid Fortran compiler which we check for, however this is only to ensure proper linking of LAPACK libraries.}
+  \fixedWidthInList{GSL}{($\geq$ 1.15, tested through 1.16)}{http://www.gnu.org/software/gsl/}{ \\
+  GSL is required to compute the eigendecomposition of a (possibly) non-symmetric transition rate matrix for \rnaeq.}
+  \fixedWidthInList{FFTW3}{($\geq$ 3.3.4)}{http://www.fftw.org/}{ \\
+  FFTW3 functions are used to compute the inverse discrete Fourier transform in \fft.}
+  \fixedWidthInList{libRNA.a}{($\geq$ 2.0.7, tested through 2.1.7)}{http://www.tbi.univie.ac.at/RNA/}{ \\
   Various ViennaRNA functions and data structures are leveraged for homogenous energy model support, as well as \ttt{fold\_par}, \ttt{pf\_fold\_par}, and \ttt{subopt\_par}. We additionally make use of ViennaRNA functions to compute the necessary polynomial size for \fft, determined in the following fashion. Parameters $K$ (resp. $L$) are defined to be the sum of the number of base pairs in reference structure $A$ (resp. reference structure $B$) plus the number of base pairs in the maximum matching (Nussinov) structure which contains no base pair of $A$ (resp. $B$).}
 \end{description}
 
@@ -202,10 +215,10 @@ Leveraging the example from \ref{sub:mpoverview} a final time, the variable \ttt
 \begin{verbatim}
 [
   {
-    argv: ["-v", "-i", "GGGAAACCC", "-j", ".........", "-k", "(((...)))"],
+    argv: ['-v', '-i', 'GGGAAACCC', '-j', '.........', '-k', '(((...)))'],
     argc: 7
   }, {
-    argv: ["-v", "-x", "-h"],
+    argv: ['-v', '-x', '-h'],
     argc: 3
   }
 ]
@@ -224,13 +237,13 @@ Leveraging the example from \ref{sub:mpoverview} a final time, the variable \ttt
 \begin{verbatim}
 FFTbor2D -m -i GGGAAACCC -j '.........' -k '(((...)))' -e ./misc/rna_turner2004.par
 
-+0.00000000  +0.00000000  +0.00000000  +0.10047371  +0.00000000  +0.00000000  +0.000000000
-+0.00000000  +0.00000000  +0.00019384  +0.00000000  +0.00181492  +0.00000000  +0.000000000
-+0.00000000  +0.02666435  +0.00000000  +0.00036362  +0.00000000  +0.16642614  +0.000000000
-+0.70406341  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.000000000
-+0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.000000000
-+0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.000000000
-+0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.000000000
++0.00000000  +0.00000000  +0.00000000  +0.10047371  +0.00000000  +0.00000000  ...
++0.00000000  +0.00000000  +0.00019384  +0.00000000  +0.00181492  +0.00000000  ...
++0.00000000  +0.02666435  +0.00000000  +0.00036362  +0.00000000  +0.16642614  ...
++0.70406341  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  ...
++0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  ...
++0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  ...
++0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  +0.00000000  ...
 \end{verbatim}
 
 In the above example, position $(0, 0)$ is located in the upper-left of the output matrix, and base pair distance from \A (resp. \B) moves along the rows (resp. columns). This can be verified using the \optionFlag{c} flag for CSV output instead of matrix formatting (using \optionFlag{m}):
@@ -250,21 +263,21 @@ FFTbor2D -c -i GGGAAACCC -j '.........' -k '(((...)))' -e ./misc/rna_turner2004.
 \subsubsection{Options} \label{subsub:fftboropt}
 
 \begin{itemize}
-  \optionListItem{i}{\req. The RNA sequence \s to be used by \fft.}
-  \optionListItem{j}{\req. The first structure \A to be used by \fft. Any base pairs in \A incompatible with \s (i.e. not a Watson-Crick or GU wobble) are ignored by \fft.}
-  \optionListItem{k}{\req. The second structure \B to be used by \fft. The same restrictions apply as with \optionFlag{j}.}
-  \optionListItem{t}{The temperature at which the energy landscape is computed. The provided value is used both in computing Boltzmann factors ($\beta = -1/RT$) and for energy table lookups. The default is $37^{\circ}$C.}
+  \optionListItem{i}{\req The RNA sequence \s to be used by \fft.}
+  \optionListItem{j}{\req The first structure \A to be used by \fft. Any base pairs in \A incompatible with \s (i.e. not a Watson-Crick or GU wobble) are ignored by \fft.}
+  \optionListItem{k}{\req The second structure \B to be used by \fft. The same restrictions apply as with \optionFlag{j}.}
+  \optionListItem{t}{The temperature at which the energy landscape is computed. The provided value is used both in computing Boltzmann factors ($\beta = -1/\rt$) and for energy table lookups. The default is $37^{\circ}$C.}
   \optionListItem{e}{The energy file to be used by \fft, in the Vienna 2.0 format. The default is \ttt{rna\_turner2004.par} located in the same directory as the \fft executable.}
   \optionListItem{p}{The precision $m$ of the probabilities output by \fft, in base 2 format. The default is system specific (you can call \fft with no parameters to see the precision range available on your platform), and using $0$ disables any precision control---not recommended. The default is 27, which corresponds to 8 decimal places of precision.}
   \optionListItem{b}{Enables the output of performance related benchmarking for all major subroutines in \fft.}
-  \optionListItem{v}{Enables verbose output.}
   \item[Output formatting flags (mutually exclusive):] \hfill
     \begin{itemize}
       \item[] The default format is a verbose version of \optionFlag{s} which also includes the user-input \s, \A, \B, and column headers.
       \optionListItem{c}{CSV-formatted output, where only non-zero positions are emitted. The first (resp. second) column corresponds to base pair distance from \A (resp. \B), and the final column is the Boltzmann probability ($p(Z_{k, l}/Z)$) for that position.}
       \optionListItem{m}{Output formatted as a matrix, where $(0, 0)$ is in the lop-left and base pair distance from \A (resp. \B) moves along the rows (resp. columns).}
-      \optionListItem{s}{Output formatted in the same fashion as \optionFlag{c}, but delimited with tab characters. The rightmost column is the ensemble free energy ($-RT\log(Z_{k, l})$) in \footnotesize$\dfrac{kcal}{mol}$.}
+      \optionListItem{s}{Output formatted in the same fashion as \optionFlag{c}, but delimited with tab characters. The rightmost column is the ensemble free energy ($-\rt\log(Z_{k, l})$) in \kcalMol.}
     \end{itemize}
+  \optionListItem{v}{Enables verbose output.}
 \end{itemize}
 
 \subsectionLabel{{\tt RNAmfpt}}{rnamfpt}
@@ -274,6 +287,8 @@ FFTbor2D -c -i GGGAAACCC -j '.........' -k '(((...)))' -e ./misc/rna_turner2004.
 \rnamfpt computes the mean first passage time (hitting time) of an user-provided input matrix, in CSV format. The user can provide as input either a 2D energy grid (such as those produced by \fft with the \optionFlag{c} format) or a transition probability matrix. The default expectation is a 2D energy grid composed of Boltzmann probabilities, though ensemble free energies are alternatively supported with \optionFlag{e}.
 
 If providing a transition probability matrix $M$ as input (with the \optionFlag {t} flag), the format is still expected to be in CSV form, where columns $i$, $j$, $p$ represent the 0-indexed row-based probabilities for $M$, s.t. $M_{i, j} = p_{i\to j} = (i, j,p_{i\to j})$. Only non-zero $M_{i, j}$ entries are required.
+
+We also provide an extension of \rnamfpt through \fftmfpt (\ref{sub:fftmfpt}) which leverages the 2D energy landscape output by \fft (\ref{sub:fft}) to estimate mean first passage time with good results.
 
 \subsubsection{Example Usage} \label{subsub:rnamfptex}
 
@@ -304,11 +319,19 @@ In the above example, the value output by \rnamfpt is the approximate hitting ti
 \subsubsection{Options} \label{subsub:rnamfptopt}
 
 \begin{itemize}
-  \optionListItem{c}{\req. Path to the input CSV file.}
+  \optionListItem{c}{\req Path to the input CSV file.}
   \item[Input format flags (mutually exclusive):] \hfill
     \begin{itemize}
-      \item[] The default expectation is a 0-indexed 2D probability landscape in the CSV format described within \ref{subsub:rnamfptapp}. In this case, transition probability $p_{a\to b} = \min(1, \exp(-(p_b / p_a) / RT)) / N_a$, where $p_a$, $p_b$ are Boltzmann probabilities and $N_a$ is the number of neighbors of $a$.
-      \optionListItem{e}{The input matrix is comprised of ensemble free energies rather than Boltzmann probabilities. If this flag is provided, the transition probability $p_{a\to b} = \min(1, \exp(-(E_b - E_a) / RT)) / N_a$ where definitions follow as above.}
+      \item[] The default expectation is a 0-indexed 2D probability landscape in the CSV format described within \ref{subsub:rnamfptapp}. In this case, the transition probability is defined:
+      \begin{equation}
+        p_{a\to b} = \min(1, \exp(-(p_b / p_a) / \rt)) / N_a
+      \end{equation}
+      where $p_a$, $p_b$ are Boltzmann probabilities and $N_a$ is the number of neighbors of $a$.
+      \optionListItem{e}{The input matrix is comprised of ensemble free energies rather than Boltzmann probabilities. If this flag is provided, the transition probability is defined:
+      \begin{equation}
+        p_{a\to b} = \min(1, \exp(-(E_b - E_a) / \rt)) / N_a
+      \end{equation}
+      where definitions follow as above.}
       \optionListItem{t}{The input CSV file is a transition probability matrix already, and \rnamfpt should not try to convert it into one. In this case, the first two columns in the CSV file are 0-indexed row-order indices into the transition probability matrix, and the third (final) column is the transition probability $p_{a\to b}$.}
     \end{itemize}
   \item[Transition probability matrix manipulation:] \hfill
@@ -316,11 +339,19 @@ In the above example, the value output by \rnamfpt is the approximate hitting ti
       \optionListItem{x}{Only permit single base pair moves: $(i, j) \to (k, l) \implies (k, l) \in (i\pm 1, j\pm 1)$. This option assumes that the input is not already a transition probability matrix, the matrix is parameterized by base pair distance to some fixed, implicit \A, \B and that the matrix already satisfies the triangle inequality and parity condition.}
       \optionListItem{f}{The transition probability matrix generated by \rnamfpt should be fully connected.}
       \optionListItem{t}{The input CSV file is a transition probability matrix already, and \rnamfpt should not try to convert it into one. In this case, the first two columns in the CSV file are 0-indexed row-order indices into the transition probability matrix, and the third (final) column is the transition probability $p_{a\to b}$.}
-      \optionListItem{h}{Enables the usage of the Hastings adjustment in formulating the transition probability matrix. Has no effect if the input is already a transition matrix (using \optionFlag{t}) or fully connected (using using \optionFlag{f}). When enabled, the transition probabilities are defined as $p_{a\to b} = \min(1, (N_a / N_b) \times \exp(-(p_b / p_a) / RT)) / N_a$, where variable definitions are the same as described above. Computation of $N_a$, $N_b$ respects grid boundaries and the triangle inequality, with base pair distance $d_{bp}(A,B)$ inferred from the input energy landscape by looking for a non-zero $(0, d_{bp}(A,B))$ or $(d_{bp}(A,B), 0)$ position. Also works with the \optionFlag{e} flag to use energies instead of probabilities.}
+      \optionListItem{h}{Enables the usage of the Hastings adjustment in formulating the transition probability matrix. Has no effect if the input is already a transition matrix (using \optionFlag{t}) or fully connected (using using \optionFlag{f}). When enabled, the transition probabilities are defined as:
+      \begin{equation}
+        p_{a\to b} = \min(1, (N_a / N_b) \times \exp(-(p_b / p_a) / \rt)) / N_a
+      \end{equation}
+      where variable definitions are the same as described above. Computation of $N_a$, $N_b$ respects grid boundaries and the triangle inequality, with base pair distance $d_{bp}(A,B)$ inferred from the input energy landscape by looking for a non-zero $(0, d_{bp}(A,B))$ or $(d_{bp}(A,B), 0)$ position. Also works with the \optionFlag{e} flag to use energies instead of probabilities.}
     \end{itemize}
   \item[Using $\epsilon$ to inflate the energy landscape:] \hfill
     \begin{itemize}
-      \item[] In instances where no direct path exists from \A to \B in single base pair steps, or one would like to adjust the energy landscape such that all valid positions are accessible, we provide a number of flags to make an $\epsilon$ adjustment to the input 2D probability landscape. Valid positions are defined as $V = \{ (i, j) \mid 0 \leq i, j \leq n \wedge i + j \geq d_{bp}(A, B) \wedge i + j \equiv d_{bp}(A, B) \;(\bmod\; 2) \}$, where $n$ is set with \optionFlag{n} and $d_{bp}(A, B)$ with \optionFlag{d} (if it can't be inferred). All probabilities $\{ p_{i, j} \mid (i, j) \in V \}$ are then $\epsilon$-adjusted such that $p^*_{i, j} = \frac{p_{i, j} + \frac{\epsilon}{\left\vert{V}\right\vert}}{1 + \epsilon}$.
+      \item[] In instances where no direct path exists from \A to \B in single base pair steps, or one would like to adjust the energy landscape such that all valid positions are accessible, we provide a number of flags to make an $\epsilon$ adjustment to the input 2D probability landscape. Valid positions are defined as:
+      \begin{equation}
+        V = \{ (i, j) \mid 0 \leq i, j \leq n \wedge i + j \geq d_{bp}(A, B) \wedge i + j \equiv d_{bp}(A, B) \;(\bmod\; 2) \}
+      \end{equation}
+      where $n$ is set with \optionFlag{n} and $d_{bp}(A, B)$ with \optionFlag{d} (if it can't be inferred). All probabilities $\{ p_{i, j} \mid (i, j) \in V \}$ are then $\epsilon$-adjusted such that $p^*_{i, j} = \frac{p_{i, j} + \frac{\epsilon}{\left\vert{V}\right\vert}}{1 + \epsilon}$.
       \optionListItem{d}{Flag to explicitly provide $d_{bp}(A,B)$, as defined in \optionFlag{h}. Only required when $d_{bp}(A,B)$ can't be inferred from the input probability matrix by identifying a non-zero $(0, d_{bp}(A,B))$ or $(d_{bp}(A,B), 0)$ position in the input.}
       \optionListItem{n}{Maximum base pair distance $n$ to use when including all accessible positions.}
       \optionListItem{o}{The {\em total} $\epsilon$ probability to add to the input probability grid before renormalization. The {\em per-position} contribution will be $\frac{\epsilon}{\left\vert{V}\right\vert}$, where definitions are as above.}
@@ -338,29 +369,87 @@ In the above example, the value output by \rnamfpt is the approximate hitting ti
 
 \subsectionLabel{{\tt RNAeq}}{rnaeq}
 
-  % fprintf(stderr, "-A/a\tstart state,           default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the starting structure (see options for -k).\n");
-  % fprintf(stderr, "-B/b\t(b)enchmarking,        default is disabled. When enabled, RNAeq will print benchmarking times for internal function calls.\n");
-  % fprintf(stderr, "-C/c\tenergy (c)ap,          default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
-  % fprintf(stderr, "-D/d\t(d)elta range,         default is disabled. When provided, this value specifies the delta-size required for the population to be approaching equilibrium. This position is used as a starting point for a more fine-grained scan using the -e and -w values.\n");
-  % fprintf(stderr, "-E/e\t(e)psilon,             default is disabled. When provided, we will output the time at which the equilibrium stable within -e for a window of size -w.\n");
-  % fprintf(stderr, "-F/f\tbin (f)ilename,        Provided in conjunction with the -r flag to specify the read / write file for serializing the eigensystem.\n");
-  % fprintf(stderr, "-G/g\tei(g)envalues only,    default is disabled. When enabled, RNAeq will only generate the eigenvalues for the transition rate matrix.\n");
-  % fprintf(stderr, "-H/h\tall subpop. in eq.,    default is disabled. When provided alongside the -q flag, the equilibrium time is estimated for when *all* subpopulations approach equilibrium, rather than when just the start-to-end state curve (-a to -z) doesn't deviate more than epsilon (-e) within the window size (-w).\n");
-  % fprintf(stderr, "-I/i\tstart time,            natrual log of the starting time for computing population proportion.\n");
-  % fprintf(stderr, "-J/j\tend time,              natrual log of the ending time for computing population proportion.\n");
-  % fprintf(stderr, "-K/k\tstarting structure,    structure for which the probability at time 0 is equal to 1. If not provided, the empty structure is used / inferred.\n");
-  % fprintf(stderr, "-L/l\tending structure,      structure of interest for detailed population proportion values. If not provided, the MFE structure is used / inferred.\n");
-  % fprintf(stderr, "-N/n\t(n)o soft bounds,      default is disabled. When enabled, the population proportion / equilibrium time will not use soft bounds computed with the -d delta value, and instead will compute population proportion / equilibrium over the entire timespan (timespan can be adjusted with -i and -j).\n");
-  % fprintf(stderr, "-O/o\tl(o)nely basepairs,    default is disabled. When enabled, RNAsubopt will sample structures containing lonely basepairs.\n");
-  % fprintf(stderr, "-P/p\tste(p) size,           natrual log of the step size for computing population proportion (start_time < start_time + step_size <= end_time).\n");
-  % fprintf(stderr, "-Q/q\te(q)uilibrium,         Compute the equilibrium time for the target state. By default uses an exact method that requires a target structure. If the -e flag is passed as well, uses an aproximation technique suitable for any probability rate matrix.\n");
-  % fprintf(stderr, "-R/r\tse(r)ialize direction, default is disabled. If passed with the value '1', then the eigensystem and its inversion will be serialized to the file specified by the -f flag. If passed with the value '-1', the file specified by the -f flag will be deserialized and used for computing the data of interest.\n");
-  % fprintf(stderr, "-S/s\t(s)equence,            sequence of interest for computing population proportions.\n");
-  % fprintf(stderr, "-T/t\t(t)emperature,         temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
-  % fprintf(stderr, "-V/v\t(v)erbose,       default is disabled, presents some debug information at runtime.\n\n");
-  % fprintf(stderr, "-W/w\t(w)indow size,         default is 5. Specifies the window size (exclusive) for predicting equilibrium. Equilibrium is considered as having been achieved when all indicies (i + 1)..(i + window_size - 1) are within epsilon (-e) of the population proportion at time i.\n");
-  % fprintf(stderr, "-Z/z\tend state,             default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the ending structure (see options for -l).\n\n");
+\subsubsection{Applications} \label{subsub:rnaeqapp}
 
+\rnaeq is a tool to compute the population occupancy and equilibrium time for an RNA sequence, transitioning from a starting distribution wholly occupied by an arbitrary input structure \A (the empty structure by default). From this starting distribution, occupancy curves can be generated for any arbitrary structure \B, which is taken to be the MFE by default. The resulting population occupancy curves can be used to estimate the equilibrium time as well using a sliding window approach.
+
+By default, this code takes an input RNA sequence \s and uses \ttt{RNAsubopt} from the Vienna package to generate all secondary structures for \s, making its use practical only for trivially small sequences. Alternatively an energy band can be enabled to only sample structures within $\Delta$ \kcalMol of the MFE structure using \optionFlag{c}. Even then, it is quite possible that exponential number of secondary structures makes a sampling-based approach intractable for anything but small RNAs, highlighting the difficulty of performing computational kinetics. In this case it's recommended to use a notion of macrostates, whereby the granularity of the transition space is decreased to make software more performant, at the expense of accuracy. The extension program \ffteq (\ref{sub:ffteq}) uses the 2D energy landscape from \fft (\ref{sub:fft}) to good effect, and more generally \rateeq (\ref{sub:rateeq}) allows the user to input an arbitrary rate matrix to perform population kinetics on, allowing for a user-defined generalization of macrostates.
+
+\subsubsection{Example Usage} \label{subsub:rnaeqex}
+
+\noindent A simple invocation of \rnaeq appears like:
+
+\begin{verbatim}
+RNAeq -o -s GGGAAACCC -l '(((...)))' -p 0.25
+
+-3.250000	+0.00056212	+0.99856051
+-3.000000	+0.00099929	+0.99744193
+-2.750000	+0.00177604	+0.99545654
+-2.500000	+0.00315519	+0.99193786
+-2.250000	+0.00560102	+0.98571804
+-2.000000	+0.00992932	+0.97477461
+-1.750000	+0.01756010	+0.95567878
+-1.500000	+0.03092313	+0.92284200
+-1.250000	+0.05404704	+0.86782054
+-1.000000	+0.09322305	+0.77973465
+-0.750000	+0.15714791	+0.64949189
+-0.500000	+0.25475008	+0.48144406
+-0.250000	+0.38729984	+0.30830977
++0.000000	+0.53394003	+0.18159969
++0.250000	+0.64774409	+0.12138539
++0.500000	+0.69618181	+0.10316965
++0.750000	+0.70383144	+0.10055275
+\end{verbatim}
+
+Invoking \rnaeq in this fashion produces output in three columns representing
+\begin{inparaenum}
+  [\itshape a\upshape)]
+  \item \logt, where $t$ is arbitrary time
+  \item $p(B, \logt)$, the population occupancy of \B (defaulting to the MFE) at time \logt, and
+  \item $p(A, \logt)$, the population occupancy of \A (defaulting to the empty structure) at time \logt.
+\end{inparaenum}
+The \optionFlag{o} flag indicates that we will permit \ttt{RNAsubopt} to sample structures having lonely base pairs, and \optionFlag{p} indicates that we would like \logt to increment in steps of 0.25. As before, all available options are described in detail below.
+
+\subsubsection{Options} \label{subsub:rnaeqopt}
+
+\begin{itemize}
+  \optionListItem{g}{\rnaeq will only produce the eigenvalues for the rate matrix, rather than produce population occupancy values or equilibrium times. The is much faster because the eigenvector matrix does not need to be inverted.}
+  \optionListItem{a}{Indicates the 0-indexed position in the rate matrix corresponding to the structure $S$ for which $p(S, t_0) = 1$. By default this is taken from \optionFlag{k}, but this flag is of use in extensions where precomputed rate matrices are provided as command-line input.}
+  \optionListItem{z}{Indicates the 0-indexed position in the rate matrix corresponding to the target structure $S$ for which population occupancy curves should be computed or equilibrium times estimated. By default this is taken from \optionFlag{l}, but this flag is of use in extensions where precomputed rate matrices are provided as command-line input.}
+  \optionListItem{r}{Serialization direction, can be one of -1, 1. When 1, the eigensystem and its inversion will be serialized using \ttt{TPL} to the binary file specified named by \optionFlag{f}. When -1, the file named by \optionFlag{f} will be loaded and used as the eigensystem of interest for the invocation of \rnaeq. This allows repeated analysis of the kinetic characteristics of a given rate matrix without redundant computation of the eigendecomposition.}
+  \optionListItem{f}{The filename for the binary serialization of the eigensystem described by \optionFlag{r}. Depending on the value of \optionFlag{r}, either specifies a filename to read from (when \optionFlag{r} is -1) or write to (when \optionFlag{r} is 1).}
+  \item[Input format flags:] \hfill
+    \begin{itemize}
+      \optionListItem{s}{\req The RNA sequence \s to be used by \rnaeq.}
+      \optionListItem{k}{The starting structure for \rnaeq refolding. Represents the structure $S$ for which $p(S, t_0) = 1$. If not explicitly provided, the empty structure is used.}
+      \optionListItem{l}{The target structure to be used by \rnaeq when computing population occupancy curves or equilibrium time. If not explicitly provided, the MFE structure is computed using \ttt{RNAfold} and used.}
+      \optionListItem{c}{The \ttt{RNAsubopt} sampling threshold $\Delta$ (in \kcalMol) such that only suboptimal structures with energy less than $E_{MFE} + \Delta$ are generated. If not provided, all suboptimal structures are generated.}
+      \optionListItem{o}{Allow \ttt{RNAsubopt} to sample structures containing lonely base pairs.}
+    \end{itemize}
+  \item[Managing the population occupancy time window:] \hfill
+    \begin{itemize}
+      \item[] As described in \ref{subsub:rnaeqex}, all time values presented by \rnaeq are in \logtime, so a time point of $10^6$ would be presented in the output as 6. This format is maintained across all of \rnaeq, and thus any flags dealing with time accept values in \logtime, similar to how the output times for population occupancy and equilibrium are in \logtime.
+      \item[] By default, \rnaeq requires no configuration to reasonably estimate the time range of interest for arbitrary population curves. This is done by using what we refer to as a {\em soft bounding} heuristic. Due to our observed numeric instability when working with floating point numbers beyond \logtime $(-12, 12)$, \rnaeq sets two global time-points, $t_{0} \approx -10$ (\optionFlag{i}) and $t_{\inf} \approx 10$ (\optionFlag{j}). It is unreasonable to expect that the time range $[t_{0}, t_{\inf}]$ to always be of interest to the investigator, regardless of input sequence. On the contrary, there are many cases where an RNA rapidly reaches equilibrium, and large regions to the left (resp. right) of the sigmoidal curve have a $\frac{dp}{dt} \approx 0$, perhaps due to insufficient time to start refolding (resp. equilibrium having been achieved).
+      \item[] \rnaeq prunes out these regions by identifying two positions, a \tStart value for which $\lvert p(t_{0}) - \tStart\rvert \approx \delta$, and corresponding \tStop for which $\lvert p(t_{\inf}) - \tStop\rvert \approx \delta$. In both instances, $\delta$ is taken to be $10^{-3}$ by default. In our experience, the time range $[\tStart, \tStop]$ is an effective {\em soft bound} for the population occupancy curve which helps to present only the window of interest to the investigator. If desired, it is possible to disable the soft bounding feature using \optionFlag{n}, which will present the entire timespan $[t_{0}, t_{\inf}]$ to the user, where $t_{0}$ can be set in \logtime with \optionFlag{i} (default -10), and $t_{\inf}$ can be set in \logtime with \optionFlag{j} (default 10).
+      \optionListItem{i}{The \logtime to represent $t_0$, -10 by default. Serves as a hard bound to prevent numeric instability, values $\leq -12$ are not recommended.}
+      \optionListItem{j}{The \logtime to represent $t_{\inf}$, 10 by default. Serves as a hard bound to prevent numeric instability, values $\geq 12$ are not recommended.}
+      \optionListItem{p}{The step size $i$ to use when computing population occupancy curves. Population occupancy is computed at discrete times $(t_0, t_0 + i, t_0 + 2i, \cdots, t_{\inf} - i, t_{\inf})$.}
+      \optionListItem{d}{$\delta$ value used to estimate {\em soft bounds} \tStart and \tStop for the computed population kinetics. Defaults to $10^{-3}$.}
+      \optionListItem{n}{Disables the usage of soft bounds (estimated with \optionFlag{d}). The full time range $[t_{0}, t_{\inf}]$ (\optionFlag{i} to \optionFlag{j}) is output.}
+    \end{itemize}
+  \item[Equilibrium computation:] \hfill
+    \begin{itemize}
+      \item[] \rnaeq allows for the estimation of equilibrium time from an implicitly computed population occupancy curve for a target structure (\optionFlag{l}), refolding from a starting structure (\optionFlag{k}). The equilibrium time is estimated using a sliding window approach, starting from the {\em right soft bound} \tStop (see documentation above for definition). The sliding window (default size: 5, starting at \tStop) is used in the following fashion.
+      \item[] If the probabilities at {\em all} positions $(i + 1, i + 2, \cdots, i + \text{\ttt{window\_size}} - 1)$ are within $\epsilon$ of $p(i)$, the window starting at $i$ is said to be in equilibrium (we will call this {\em satisfying the equilibrium condition}), and moved to the left. This process is continued until a window starting at some $j$ is found that is not at equilibrium, in which case $j + 1$, the last time the window equilibrium was satisfied, is returned. Should the window starting at \tStop not be in equilibrium already, the window is instead moved to the right until a position $j$ is encountered for which the equilibrium condition is satisfied, and returned. Should the sliding window ever encounter the hard bound $t_0$ (resp. $t_{\inf}$), the equilibrium time is said to be $-\infty$ (resp. $\infty$).
+      \optionListItem{q}{Compute the estimated equilibrium time for the refolding of input sequence \s from \A to \B.}
+      \optionListItem{h}{Equilibrium is considered for all macrostates, rather than just the refolding of \A to \B. A window starting at index $i$ is then said to be in equilibrium if the population occupancy curves for all macrostates $M^*$ s.t. $M^* = M - \{A\}$ are in equilibrium at $i$.}
+      \optionListItem{e}{The maximum deviation $\epsilon$ that all window indexes may have with the left-most position while still being considered {\em in equilibrium}. Defaults to $10^{-4}$.}
+      \optionListItem{w}{The window size used for predicting equilibrium. Equilibrium is considered as having been achieved when all indexes $(i + 1, i + 2, \cdots, i + \text{\ttt{window\_size}} - 1)$ have values within $\epsilon$ (\optionFlag{e}) of the population proportion at index $i$.}
+    \end{itemize}
+  \optionListItem{t}{The temperature at which structures as sampled via \ttt{RNAsubopt}. The default is $37^{\circ}$C.}
+  \optionListItem{b}{Enables the output of performance related benchmarking for all major subroutines in \rnaeq.}
+  \optionListItem{v}{Enables verbose output.}
+\end{itemize}
 
 \sectionLabel{Extensions}{extprogs}
 
