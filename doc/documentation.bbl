@@ -1,0 +1,20 @@
+\begin{thebibliography}{1}
+
+\bibitem{fftwThreePaper}
+M.~Frigo and S.G. Johnson.
+\newblock The design and implementation of fftw3.
+\newblock {\em Proceedings of the IEEE}, 93(2):216–231.
+
+\bibitem{viennaTwoPaper}
+R.~Lorenz, S.~H. Bernhart, C.~Honer Zu~Siederdissen, H.~Tafer, C.~Flamm, P.~F.
+  Stadler, and I.~L. Hofacker.
+\newblock {{V}ienna{R}{N}{A} {P}ackage 2.0}.
+\newblock {\em Algorithms Mol Biol}, 6:26, 2011.
+
+\bibitem{fftTwoPaper}
+E.~Senter, I.~Dotu, and P.~Clote.
+\newblock {{R}{N}{A} folding pathways and kinetics using 2{D} energy
+  landscapes}.
+\newblock {\em J Math Biol}, Feb 2014.
+
+\end{thebibliography}

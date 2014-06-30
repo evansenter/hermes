@@ -80,9 +80,9 @@ If you encounter errors in configuring or compiling the software, we recommend c
   \fixedWidthInList{GSL}{($\geq$ 1.15, tested through 1.16)}{http://www.gnu.org/software/gsl/}{ \\
   GSL is required to compute the eigendecomposition of a (possibly) non-symmetric transition rate matrix for \rnaeq.}
   \fixedWidthInList{FFTW3}{($\geq$ 3.3.4)}{http://www.fftw.org/}{ \\
-  FFTW3 functions are used to compute the inverse discrete Fourier transform in \fft.}
+  FFTW3 (\cite{fftwThreePaper}) functions are used to compute the inverse discrete Fourier transform in \fft.}
   \fixedWidthInList{libRNA.a}{($\geq$ 2.0.7, tested through 2.1.7)}{http://www.tbi.univie.ac.at/RNA/}{ \\
-  Various ViennaRNA functions and data structures are leveraged for homogenous energy model support, as well as \ttt{fold\_par}, \ttt{pf\_fold\_par}, and \ttt{subopt\_par}. We additionally make use of ViennaRNA functions to compute the necessary polynomial size for \fft, determined in the following fashion. Parameters $K$ (resp. $L$) are defined to be the sum of the number of base pairs in reference structure $A$ (resp. reference structure $B$) plus the number of base pairs in the maximum matching (Nussinov) structure which contains no base pair of $A$ (resp. $B$).}
+  Various ViennaRNA (\cite{viennaTwoPaper}) functions and data structures are leveraged for homogenous energy model support, as well as \ttt{fold\_par}, \ttt{pf\_fold\_par}, and \ttt{subopt\_par}. We additionally make use of ViennaRNA functions to compute the necessary polynomial size for \fft, determined in the following fashion. Parameters $K$ (resp. $L$) are defined to be the sum of the number of base pairs in reference structure $A$ (resp. reference structure $B$) plus the number of base pairs in the maximum matching (Nussinov) structure which contains no base pair of $A$ (resp. $B$).}
 \end{description}
 
 \subsectionLabel{Compilation}{compile}
@@ -230,7 +230,7 @@ Leveraging the example from \ref{sub:mpoverview} a final time, the variable \ttt
 
 \subsubsection{Applications} \label{subsub:fftborapp}
 
-\fft computes the 2D energy landscape of an arbitrary but fixed sequence \s, parameterized by base pair distance from input structures \A and \B.
+\fft (\cite{fftTwoPaper}) computes the 2D energy landscape of an arbitrary but fixed sequence \s, parameterized by base pair distance from input structures \A and \B.
 
 \subsubsection{Example Usage} \label{subsub:fftborex}
 
@@ -455,10 +455,153 @@ The \optionFlag{o} flag indicates that we will permit \ttt{RNAsubopt} to sample 
 
 \subsectionLabel{{\tt FFTmfpt}}{fftmfpt}
 
+\subsubsection{Applications} \label{subsub:fftmfptapp}
+
+\fftmfpt can be used to estimate the mean first passage time of a given RNA in the same fashion as \rnamfpt, but using the 2D energy landscape computed by \fft as the underlying graph for the Markov chain. We expect this extension to be particularly useful to investigators interested in leveraging the speed of \fft as a coarse-grained representation of the refolding landscape in order to quickly estimate hitting times for a large collection of sequences, where speed is a major factor.
+
+\fftmfpt uses the \multiParam framework to accept all command line flags available for \fft (prefixed by \ttt{--fftbor2d-}) and \rnamfpt (prefixed by \ttt{--mfpt-}). The only required flags are \ttt{--fftbor2d-i} (input sequence \s), \ttt{--fftbor2d-j} (starting structure \A), \ttt{--fftbor2d-k} (target structure \B), and a move type for the Markov chain, one of \ttt{--mfpt-x} or \ttt{--mfpt-f}.
+See the command-line options documentation for \fft (\ref{subsub:fftboropt}) and \rnamfpt (\ref{subsub:rnamfptopt}) for a full description of all available settings.
+
+\subsubsection{Example Usage} \label{subsub:fftmfptex}
+
+In the following example, we compute the estimated hitting time of a toy 9 nt. sequence permitting only single base pair moves and applying the Hastings adjustment to the transition probability matrix.
+
+\begin{verbatim}
+FFTmfpt --fftbor2d-i GGGAAACCC --fftbor2d-j "........." --fftbor2d-k "(((...)))" \
+--mfpt-x --mfpt-h
+
+6786.738209
+\end{verbatim}
+
+To highlight the speed of computing kinetics in this fashion, consider the following 76 nt. tRNA sequence for which the mean first passage time is estimated in approximately one second of wall time on a laptop!
+
+\begin{verbatim}
+time FFTmfpt --mfpt-x --mfpt-h \
+--fftbor2d-i \
+'GCCUCCUUAGCGCAGUAGGUAGCGCGUCAGUCUCAUAAUCUGAAGGUCCUGAGUUCGAACCUCAGAGGGGGCACCA' \
+--fftbor2d-j \
+'............................................................................' \
+--fftbor2d-k \
+'(((((((..((((........)))).((((.........)))).....(((((.......))))))))))))....'
+
+4509.578593
+
+real	0m1.146s
+user	0m3.743s
+sys	0m0.039s
+\end{verbatim}
+
 \subsectionLabel{{\tt FFTeq}}{ffteq}
+
+\subsubsection{Applications} \label{subsub:ffteqapp}
+
+The intention of \ffteq is to present an efficient estimator of population occupancy and equilibrium time for a given RNA sequence in a similar fashion to \fftmfpt (\ref{subsub:fftmfptapp}), making use of the energy grid computed by \fft as a coarse grained graph for the Markov process. As with \fftmfpt (\ref{subsub:fftmfptapp}), the only required flags are \ttt{--fftbor2d-i} (input sequence \s), \ttt{--fftbor2d-j} (starting structure \A), and \ttt{--fftbor2d-k} (target structure \B).
+
+\fftmfpt uses the \multiParam framework to accept all command line flags available for \fft (prefixed by \ttt{--fftbor2d-}), \rnamfpt (prefixed by \ttt{--mfpt-}), and \rnaeq (prefixed by \ttt{--population-}).
+
+\subsubsection{Example Usage} \label{subsub:ffteqex}
+
+\ffteq can be used to generate population occupancy curves in the following manner:
+
+\begin{verbatim}
+FFTeq --fftbor2d-i GGGAAACCC --fftbor2d-j "........." --fftbor2d-k "(((...)))" \
+--population-p 0.5
+
+-1.500000	+0.00000001	+0.99937772
+-1.000000	+0.00000029	+0.99809540
+-0.500000	+0.00000753	+0.99449426
++0.000000	+0.00014023	+0.98557561
++0.500000	+0.00145114	+0.96352653
++1.000000	+0.00733188	+0.90182966
++1.500000	+0.02430557	+0.74360243
++2.000000	+0.06459245	+0.47569262
++2.500000	+0.14819884	+0.31072886
++3.000000	+0.33391730	+0.23696313
++3.500000	+0.60157943	+0.13826409
++4.000000	+0.70229737	+0.10112492
+\end{verbatim}
+
+It can also estimate equilibrium time, just as \rnaeq can:
+
+\begin{verbatim}
+FFTeq --fftbor2d-i GGGAAACCC --fftbor2d-j "........." --fftbor2d-k "(((...)))" \
+--population-q
+
+3.995000
+\end{verbatim}
+
+To highlight the speed of \ffteq, consider the following real-world example, using the same tRNA as in the \fftmfpt (\ref{subsub:fftmfptex}). The equilibrium time is estimated from the population occupancy curve in approximately 10 seconds on a laptop!
+
+\begin{verbatim}
+time FFTeq --population-q \
+--fftbor2d-i \
+'GCCUCCUUAGCGCAGUAGGUAGCGCGUCAGUCUCAUAAUCUGAAGGUCCUGAGUUCGAACCUCAGAGGGGGCACCA' \
+--fftbor2d-j \
+'............................................................................' \
+--fftbor2d-k \
+'(((((((..((((........)))).((((.........)))).....(((((.......))))))))))))....'
+
+3.111000
+
+real	0m10.550s
+user	0m13.258s
+sys	0m0.067s
+\end{verbatim}
 
 \subsectionLabel{{\tt RateEq}}{rateeq}
 
-\sectionLabel{References}{ref}
+\subsubsection{Applications} \label{subsub:rateeqapp}
+
+The program \rateeq allows an investigator to compute population occupancy curves and equilibrium times using the underlying functions in \rnaeq, but providing their own transition rate matrix. This allows users to easily use the Hermes framework for kinetics applications beyond its current scope, and allows for arbitrary generalizations of macrostates or exhaustive kinetics through a single tool, similar to the generality of \rnamfpt.
+
+\rateeq accepts command-line options for both \rnamfpt (using \ttt{--mfpt-}) and \rnaeq (using \ttt{--population-}), where \rnamfpt functions are used to convert the rate matrix (provided via CSV with the \ttt{--mfpt-c} flag) to a generalized data structure, and \rnaeq performs the required eigendecomposition. The only required flags are \ttt{--mfpt-c} to provide the input rate matrix, in the CSV format described in \ref{subsub:rnamfptapp}, and \ttt{--population-a} (resp. \ttt{--population-z}) to indicate the 0-indexed position in the rate matrix correspondent to the starting state (resp. ending state), described in greater detail in \ref{subsub:rnaeqopt}.
+
+\subsubsection{Example Usage} \label{subsub:rateeqex}
+
+These trivial examples make use of the following CSV file.
+
+\begin{verbatim}
+./ext/population_from_rate_matrix/all_structures_for_gggaaaccc\
+__19_5_rate_move_with_hastings.csv
+\end{verbatim}
+
+This file is the rate matrix derived from all compatible structures for the toy sequence \ttt{GGGAAACCC}, similar to the matrix computed by \rnaeq when invoked like \ttt{RNAeq -s GGGAAACCC -o}. The index representing the empty structure (starting state) is 19 and the MFE structure is located at index 5.
+
+\begin{verbatim}
+RateEq --population-a 19 --population-z 5 --population-p 0.5 --mfpt-c \
+./ext/population_from_rate_matrix/all_structures_for_gggaaaccc\
+__19_5_rate_move_without_hastings.csv
+
+-2.000000	+0.00000000	+0.99878366
+-1.500000	+0.00000014	+0.99619920
+-1.000000	+0.00000415	+0.98841027
+-0.500000	+0.00010582	+0.96692649
++0.000000	+0.00184091	+0.91694937
++0.500000	+0.01529280	+0.80912513
++1.000000	+0.05796537	+0.57473609
++1.500000	+0.13220381	+0.27178670
++2.000000	+0.23416181	+0.16602654
++2.500000	+0.41551053	+0.12445470
++3.000000	+0.57547984	+0.08935250
++3.500000	+0.59543269	+0.08497569
+\end{verbatim}
+
+The above example computes the population occupancy curves for the given rate matrix (in \logtime increments of 0.5, specified by the \ttt{--population-p 0.5} flag), while the invocation below estimates the equilibrium time for state 5 (representing the MFE structure), starting from state 19 (representing the empty structure).
+
+\begin{verbatim}
+RateEq --population-a 19 --population-z 5 --population-q --mfpt-c \
+./ext/population_from_rate_matrix/all_structures_for_gggaaaccc\
+__19_5_rate_move_without_hastings.csv
+
+3.235000
+\end{verbatim}
+
+\clearpage
+
+\sectionLabel{References}{refs}
+
+\renewcommand{\refname}{\vskip -1cm}
+\bibliographystyle{plain}
+\bibliography{references}
 
 \end{document}

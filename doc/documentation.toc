@@ -1,28 +1,34 @@
-\contentsline {section}{\numberline {1}Introduction}{2}{section.1}
-\contentsline {section}{\numberline {2}Installation}{2}{section.2}
-\contentsline {subsection}{\numberline {2.1}Quick Start}{2}{subsection.2.1}
-\contentsline {subsection}{\numberline {2.2}Dependencies}{2}{subsection.2.2}
-\contentsline {subsection}{\numberline {2.3}Compilation}{3}{subsection.2.3}
-\contentsline {subsection}{\numberline {2.4}Troubleshooting}{3}{subsection.2.4}
-\contentsline {section}{\numberline {3}Software Organization}{5}{section.3}
-\contentsline {subsection}{\numberline {3.1}General Principles}{5}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}multi\_param Overview}{5}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}multi\_param Details}{6}{subsection.3.3}
-\contentsline {section}{\numberline {4}Core Programs}{7}{section.4}
-\contentsline {subsection}{\numberline {4.1}{\tt FFTbor2D}}{7}{subsection.4.1}
-\contentsline {subsubsection}{\numberline {4.1.1}Applications}{7}{subsubsection.4.1.1}
-\contentsline {subsubsection}{\numberline {4.1.2}Example Usage}{7}{subsubsection.4.1.2}
-\contentsline {subsubsection}{\numberline {4.1.3}Options}{7}{subsubsection.4.1.3}
-\contentsline {subsection}{\numberline {4.2}{\tt RNAmfpt}}{8}{subsection.4.2}
-\contentsline {subsubsection}{\numberline {4.2.1}Applications}{8}{subsubsection.4.2.1}
-\contentsline {subsubsection}{\numberline {4.2.2}Example Usage}{8}{subsubsection.4.2.2}
-\contentsline {subsubsection}{\numberline {4.2.3}Options}{9}{subsubsection.4.2.3}
-\contentsline {subsection}{\numberline {4.3}{\tt RNAeq}}{11}{subsection.4.3}
-\contentsline {subsubsection}{\numberline {4.3.1}Applications}{11}{subsubsection.4.3.1}
-\contentsline {subsubsection}{\numberline {4.3.2}Example Usage}{11}{subsubsection.4.3.2}
-\contentsline {subsubsection}{\numberline {4.3.3}Options}{12}{subsubsection.4.3.3}
-\contentsline {section}{\numberline {5}Extensions}{14}{section.5}
-\contentsline {subsection}{\numberline {5.1}{\tt FFTmfpt}}{14}{subsection.5.1}
-\contentsline {subsection}{\numberline {5.2}{\tt FFTeq}}{14}{subsection.5.2}
-\contentsline {subsection}{\numberline {5.3}{\tt RateEq}}{14}{subsection.5.3}
-\contentsline {section}{\numberline {6}References}{14}{section.6}
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}
+\contentsline {section}{\numberline {2}Installation}{3}{section.2}
+\contentsline {subsection}{\numberline {2.1}Quick Start}{3}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Dependencies}{3}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Compilation}{4}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Troubleshooting}{4}{subsection.2.4}
+\contentsline {section}{\numberline {3}Software Organization}{6}{section.3}
+\contentsline {subsection}{\numberline {3.1}General Principles}{6}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}multi\_param Overview}{6}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}multi\_param Details}{7}{subsection.3.3}
+\contentsline {section}{\numberline {4}Core Programs}{8}{section.4}
+\contentsline {subsection}{\numberline {4.1}{\tt FFTbor2D}}{8}{subsection.4.1}
+\contentsline {subsubsection}{\numberline {4.1.1}Applications}{8}{subsubsection.4.1.1}
+\contentsline {subsubsection}{\numberline {4.1.2}Example Usage}{8}{subsubsection.4.1.2}
+\contentsline {subsubsection}{\numberline {4.1.3}Options}{8}{subsubsection.4.1.3}
+\contentsline {subsection}{\numberline {4.2}{\tt RNAmfpt}}{9}{subsection.4.2}
+\contentsline {subsubsection}{\numberline {4.2.1}Applications}{9}{subsubsection.4.2.1}
+\contentsline {subsubsection}{\numberline {4.2.2}Example Usage}{9}{subsubsection.4.2.2}
+\contentsline {subsubsection}{\numberline {4.2.3}Options}{10}{subsubsection.4.2.3}
+\contentsline {subsection}{\numberline {4.3}{\tt RNAeq}}{12}{subsection.4.3}
+\contentsline {subsubsection}{\numberline {4.3.1}Applications}{12}{subsubsection.4.3.1}
+\contentsline {subsubsection}{\numberline {4.3.2}Example Usage}{12}{subsubsection.4.3.2}
+\contentsline {subsubsection}{\numberline {4.3.3}Options}{13}{subsubsection.4.3.3}
+\contentsline {section}{\numberline {5}Extensions}{15}{section.5}
+\contentsline {subsection}{\numberline {5.1}{\tt FFTmfpt}}{15}{subsection.5.1}
+\contentsline {subsubsection}{\numberline {5.1.1}Applications}{15}{subsubsection.5.1.1}
+\contentsline {subsubsection}{\numberline {5.1.2}Example Usage}{15}{subsubsection.5.1.2}
+\contentsline {subsection}{\numberline {5.2}{\tt FFTeq}}{16}{subsection.5.2}
+\contentsline {subsubsection}{\numberline {5.2.1}Applications}{16}{subsubsection.5.2.1}
+\contentsline {subsubsection}{\numberline {5.2.2}Example Usage}{16}{subsubsection.5.2.2}
+\contentsline {subsection}{\numberline {5.3}{\tt RateEq}}{17}{subsection.5.3}
+\contentsline {subsubsection}{\numberline {5.3.1}Applications}{17}{subsubsection.5.3.1}
+\contentsline {subsubsection}{\numberline {5.3.2}Example Usage}{17}{subsubsection.5.3.2}
+\contentsline {section}{\numberline {6}References}{19}{section.6}
