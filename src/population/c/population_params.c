@@ -365,18 +365,18 @@ void population_flags() {
   fprintf(stderr, "-F/f\tbin (f)ilename,        Provided in conjunction with the -r flag to specify the read / write file for serializing the eigensystem.\n");
   fprintf(stderr, "-G/g\tei(g)envalues only,    default is disabled. When enabled, RNAeq will only generate the eigenvalues for the transition rate matrix.\n");
   fprintf(stderr, "-H/h\tall subpop. in eq.,    default is disabled. When provided alongside the -q flag, the equilibrium time is estimated for when *all* subpopulations approach equilibrium, rather than when just the start-to-end state curve (-a to -z) doesn't deviate more than epsilon (-e) within the window size (-w).\n");
-  fprintf(stderr, "-I/i\tstart time,            natrual log of the starting time for computing population proportion.\n");
-  fprintf(stderr, "-J/j\tend time,              natrual log of the ending time for computing population proportion.\n");
+  fprintf(stderr, "-I/i\tstart time,            natural log of the starting time for computing population proportion.\n");
+  fprintf(stderr, "-J/j\tend time,              natural log of the ending time for computing population proportion.\n");
   fprintf(stderr, "-K/k\tstarting structure,    structure for which the probability at time 0 is equal to 1. If not provided, the empty structure is used / inferred.\n");
   fprintf(stderr, "-L/l\tending structure,      structure of interest for detailed population proportion values. If not provided, the MFE structure is used / inferred.\n");
   fprintf(stderr, "-N/n\t(n)o soft bounds,      default is disabled. When enabled, the population proportion / equilibrium time will not use soft bounds computed with the -d delta value, and instead will compute population proportion / equilibrium over the entire timespan (timespan can be adjusted with -i and -j).\n");
-  fprintf(stderr, "-O/o\tl(o)nely basepairs,    default is disabled. When enabled, RNAsubopt will sample structures containing lonely basepairs.\n");
+  fprintf(stderr, "-O/o\tl(o)nely basepairs,    default is disabled. When enabled, RNAsubopt will sample structures containing lonely base pairs.\n");
   fprintf(stderr, "-P/p\tste(p) size,           natrual log of the step size for computing population proportion (start_time < start_time + step_size <= end_time).\n");
-  fprintf(stderr, "-Q/q\te(q)uilibrium,         Compute the equilibrium time for the target state. By default uses an exact method that requires a target structure. If the -e flag is passed as well, uses an aproximation technique suitable for any probability rate matrix.\n");
+  fprintf(stderr, "-Q/q\te(q)uilibrium,         Compute the equilibrium time for the target state. Uses an approximation technique that looks at occupancy deviation within a sliding window, parameterized by -e and -w.\n");
   fprintf(stderr, "-R/r\tse(r)ialize direction, default is disabled. If passed with the value '1', then the eigensystem and its inversion will be serialized to the file specified by the -f flag. If passed with the value '-1', the file specified by the -f flag will be deserialized and used for computing the data of interest.\n");
   fprintf(stderr, "-S/s\t(s)equence,            sequence of interest for computing population proportions.\n");
   fprintf(stderr, "-T/t\t(t)emperature,         temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
   fprintf(stderr, "-V/v\t(v)erbose,       default is disabled, presents some debug information at runtime.\n\n");
-  fprintf(stderr, "-W/w\t(w)indow size,         default is 5. Specifies the window size (exclusive) for predicting equilibrium. Equilibrium is considered as having been achieved when all indicies (i + 1)..(i + window_size - 1) are within epsilon (-e) of the population proportion at time i.\n");
+  fprintf(stderr, "-W/w\t(w)indow size,         default is 5. Specifies the window size (exclusive) for predicting equilibrium. Equilibrium is considered as having been achieved when all indices (i + 1)..(i + window_size - 1) are within epsilon (-e) of the population proportion at time i.\n");
   fprintf(stderr, "-Z/z\tend state,             default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the ending structure (see options for -l).\n\n");
 }

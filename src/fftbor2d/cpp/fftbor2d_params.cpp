@@ -307,6 +307,6 @@ void fftbor2d_flags() {
   fprintf(stderr, "-M/m\t(m)atrix format, default is disabled, presents output in a matrix format instead of a column format.\n");
   fprintf(stderr, "-P/p\t(p)recision,     default is %d, indicates precision (base 2) of probabilities Z_k / Z to be returned (0-%d, 0 disables precision handling).\n", (int)ceil(log(pow(10., 8)) / log(2.)), std::numeric_limits<double>::digits);
   fprintf(stderr, "-S/s\t(s)imple output, default is disabled, presents output in column format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z), -RTln(Z_{k,l})).\n");
-  fprintf(stderr, "-T/t\t(t)emperature,   default is 37 degrees Celsius (unless an energyfile with parameters for a different temperature is used.\n");
+  fprintf(stderr, "-T/t\t(t)emperature,   default is 37 degrees Celsius.\n");
   fprintf(stderr, "-V/v\t(v)erbose,       default is disabled, presents some debug information at runtime.\n\n");
 }
