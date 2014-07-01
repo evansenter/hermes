@@ -16,7 +16,6 @@ MFPT_PARAMS init_mfpt_params() {
     .run_type      = DIAG_MOVES_ONLY_FLAG,
     .epsilon       = 0.,
     .energy_based  = 0,
-    .pseudoinverse = 0,
     .hastings      = 0,
     .rate_matrix   = 0,
     .all_mfpt      = 0,
@@ -39,11 +38,6 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usag
       case 'T':
       case 't':
         parameters->run_type = TRANSITION_INPUT_FLAG;
-        break;
-
-      case 'P':
-      case 'p':
-        parameters->pseudoinverse = 1;
         break;
 
       case 'X':
@@ -257,7 +251,6 @@ void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   printf("(c) input_file\t\t\t%s\n",          parameters.input_file);
   printf("(e) energy_based\t\t%s\n",          parameters.energy_based                     ? "Yes" : "No");
   printf("(t) transition_matrix_input\t%s\n", RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) ? "Yes" : "No");
-  printf("(p) pseudoinverse\t\t%s\n",         parameters.pseudoinverse                    ? "Yes" : "No");
   printf("(x) single_bp_moves_only\t%s\n",    RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG)  ? "Yes" : "No");
   printf("(f) fully_connected\t\t%s\n",       RUN_TYPE(parameters, FULLY_CONNECTED_FLAG)  ? "Yes" : "No");
   printf("(h) hastings\t\t\t%s\n",            parameters.hastings                         ? "Yes" : "No");
@@ -308,7 +301,6 @@ void mfpt_flags() {
   fprintf(stderr, "-L/l\tprint a(l)l MFPT,           if this flag is provided, the program will print the MFPT for every non-end state to hit the end state, and then print the same beginning -> end MFPT that is printed without this flag. Indices for the MFPT correspond to 0-ordered indices in the transition probability matrix.\n");
   fprintf(stderr, "-N/n\tsequence le(n)gth,          default is disabled. This flag represents the sequence length of the sequence on which kinetics is being performed. It is used to ensure that the graph is fully connected.\n");
   fprintf(stderr, "-O/o\tepsil(o)n,                  if the graph is going to be populated with all possible moves (via the -n flag), this will inflate all 0-probability positions.\n");
-  fprintf(stderr, "-P/p\t(p)seudoinverse,            default is disabled. If this flag is provided, the Moore-Penrose pseudoinverse is computed for the transition probability matrix, rather than the true inverse.\n");
   fprintf(stderr, "-R/r\t(r)ate matrix,              default is disabled. If this flag is provided, the transition rate matrix is computed rather than the transition probability matrix.\n");
   fprintf(stderr, "-T/t\t(t)ransition matrix input,  default is disabled. If this flag is provided, the input is expected to be a transition probability matrix, rather than a 2D energy grid. In this case, the first two columns in the CSV file are row-order indices into the transition probability matrix, and the third (final) column is the transition probability of that cell.\n");
   fprintf(stderr, "-V/v\tverbose,                    default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n");

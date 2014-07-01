@@ -75,8 +75,6 @@ If you encounter errors in configuring or compiling the software, we recommend c
   C++11 support (included in \ttt{g++} $\geq$ 4.7) is necessary for proper struct initialization in \fft.}
   \fixedWidthInList{\textnormal{OpenMP support}}{}{http://openmp.org/wp/}{ \\
   OpenMP support comes by default in most modern compilers, and is required for loop-optimization in \fft.}
-  \fixedWidthInList{LAPACK}{($\geq$ 3.4.2)}{http://www.netlib.org/lapack/}{ \\
-  Various LAPACK routines are used in \rnamfpt to compute the inverse, or pseudoinverse, of a transition probability matrix. LAPACK comes with in implicit dependency on having a valid Fortran compiler which we check for, however this is only to ensure proper linking of LAPACK libraries.}
   \fixedWidthInList{GSL}{($\geq$ 1.15, tested through 1.16)}{http://www.gnu.org/software/gsl/}{ \\
   GSL is required to compute the eigendecomposition of a (possibly) non-symmetric transition rate matrix for \rnaeq.}
   \fixedWidthInList{FFTW3}{($\geq$ 3.3.4)}{http://www.fftw.org/}{ \\
@@ -361,7 +359,6 @@ In the above example, the value output by \rnamfpt is the approximate hitting ti
       \optionListItem{a}{The 0-indexed position of $(0, d_{bp}(A,B))$ in the input CSV file, representing the starting state for folding. If this flag is not provided, \rnamfpt will attempt to infer it by looking for a non-zero $(0, d_{bp}(A,B))$ position in the input and present an error to the user if it can't be found. If the input is already a transition matrix (using \optionFlag{t}), \optionFlag{a} should be the index of the row / column correspondent to the start state.}
       \optionListItem{z}{The 0-indexed position of $(d_{bp}(A,B), 0)$ in the input CSV file, representing the target state for folding. Expectations are identical as with \optionFlag{a}.}
       \optionListItem{r}{Compute a transition rate matrix rather than a probability matrix. The rate matrix $M$ is defined such that $q_{i,i} = -\sum\limits_{j\neq i}q_{i,j}$. This flag is provided so that \rnaeq and extensions involving rate matrices can use a unified codebase for their generation, and is not intended for typical calls to \rnamfpt.}
-      \optionListItem{p}{Use the Moore-Penrose pseudoinverse to invert the transition probability matrix. This can be useful when an approximate solution is desired for input which produces a singular transition probability matrix.}
       \optionListItem{l}{Prints all mean first passage times $\{\text{mfpt}_{X\to B} \mid X \in V \wedge X \neq B\}$ where $V$ is the set of valid positions for the given input.}
     \end{itemize}
   \optionListItem{v}{Enables verbose output.}

@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_eigen.h>
 #include "mfpt_initializers.h"
 #include "mfpt_functions.h"
 #include "shared/constants.h"
@@ -114,7 +116,7 @@ double compute_mfpt(const TRANSITION_MATRIX transition_matrix, const MFPT_PARAMS
     }
   }
 
-  inversion_matrix = parameters.pseudoinverse ? pseudoinverse(inversion_matrix) : inverse(inversion_matrix);
+  inversion_matrix = inverse(inversion_matrix);
 
   for (i = 0; i < inversion_matrix.row_length; ++i) {
     for (j = 0; j < inversion_matrix.row_length; ++j) {
@@ -134,87 +136,32 @@ double compute_mfpt(const TRANSITION_MATRIX transition_matrix, const MFPT_PARAMS
   return mfpt_from_start;
 }
 
-TRANSITION_MATRIX inverse(TRANSITION_MATRIX matrix_to_invert) {
-  // http://stackoverflow.com/questions/3519959/computing-the-inverse-of-a-matrix-using-lapack-in-c
-  double* a = matrix_to_invert.matrix;
-  int size  = matrix_to_invert.row_length;
+TRANSITION_MATRIX inverse(TRANSITION_MATRIX transition_matrix) {
+  int i, j, signum;
+  gsl_matrix* matrix_to_invert = gsl_matrix_alloc(transition_matrix.row_length, transition_matrix.row_length);
+  gsl_matrix* inversion_matrix = gsl_matrix_alloc(transition_matrix.row_length, transition_matrix.row_length);
+  gsl_permutation* permutation = gsl_permutation_alloc(transition_matrix.row_length);
 
-  // -----------------------------------------------------
-  // Begin LAPACK calls
-  // -----------------------------------------------------
-  int* ipiv    = malloc((size + 1) * sizeof(int));
-  int lwork    = size * size;
-  double* work = malloc(lwork * sizeof(double));
-  int info;
-  dgetrf_(&size, &size, a, &size, ipiv, &info);
-#ifdef DEBUG
-  printf("dgetrf_(&size, &size, a, &size, ipiv, &info)\ninfo:\t%d\n", info);
-#endif
-  dgetri_(&size, a, &size, ipiv, work, &lwork, &info);
-#ifdef DEBUG
-  printf("dgetri_(&size, a, &size, ipiv, work, &lwork, &info)\ninfo:\t%d\n", info);
-#endif
-  free(ipiv);
-  free(work);
-  // -----------------------------------------------------
-  // End LAPACK calls
-  // -----------------------------------------------------
-
-  return matrix_to_invert;
-}
-
-TRANSITION_MATRIX pseudoinverse(TRANSITION_MATRIX matrix_to_invert) {
-  // Least-squares fit solution to B - Ax, where (in this case) A is square and B is the identity matrix.
-  double* a = matrix_to_invert.matrix;
-  int size  = matrix_to_invert.row_length;
-
-  // -----------------------------------------------------
-  // Begin LAPACK calls
-  // -----------------------------------------------------
-  char trans;
-  int i, m, n, nrhs, lda, ldb, lwork, info;
-  trans = 'N';
-  m     = size;
-  n     = m;
-  nrhs  = m;
-  lda   = m;
-  ldb   = m;
-  double* b = calloc(ldb * nrhs, sizeof(double));
-
-  for (i = 0; i < ldb; ++i) {
-    b[i * nrhs + i] = 1.;
+  for (i = 0; i < transition_matrix.row_length; ++i) {
+    for (j = 0; j < transition_matrix.row_length; ++j) {
+      gsl_matrix_set(matrix_to_invert, i, j, T_ROW_ORDER(transition_matrix, i, j));
+    }
   }
 
-#ifdef SUPER_HEAVY_DEBUG
-  printf("dgels_(&trans, &m, &n, &nrhs, a, &lda, b, &ldb, work, &lwork, &info)\n\n");
-#endif
-  lwork        = -1;
-  double* work = malloc(MAX(1, lwork) * sizeof(double));
-  dgels_(&trans, &m, &n, &nrhs, a, &lda, b, &ldb, work, &lwork, &info);
-  lwork = (int)work[0];
-#ifdef SUPER_HEAVY_DEBUG
-  printf("workspace query (lwork):\t%d\n", lwork);
-#endif
-  free(work);
-  work = malloc(MAX(1, lwork) * sizeof(double));
-  dgels_(&trans, &m, &n, &nrhs, a, &lda, b, &ldb, work, &lwork, &info);
-#ifdef DEBUG
-  printf("info:\t%d\n", info);
-#endif
-  free(work);
-  // -----------------------------------------------------
-  // End LAPACK calls.
-  // -----------------------------------------------------
+  gsl_linalg_LU_decomp(matrix_to_invert, permutation, &signum);
+  gsl_linalg_LU_invert(matrix_to_invert, permutation, inversion_matrix);
 
-  TRANSITION_MATRIX inverted_matrix = {
-    .matrix     = b,
-    .row_length = matrix_to_invert.row_length,
-    .type       = matrix_to_invert.type
-  };
+  for (i = 0; i < transition_matrix.row_length; ++i) {
+    for (j = 0; j < transition_matrix.row_length; ++j) {
+      T_ROW_ORDER(transition_matrix, i, j) = gsl_matrix_get(inversion_matrix, i, j);
+    }
+  }
 
-  free_transition_matrix(matrix_to_invert);
+  gsl_matrix_free(matrix_to_invert);
+  gsl_matrix_free(inversion_matrix);
+  gsl_permutation_free(permutation);
 
-  return inverted_matrix;
+  return transition_matrix;
 }
 
 int find_start_and_end_positions_in_klp_matrix(KLP_MATRIX* klp_matrix, MFPT_PARAMS* parameters) {

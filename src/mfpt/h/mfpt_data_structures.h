@@ -10,7 +10,6 @@ typedef struct {
   char run_type;
   double epsilon;
   short energy_based;
-  short pseudoinverse;
   short hastings;
   short rate_matrix;
   short all_mfpt;

@@ -11,8 +11,6 @@ endif()
 
 project(HERMES)
 
-enable_language(Fortran)
-
 if (CMAKE_BUILD_TYPE)
   string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
 endif()
@@ -53,7 +51,7 @@ c_compiler_flag_test(C_WEXTRA "-Wextra" "" 0)
 c_compiler_flag_test(C_MARCH "-march=native" "" 0)
 c_compiler_flag_test(C_CLANG_ASSEMBLER "-Wa,-q" "" 0)
 
-cxx_compiler_flag_test(CXX_STD_CXX11 "-std=c++11" "" 1)
+cxx_compiler_flag_test(CXX_STD_CXX11 "-std=c++11" "-std=c++03" 1)
 cxx_compiler_flag_test(CXX_PEDANTIC "-pedantic" "" 0)
 cxx_compiler_flag_test(CXX_WALL "-Wall" "" 0)
 cxx_compiler_flag_test(CXX_WEXTRA "-Wextra" "" 0)

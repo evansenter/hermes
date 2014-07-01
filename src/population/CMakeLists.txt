@@ -1,6 +1,5 @@
 find_package(OpenMP REQUIRED)
 find_package(FFTW REQUIRED)
-find_package(LAPACK REQUIRED)
 find_package(GSL REQUIRED)
 find_library(RNA libRNA.a PATHS)
 
@@ -16,7 +15,6 @@ add_executable(RNAeq c/population.c c/population_params.c c/population_initializ
 
 target_link_libraries(RNAeq mfpt_static)
 target_link_libraries(RNAeq tpl_static)
-target_link_libraries(RNAeq ${LAPACK_LIBRARIES})
 target_link_libraries(RNAeq ${GSL_LIBRARIES})
 target_link_libraries(RNAeq ${RNA})
 target_link_libraries(RNAeq m)
