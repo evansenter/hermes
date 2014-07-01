@@ -62,6 +62,10 @@ if (CMAKE_BUILD_TYPE_UPPER STREQUAL "DEBUG")
   c_compiler_flag_test(C_DEBUG "-g" "" 1)
 
   cxx_compiler_flag_test(CXX_DEBUG "-g" "" 1)
+elseif(CMAKE_BUILD_TYPE_UPPER STREQUAL "SAFE")
+  c_compiler_flag_test(C_O2 "-O2" "" 0)
+
+  cxx_compiler_flag_test(CXX_O2 "-O2" "" 0)
 else()
   c_compiler_flag_test(C_FUNROLL_LOOPS "-funroll-loops" "" 0)
   c_compiler_flag_test(C_OFAST "-Ofast" "-O3" 1)
