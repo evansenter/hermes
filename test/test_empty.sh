@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 
 echo "Testing FFTbor2D:"
-./bin/FFTbor2D
+../bin/FFTbor2D
 
 echo "Testing RNAmfpt:"
-./bin/RNAmfpt
+../bin/RNAmfpt
 
 echo "Testing RNAeq:"
-./bin/RNAeq
+../bin/RNAeq
 
 echo "Testing FFTmfpt:"
-./bin/FFTmfpt
+../bin/FFTmfpt
 
 echo "Testing FFTeq:"
-./bin/FFTeq
+../bin/FFTeq
 
 echo "Testing RateEq:"
-./bin/RateEq
+../bin/RateEq
