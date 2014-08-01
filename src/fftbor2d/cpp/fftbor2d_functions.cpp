@@ -134,7 +134,7 @@ void evaluate_recursions_in_parallel(const FFTBOR2D_PARAMS parameters, FFTBOR2D_
   int i, thread_id;
 
   // Start main recursions (i <= data.run_length / 2 is an optimization leveraging complex conjugates).
-  #pragma omp parallel for private(i, thread_id) shared(data, threaded_data) default(none) num_threads(parameters.max_threads)
+  #pragma omp parallel for private(i, thread_id) num_threads(parameters.max_threads)
 
   for (i = 0; i <= data.run_length / 2; ++i) {
 #ifdef _OPENMP
@@ -461,7 +461,7 @@ inline int j_paired_in(int i, int j, const int* base_pairs) {
 
 void populate_matrices(dcomplex* roots_of_unity, int num_roots) {
   int i;
-  #pragma omp parallel for default(shared)
+  #pragma omp parallel
 
   for (i = 0; i < num_roots; ++i) {
     roots_of_unity[i] = dcomplex(cos(-2 * M_PI * i / num_roots), sin(-2 * M_PI * i / num_roots));
