@@ -12,12 +12,25 @@ All your kinetics are belong to us.
     FFTmfpt                 ([--fftbor2d --mfpt] Approximate mean first passage time [hitting time] using 2D energy landscape from FFTbor2D)
     FFTeq                   ([--fftbor2d --mfpt --population] Approximate population proportion and equilibrium using 2D energy landscape from FFTbor2D)
     RateEq                  ([--mfpt --population] Population proportion and equilibrium using row-ordered rate matrix in CSV (i, j, x) format)
+    
+Dependencies:
+-------------
+  
+* CMake >= 2.6-patch 4, tested through 3.0.0
+* GNU99 compiler, developed with gcc-4.9
+* C++98 compiler supporting OpenMP, developed with g++-4.9
+* GSL <= 1.15, tested through 1.16
+* FFTW3 >= 3.3.3, tested through 3.3.4
+* libRNA.a >= 2.0.7, tested through 2.1.7
+  
 
 Installation:
+-------------
 
     cd build && cmake .. && make
 
 Useful CMake configuration flags:
+---------------------------------
 
     -DCMAKE_C_COMPILER=/path/to/c/compiler
     -DCMAKE_CXX_COMPILER=/path/to/c++/compiler
