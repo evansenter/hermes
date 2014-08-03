@@ -12,6 +12,7 @@ add_executable(FFTmfpt mfpt_from_fftbor2d.cpp)
 
 target_link_libraries(FFTmfpt fftbor_static)
 target_link_libraries(FFTmfpt mfpt_static)
+target_link_libraries(FFTmfpt klp_matrix_static)
 target_link_libraries(FFTmfpt multi_param_static)
 target_link_libraries(FFTmfpt ${FFTW_LIBRARIES})
 target_link_libraries(FFTmfpt ${GSL_LIBRARIES})

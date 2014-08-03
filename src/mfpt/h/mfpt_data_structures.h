@@ -22,21 +22,8 @@ typedef struct {
 #define FULLY_CONNECTED_FLAG 'F'
 #define RUN_TYPE(parameters, flag) (parameters.run_type == flag)
 #define MATRIX_TYPE(parameters) (parameters.rate_matrix ? 'R' : 'P')
-#define T_ROW_ORDER(m, i, j) ((m.matrix)[((i) * (m.row_length)) + (j)])
-#define T_COL_ORDER(m, i, j) ((m.matrix)[((j) * (m.row_length)) + (i)])
 
-typedef struct {
-  int* k;
-  int* l;
-  double* p;
-  int length;
-} KLP_MATRIX;
-
-typedef struct {
-  double* matrix;
-  int row_length;
-  char type;
-} TRANSITION_MATRIX;
+#include "shared/libklp_matrix_header.h"
 
 typedef double(*transition_probability)(const KLP_MATRIX, const double*, int, int, short);
 

@@ -16,15 +16,13 @@ int main(int argc, char** argv) {
   POPULATION_PARAMS population_params;
   TRANSITION_MATRIX transition_matrix;
   
-  params = split_args(argc, argv, subparams, 2);
-  
-  mfpt_params       = init_mfpt_params();
-  mfpt_params.input = 0;
+  params      = split_args(argc, argv, subparams, 2);
+  mfpt_params = init_mfpt_params();
   
   parse_mfpt_args(&mfpt_params, params[0].argc, params[0].argv, &population_from_rate_matrix_usage);
   
-  klp_matrix        = klp_matrix_from_file(mfpt_params, &population_from_rate_matrix_usage);
-  transition_matrix = transition_matrix_from_klp_matrix(&klp_matrix, mfpt_params);
+  klp_matrix        = klp_matrix_from_file(mfpt_params.input_file, 0, &population_from_rate_matrix_usage);
+  transition_matrix = transition_matrix_from_klp_matrix(&klp_matrix, MATRIX_TYPE(mfpt_params));
   
   population_params       = init_population_params();
   population_params.input = 0;

@@ -280,7 +280,7 @@ void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
 }
 
 void mfpt_usage() {
-  fprintf(stderr, "RNAmfpt [options] input_csv\n\n");
+  fprintf(stderr, "RNAmfpt [options] -c input_csv\n\n");
   fprintf(stderr, "where input_csv is a CSV file (with *no* header) of the format:\n");
   fprintf(stderr, "k_0,l_0,p_0\n");
   fprintf(stderr, "...,...,...\n");

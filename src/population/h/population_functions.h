@@ -1,7 +1,7 @@
 #ifndef POPULATION_FUNCTIONS_H
 #define POPULATION_FUNCTIONS_H
 
-#include "shared/libmfpt_header.h"
+#include "shared/libklp_matrix_header.h"
 #include "population_data_structures.h"
 
 void population_from_row_ordered_transition_matrix(const POPULATION_PARAMS, TRANSITION_MATRIX);

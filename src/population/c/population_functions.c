@@ -4,7 +4,7 @@
 #include <math.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_eigen.h>
-#include "shared/libmfpt_header.h"
+#include "shared/libklp_matrix_header.h"
 #include "shared/libtpl_header.h"
 #include "population_constants.h"
 #include "population_params.h"

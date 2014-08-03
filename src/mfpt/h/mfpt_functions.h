@@ -1,11 +1,10 @@
-#ifndef MFPT_ENERGY_GRID_H
-#define MFPT_ENERGY_GRID_H
+#ifndef MFPT_FUNCTIONS_H
+#define MFPT_FUNCTIONS_H
 
 #include "mfpt_data_structures.h"
 
 TRANSITION_MATRIX convert_klp_matrix_to_transition_matrix(KLP_MATRIX*, MFPT_PARAMS*);
 double compute_mfpt(const TRANSITION_MATRIX, const MFPT_PARAMS);
-TRANSITION_MATRIX inverse(TRANSITION_MATRIX);
 int find_start_and_end_positions_in_klp_matrix(KLP_MATRIX*, MFPT_PARAMS*);
 void set_bp_dist_from_start_and_end_positions(const KLP_MATRIX, MFPT_PARAMS*, int);
 void extend_klp_matrix_to_all_possible_positions(KLP_MATRIX*, const MFPT_PARAMS);

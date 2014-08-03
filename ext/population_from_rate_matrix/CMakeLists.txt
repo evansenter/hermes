@@ -9,6 +9,7 @@ add_executable(RateEq population_from_rate_matrix.c)
 
 target_link_libraries(RateEq population_static)
 target_link_libraries(RateEq mfpt_static)
+target_link_libraries(RateEq klp_matrix_static)
 target_link_libraries(RateEq multi_param_static)
 target_link_libraries(RateEq tpl_static)
 target_link_libraries(RateEq ${GSL_LIBRARIES})

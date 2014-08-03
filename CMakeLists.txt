@@ -78,6 +78,7 @@ endif()
 
 add_subdirectory(src/tpl)
 add_subdirectory(src/multi_param)
+add_subdirectory(src/klp_matrix)
 add_subdirectory(src/fftbor2d)
 add_subdirectory(src/mfpt)
 add_subdirectory(src/population)

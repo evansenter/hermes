@@ -2,10 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
-#include <gsl/gsl_linalg.h>
-#include <gsl/gsl_eigen.h>
-#include "mfpt_initializers.h"
 #include "mfpt_functions.h"
+#include "shared/libklp_matrix_header.h"
 #include "shared/constants.h"
 
 #define ONE_BP_MOVE(i, j) ((int)abs(klp_matrix.k[(i)] - klp_matrix.k[(j)]) == 1 && (int)abs(klp_matrix.l[(i)] - klp_matrix.l[(j)]) == 1)
@@ -134,34 +132,6 @@ double compute_mfpt(const TRANSITION_MATRIX transition_matrix, const MFPT_PARAMS
   free(mfpt);
   free_transition_matrix(inversion_matrix);
   return mfpt_from_start;
-}
-
-TRANSITION_MATRIX inverse(TRANSITION_MATRIX transition_matrix) {
-  int i, j, signum;
-  gsl_matrix* matrix_to_invert = gsl_matrix_alloc(transition_matrix.row_length, transition_matrix.row_length);
-  gsl_matrix* inversion_matrix = gsl_matrix_alloc(transition_matrix.row_length, transition_matrix.row_length);
-  gsl_permutation* permutation = gsl_permutation_alloc(transition_matrix.row_length);
-  
-  for (i = 0; i < transition_matrix.row_length; ++i) {
-    for (j = 0; j < transition_matrix.row_length; ++j) {
-      gsl_matrix_set(matrix_to_invert, i, j, T_ROW_ORDER(transition_matrix, i, j));
-    }
-  }
-  
-  gsl_linalg_LU_decomp(matrix_to_invert, permutation, &signum);
-  gsl_linalg_LU_invert(matrix_to_invert, permutation, inversion_matrix);
-  
-  for (i = 0; i < transition_matrix.row_length; ++i) {
-    for (j = 0; j < transition_matrix.row_length; ++j) {
-      T_ROW_ORDER(transition_matrix, i, j) = gsl_matrix_get(inversion_matrix, i, j);
-    }
-  }
-  
-  gsl_matrix_free(matrix_to_invert);
-  gsl_matrix_free(inversion_matrix);
-  gsl_permutation_free(permutation);
-  
-  return transition_matrix;
 }
 
 int find_start_and_end_positions_in_klp_matrix(KLP_MATRIX* klp_matrix, MFPT_PARAMS* parameters) {

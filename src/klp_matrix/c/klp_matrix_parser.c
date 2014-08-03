@@ -1,27 +1,26 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "mfpt_params.h"
-#include "mfpt_parser.h"
-#include "mfpt_initializers.h"
+#include "klp_matrix_parser.h"
+#include "klp_matrix_initializers.h"
 
-KLP_MATRIX klp_matrix_from_file(const MFPT_PARAMS parameters, void (*usage)()) {
+KLP_MATRIX klp_matrix_from_file(const char* input_file, short force_probabilities, void (*usage)()) {
   int line_count;
   KLP_MATRIX klp_matrix;
   
-  line_count = count_lines(parameters.input_file);
+  line_count = count_lines(input_file);
   
   if (!line_count) {
     (*usage)();
   }
   
   klp_matrix = init_klp_matrix(line_count);
-  populate_arrays(&klp_matrix, parameters);
+  populate_arrays(&klp_matrix, input_file, force_probabilities);
   
   return klp_matrix;
 }
 
-TRANSITION_MATRIX transition_matrix_from_klp_matrix(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters) {
+TRANSITION_MATRIX transition_matrix_from_klp_matrix(KLP_MATRIX* klp_matrix, char matrix_type) {
   int i, row_length = 0;
   TRANSITION_MATRIX transition_matrix;
   
@@ -33,7 +32,7 @@ TRANSITION_MATRIX transition_matrix_from_klp_matrix(KLP_MATRIX* klp_matrix, cons
   
   // The transition matrix is 0-ordered, so we looked for the highest k, l position above and then we add one for the row length.
   // i.e. if the largest value we saw was 10, then we have rows going from 0..10 so row_length == 10 + 1, or 11.
-  transition_matrix = init_transition_matrix(row_length + 1, MATRIX_TYPE(parameters));
+  transition_matrix = init_transition_matrix(row_length + 1, matrix_type);
   
   for (i = 0; i < klp_matrix->length; ++i) {
     T_ROW_ORDER(transition_matrix, klp_matrix->k[i], klp_matrix->l[i]) = klp_matrix->p[i];
@@ -42,7 +41,7 @@ TRANSITION_MATRIX transition_matrix_from_klp_matrix(KLP_MATRIX* klp_matrix, cons
   return transition_matrix;
 }
 
-int count_lines(char* file_path) {
+int count_lines(const char* file_path) {
   FILE* file = fopen(file_path, "r");
   int c;
   int line_count = 0;
@@ -61,9 +60,9 @@ int count_lines(char* file_path) {
   return line_count;
 }
 
-void populate_arrays(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters) {
+void populate_arrays(KLP_MATRIX* klp_matrix, const char* input_file, short force_probabilities) {
   int i = 0;
-  FILE* file = fopen(parameters.input_file, "r");
+  FILE* file = fopen(input_file, "r");
   char* token;
   char line[1024];
   
@@ -75,9 +74,9 @@ void populate_arrays(KLP_MATRIX* klp_matrix, const MFPT_PARAMS parameters) {
     token = strtok(NULL, ",");
     klp_matrix->p[i] = atof(token);
     
-    if (parameters.input && !parameters.energy_based && (klp_matrix->p[i] < 0 || klp_matrix->p[i] > 1)) {
+    if (force_probabilities && (klp_matrix->p[i] < 0 || klp_matrix->p[i] > 1)) {
       fprintf(stderr, "Error: line number %d (0-indexed) in the input doesn't satisfy 0 <= probability (%+1.2f) <= 1. Did you forget the -e flag?\n\n", i, klp_matrix->p[i]);
-      mfpt_usage(0);
+      abort();
     }
     
     i++;
