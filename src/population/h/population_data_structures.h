@@ -5,6 +5,7 @@
 
 typedef struct {
   short verbose;
+  char* input_file;
   char* sequence;
   char* start_structure;
   char* end_structure;

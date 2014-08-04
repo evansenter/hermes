@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include "../../src/klp_matrix/h/klp_matrix_data_structures.h"
+#include "../../src/klp_matrix/h/klp_matrix_params.h"
 #include "../../src/klp_matrix/h/klp_matrix_parser.h"
 #include "../../src/klp_matrix/h/klp_matrix_initializers.h"
 #include "../../src/klp_matrix/h/klp_matrix_functions.h"

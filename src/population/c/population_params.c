@@ -10,6 +10,7 @@
 POPULATION_PARAMS init_population_params() {
   POPULATION_PARAMS parameters = {
     .verbose           = 0,
+    .input_file        = NULL,
     .sequence          = NULL,
     .start_structure   = NULL,
     .end_structure     = NULL,
@@ -39,7 +40,7 @@ POPULATION_PARAMS init_population_params() {
 void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
   int c;
   
-  while ((c = getopt(argc, argv, "OoGgBbHhNnVvQqA:a:Z:z:S:s:K:k:L:l:I:i:J:j:P:p:E::e::D:d:W:w:T:t:C:c:R:r:F:f:")) != -1) {
+  while ((c = getopt(argc, argv, "OoGgBbHhNnVvQqA:a:Z:z:C:c:S:s:K:k:L:l:I:i:J:j:P:p:E::e::D:d:W:w:T:t:M:m:R:r:F:f:")) != -1) {
     switch (c) {
       case 'O':
       case 'o':
@@ -74,6 +75,11 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'Q':
       case 'q':
         parameters->equilibrium = 1;
+        break;
+        
+      case 'C':
+      case 'c':
+        parameters->input_file = strdup(optarg);
         break;
         
       case 'S':
@@ -164,8 +170,8 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         
         break;
         
-      case 'C':
-      case 'c':
+      case 'M':
+      case 'm':
         if (!sscanf(optarg, "%lf", &parameters->energy_cap)) {
           (*usage)();
         }
@@ -324,6 +330,7 @@ int population_error_handling(const POPULATION_PARAMS parameters) {
 
 void debug_population_parameters(const POPULATION_PARAMS parameters) {
   printf("RNAeq parameters\n");
+  printf("(c) input_file\t\t\t%s\n",            parameters.input_file);
   printf("(s) sequence\t\t\t%s\n",              parameters.sequence);
   printf("(k) start_structure\t\t%s\n",         parameters.start_structure == NULL && parameters.start_index < 0 ? "empty" : parameters.start_structure);
   printf("(l) end_structure\t\t%s\n",           parameters.end_structure == NULL && parameters.end_index < 0 ? "mfe" : parameters.end_structure);
@@ -336,7 +343,7 @@ void debug_population_parameters(const POPULATION_PARAMS parameters) {
   printf("(j) end_time\t\t\t%.2e\n",            parameters.end_time);
   printf("(p) step_size\t\t\t%.2e\n",           parameters.step_size);
   printf("(o) lonely_bp\t\t\t%s\n",             parameters.lonely_bp ? "Yes" : "No");
-  printf("(c) energy_cap\t\t\t%.1f kcal/mol\n", parameters.energy_cap ? parameters.energy_cap : 10000);
+  printf("(m) energy_cap\t\t\t%.1f kcal/mol\n", parameters.energy_cap ? parameters.energy_cap : 10000);
   printf("(q) equilibrium\t\t\t%s\n",           parameters.equilibrium ? "Yes" : "No");
   printf("(e) epsilon\t\t\t%.2e\n",             parameters.epsilon);
   printf("(d) delta\t\t\t%.2e\n",               parameters.delta);
@@ -350,7 +357,12 @@ void debug_population_parameters(const POPULATION_PARAMS parameters) {
 }
 
 void population_usage() {
-  fprintf(stderr, "RNAeq [options] -s [sequence]\n\n");
+  fprintf(stderr, "RNAeq [options] -c input_csv\n\n");
+  fprintf(stderr, "where input_csv is a CSV file (with *no* header) of the format:\n");
+  fprintf(stderr, "k_0,l_0,p_0\n");
+  fprintf(stderr, "...,...,...\n");
+  fprintf(stderr, "k_n,l_n,p_n\n\n");
+  fprintf(stderr, "RNAeq [options] -s sequence\n\n");
   fprintf(stderr, "Options include the following:\n");
   population_flags();
   abort();
@@ -359,7 +371,7 @@ void population_usage() {
 void population_flags() {
   fprintf(stderr, "-A/a\tstart state,           default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the starting structure (see options for -k).\n");
   fprintf(stderr, "-B/b\t(b)enchmarking,        default is disabled. When enabled, RNAeq will print benchmarking times for internal function calls.\n");
-  fprintf(stderr, "-C/c\tenergy (c)ap,          default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
+  fprintf(stderr, "-C/c\t(C)SV input file,      this option is made available to abstain from providing the input CSV as the last command line argument.\n");
   fprintf(stderr, "-D/d\t(d)elta range,         default is disabled. When provided, this value specifies the delta-size required for the population to be approaching equilibrium. This position is used as a starting point for a more fine-grained scan using the -e and -w values.\n");
   fprintf(stderr, "-E/e\t(e)psilon,             default is disabled. When provided, we will output the time at which the equilibrium stable within -e for a window of size -w.\n");
   fprintf(stderr, "-F/f\tbin (f)ilename,        Provided in conjunction with the -r flag to specify the read / write file for serializing the eigensystem.\n");
@@ -369,6 +381,7 @@ void population_flags() {
   fprintf(stderr, "-J/j\tend time,              natural log of the ending time for computing population proportion.\n");
   fprintf(stderr, "-K/k\tstarting structure,    structure for which the probability at time 0 is equal to 1. If not provided, the empty structure is used / inferred.\n");
   fprintf(stderr, "-L/l\tending structure,      structure of interest for detailed population proportion values. If not provided, the MFE structure is used / inferred.\n");
+  fprintf(stderr, "-M/m\tenergy cap,            default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
   fprintf(stderr, "-N/n\t(n)o soft bounds,      default is disabled. When enabled, the population proportion / equilibrium time will not use soft bounds computed with the -d delta value, and instead will compute population proportion / equilibrium over the entire timespan (timespan can be adjusted with -i and -j).\n");
   fprintf(stderr, "-O/o\tl(o)nely basepairs,    default is disabled. When enabled, RNAsubopt will sample structures containing lonely base pairs.\n");
   fprintf(stderr, "-P/p\tste(p) size,           natrual log of the step size for computing population proportion (start_time < start_time + step_size <= end_time).\n");
@@ -376,7 +389,7 @@ void population_flags() {
   fprintf(stderr, "-R/r\tse(r)ialize direction, default is disabled. If passed with the value '1', then the eigensystem and its inversion will be serialized to the file specified by the -f flag. If passed with the value '-1', the file specified by the -f flag will be deserialized and used for computing the data of interest.\n");
   fprintf(stderr, "-S/s\t(s)equence,            sequence of interest for computing population proportions.\n");
   fprintf(stderr, "-T/t\t(t)emperature,         temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
-  fprintf(stderr, "-V/v\t(v)erbose,       default is disabled, presents some debug information at runtime.\n\n");
+  fprintf(stderr, "-V/v\t(v)erbose,             default is disabled, presents some debug information at runtime.\n\n");
   fprintf(stderr, "-W/w\t(w)indow size,         default is 5. Specifies the window size (exclusive) for predicting equilibrium. Equilibrium is considered as having been achieved when all indices (i + 1)..(i + window_size - 1) are within epsilon (-e) of the population proportion at time i.\n");
   fprintf(stderr, "-Z/z\tend state,             default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the ending structure (see options for -l).\n\n");
 }
