@@ -1,6 +1,7 @@
 #ifndef SHARED_CONSTANTS_H
 #define SHARED_CONSTANTS_H
 
+#define INPUT_DEBUG 1
 // #define DEBUG 1
 // #define SUPER_HEAVY_DEBUG 1
 // #define INSANE_DEBUG 1

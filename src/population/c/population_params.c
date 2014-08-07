@@ -40,64 +40,52 @@ POPULATION_PARAMS init_population_params() {
 void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
   int c;
   
-  while ((c = getopt(argc, argv, "OoGgBbHhNnVvQqA:a:Z:z:C:c:S:s:K:k:L:l:I:i:J:j:P:p:E::e::D:d:W:w:T:t:M:m:R:r:F:f:")) != -1) {
+  while ((c = getopt(argc, argv, "ogbhnvqa:z:c:s:k:l:i:j:p:e::d:w:t:m:r:f:")) != -1) {
     switch (c) {
-      case 'O':
       case 'o':
         parameters->lonely_bp = 1;
         break;
         
-      case 'G':
       case 'g':
         parameters->eigen_only = 1;
         break;
         
-      case 'B':
       case 'b':
         parameters->benchmark = 1;
         break;
         
-      case 'H':
       case 'h':
         parameters->all_subpop_for_eq = 1;
         break;
         
-      case 'N':
       case 'n':
         parameters->soft_bounds = 0;
         break;
         
-      case 'V':
       case 'v':
         parameters->verbose = 1;
         break;
         
-      case 'Q':
       case 'q':
         parameters->equilibrium = 1;
         break;
         
-      case 'C':
       case 'c':
         parameters->input_file = strdup(optarg);
         break;
         
-      case 'S':
       case 's':
         parameters->sequence = strdup(optarg);
         break;
         
-      case 'K':
       case 'k':
         parameters->start_structure = strdup(optarg);
         break;
         
-      case 'L':
       case 'l':
         parameters->end_structure = strdup(optarg);
         break;
         
-      case 'A':
       case 'a':
         if (!sscanf(optarg, "%d", &parameters->start_index)) {
           (*usage)();
@@ -105,7 +93,6 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         
         break;
         
-      case 'Z':
       case 'z':
         if (!sscanf(optarg, "%d", &parameters->end_index)) {
           (*usage)();
@@ -113,7 +100,6 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         
         break;
         
-      case 'I':
       case 'i':
         if (!sscanf(optarg, "%lf", &parameters->start_time)) {
           (*usage)();
@@ -121,7 +107,6 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         
         break;
         
-      case 'J':
       case 'j':
         if (!sscanf(optarg, "%lf", &parameters->end_time)) {
           (*usage)();
@@ -129,7 +114,6 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         
         break;
         
-      case 'P':
       case 'p':
         if (!sscanf(optarg, "%lf", &parameters->step_size)) {
           (*usage)();
@@ -137,7 +121,6 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         
         break;
         
-      case 'E':
       case 'e':
         if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
           (*usage)();
@@ -146,7 +129,6 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         parameters->equilibrium = 1;
         break;
         
-      case 'D':
       case 'd':
         if (!sscanf(optarg, "%lf", &parameters->delta)) {
           (*usage)();
@@ -154,7 +136,6 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         
         break;
         
-      case 'W':
       case 'w':
         if (!sscanf(optarg, "%d", &parameters->window_size)) {
           (*usage)();
@@ -162,7 +143,6 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         
         break;
         
-      case 'T':
       case 't':
         if (!sscanf(optarg, "%lf", &parameters->temperature)) {
           (*usage)();
@@ -170,7 +150,6 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         
         break;
         
-      case 'M':
       case 'm':
         if (!sscanf(optarg, "%lf", &parameters->energy_cap)) {
           (*usage)();
@@ -178,7 +157,6 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         
         break;
         
-      case 'R':
       case 'r':
         if (!sscanf(optarg, "%d", &parameters->serialize)) {
           (*usage)();
@@ -188,42 +166,26 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         
         break;
         
-      case 'F':
       case 'f':
         parameters->filename = strdup(optarg);
         break;
         
       case '?':
         switch (optopt) {
-          case 'A':
           case 'a':
-          case 'Z':
           case 'z':
-          case 'S':
           case 's':
-          case 'K':
           case 'k':
-          case 'L':
           case 'l':
-          case 'E':
           case 'e':
-          case 'D':
           case 'd':
-          case 'W':
           case 'w':
-          case 'I':
           case 'i':
-          case 'J':
           case 'j':
-          case 'P':
           case 'p':
-          case 'T':
           case 't':
-          case 'C':
           case 'c':
-          case 'R':
           case 'r':
-          case 'F':
           case 'f':
             fprintf(stderr, "Option -%c requires an argument.\n", optopt);
             break;
@@ -369,27 +331,27 @@ void population_usage() {
 }
 
 void population_flags() {
-  fprintf(stderr, "-A/a\tstart state,           default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the starting structure (see options for -k).\n");
-  fprintf(stderr, "-B/b\t(b)enchmarking,        default is disabled. When enabled, RNAeq will print benchmarking times for internal function calls.\n");
-  fprintf(stderr, "-C/c\t(C)SV input file,      this option is made available to abstain from providing the input CSV as the last command line argument.\n");
-  fprintf(stderr, "-D/d\t(d)elta range,         default is disabled. When provided, this value specifies the delta-size required for the population to be approaching equilibrium. This position is used as a starting point for a more fine-grained scan using the -e and -w values.\n");
-  fprintf(stderr, "-E/e\t(e)psilon,             default is disabled. When provided, we will output the time at which the equilibrium stable within -e for a window of size -w.\n");
-  fprintf(stderr, "-F/f\tbin (f)ilename,        Provided in conjunction with the -r flag to specify the read / write file for serializing the eigensystem.\n");
-  fprintf(stderr, "-G/g\tei(g)envalues only,    default is disabled. When enabled, RNAeq will only generate the eigenvalues for the transition rate matrix.\n");
-  fprintf(stderr, "-H/h\tall subpop. in eq.,    default is disabled. When provided alongside the -q flag, the equilibrium time is estimated for when *all* subpopulations approach equilibrium, rather than when just the start-to-end state curve (-a to -z) doesn't deviate more than epsilon (-e) within the window size (-w).\n");
-  fprintf(stderr, "-I/i\tstart time,            natural log of the starting time for computing population proportion.\n");
-  fprintf(stderr, "-J/j\tend time,              natural log of the ending time for computing population proportion.\n");
-  fprintf(stderr, "-K/k\tstarting structure,    structure for which the probability at time 0 is equal to 1. If not provided, the empty structure is used / inferred.\n");
-  fprintf(stderr, "-L/l\tending structure,      structure of interest for detailed population proportion values. If not provided, the MFE structure is used / inferred.\n");
-  fprintf(stderr, "-M/m\tenergy cap,            default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
-  fprintf(stderr, "-N/n\t(n)o soft bounds,      default is disabled. When enabled, the population proportion / equilibrium time will not use soft bounds computed with the -d delta value, and instead will compute population proportion / equilibrium over the entire timespan (timespan can be adjusted with -i and -j).\n");
-  fprintf(stderr, "-O/o\tl(o)nely basepairs,    default is disabled. When enabled, RNAsubopt will sample structures containing lonely base pairs.\n");
-  fprintf(stderr, "-P/p\tste(p) size,           natrual log of the step size for computing population proportion (start_time < start_time + step_size <= end_time).\n");
-  fprintf(stderr, "-Q/q\te(q)uilibrium,         Compute the equilibrium time for the target state. Uses an approximation technique that looks at occupancy deviation within a sliding window, parameterized by -e and -w.\n");
-  fprintf(stderr, "-R/r\tse(r)ialize direction, default is disabled. If passed with the value '1', then the eigensystem and its inversion will be serialized to the file specified by the -f flag. If passed with the value '-1', the file specified by the -f flag will be deserialized and used for computing the data of interest.\n");
-  fprintf(stderr, "-S/s\t(s)equence,            sequence of interest for computing population proportions.\n");
-  fprintf(stderr, "-T/t\t(t)emperature,         temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
-  fprintf(stderr, "-V/v\t(v)erbose,             default is disabled, presents some debug information at runtime.\n\n");
-  fprintf(stderr, "-W/w\t(w)indow size,         default is 5. Specifies the window size (exclusive) for predicting equilibrium. Equilibrium is considered as having been achieved when all indices (i + 1)..(i + window_size - 1) are within epsilon (-e) of the population proportion at time i.\n");
-  fprintf(stderr, "-Z/z\tend state,             default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the ending structure (see options for -l).\n\n");
+  fprintf(stderr, "-a\tstart state,           default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the starting structure (see options for -k).\n");
+  fprintf(stderr, "-b\t(b)enchmarking,        default is disabled. When enabled, RNAeq will print benchmarking times for internal function calls.\n");
+  fprintf(stderr, "-c\t(C)SV input file,      this option is made available to abstain from providing the input CSV as the last command line argument.\n");
+  fprintf(stderr, "-d\t(d)elta range,         default is disabled. When provided, this value specifies the delta-size required for the population to be approaching equilibrium. This position is used as a starting point for a more fine-grained scan using the -e and -w values.\n");
+  fprintf(stderr, "-e\t(e)psilon,             default is disabled. When provided, we will output the time at which the equilibrium stable within -e for a window of size -w.\n");
+  fprintf(stderr, "-f\tbin (f)ilename,        Provided in conjunction with the -r flag to specify the read / write file for serializing the eigensystem.\n");
+  fprintf(stderr, "-g\tei(g)envalues only,    default is disabled. When enabled, RNAeq will only generate the eigenvalues for the transition rate matrix.\n");
+  fprintf(stderr, "-h\tall subpop. in eq.,    default is disabled. When provided alongside the -q flag, the equilibrium time is estimated for when *all* subpopulations approach equilibrium, rather than when just the start-to-end state curve (-a to -z) doesn't deviate more than epsilon (-e) within the window size (-w).\n");
+  fprintf(stderr, "-i\tstart time,            natural log of the starting time for computing population proportion.\n");
+  fprintf(stderr, "-j\tend time,              natural log of the ending time for computing population proportion.\n");
+  fprintf(stderr, "-k\tstarting structure,    structure for which the probability at time 0 is equal to 1. If not provided, the empty structure is used / inferred.\n");
+  fprintf(stderr, "-l\tending structure,      structure of interest for detailed population proportion values. If not provided, the MFE structure is used / inferred.\n");
+  fprintf(stderr, "-m\tenergy cap,            default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
+  fprintf(stderr, "-n\t(n)o soft bounds,      default is disabled. When enabled, the population proportion / equilibrium time will not use soft bounds computed with the -d delta value, and instead will compute population proportion / equilibrium over the entire timespan (timespan can be adjusted with -i and -j).\n");
+  fprintf(stderr, "-o\tl(o)nely basepairs,    default is disabled. When enabled, RNAsubopt will sample structures containing lonely base pairs.\n");
+  fprintf(stderr, "-p\tste(p) size,           natrual log of the step size for computing population proportion (start_time < start_time + step_size <= end_time).\n");
+  fprintf(stderr, "-q\te(q)uilibrium,         Compute the equilibrium time for the target state. Uses an approximation technique that looks at occupancy deviation within a sliding window, parameterized by -e and -w.\n");
+  fprintf(stderr, "-r\tse(r)ialize direction, default is disabled. If passed with the value '1', then the eigensystem and its inversion will be serialized to the file specified by the -f flag. If passed with the value '-1', the file specified by the -f flag will be deserialized and used for computing the data of interest.\n");
+  fprintf(stderr, "-s\t(s)equence,            sequence of interest for computing population proportions.\n");
+  fprintf(stderr, "-t\t(t)emperature,         temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
+  fprintf(stderr, "-v\t(v)erbose,             default is disabled, presents some debug information at runtime.\n\n");
+  fprintf(stderr, "-w\t(w)indow size,         default is 5. Specifies the window size (exclusive) for predicting equilibrium. Equilibrium is considered as having been achieved when all indices (i + 1)..(i + window_size - 1) are within epsilon (-e) of the population proportion at time i.\n");
+  fprintf(stderr, "-z\tend state,             default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the ending structure (see options for -l).\n\n");
 }

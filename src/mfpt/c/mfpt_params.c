@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include "mfpt_params.h"
+#include "shared/constants.h"
 
 MFPT_PARAMS init_mfpt_params() {
   MFPT_PARAMS parameters = {
@@ -20,6 +21,10 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usag
   int c;
   
   while ((c = getopt(argc, argv, "lvc:")) != -1) {
+    #ifdef INPUT_DEBUG
+      printf("parse_mfpt_args: %c\n", c);
+    #endif
+    
     switch (c) {
       case 'l':
         parameters->all_mfpt = 1;
@@ -34,29 +39,23 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usag
         break;
         
       case '?':
+        #ifdef INPUT_DEBUG
+          printf("\tcase '?' with %c\n", optopt);
+        #endif
+      
         switch (optopt) {
           case 'c':
             fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-            break;
+            (*usage)();
             
           default:
-            if (isprint(optopt)) {
-              fprintf(stderr, "Unknown option `-%c'.\n", optopt);
-            } else {
-              fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
-            }
+            break;
         }
         
-        (*usage)();
+        break;
         
       default:
         (*usage)();
-    }
-  }
-  
-  if (parameters->input_file == NULL) {
-    if (optind + 1 == argc) {
-      parameters->input_file = strdup(argv[optind]);
     }
   }
   

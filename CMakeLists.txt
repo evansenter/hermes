@@ -83,8 +83,8 @@ add_subdirectory(src/fftbor2d)
 add_subdirectory(src/mfpt)
 add_subdirectory(src/population)
 
-add_subdirectory(ext/mfpt_from_fftbor2d)
-add_subdirectory(ext/population_from_fftbor2d)
-add_subdirectory(ext/population_from_rate_matrix)
+# add_subdirectory(ext/mfpt_from_fftbor2d)
+# add_subdirectory(ext/population_from_fftbor2d)
+# add_subdirectory(ext/population_from_rate_matrix)
 
 INSTALL(FILES misc/rna_turner1999.par misc/rna_turner2004.par DESTINATION bin)

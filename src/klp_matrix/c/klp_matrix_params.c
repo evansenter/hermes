@@ -3,6 +3,7 @@
 #include <string.h>
 #include <getopt.h>
 #include "klp_matrix_params.h"
+#include "shared/constants.h"
 
 KLP_PARAMS init_klp_matrix_params() {
   KLP_PARAMS parameters = {
@@ -21,113 +22,121 @@ KLP_PARAMS init_klp_matrix_params() {
 }
 
 void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
-  int c, option_index = 0;
+  int c, i;
+  optind          = 1;
+  opterr          = 0;
+  char** argv_dup = malloc(argc * sizeof(char*));
   
-  while (1) {
-    static struct option long_options[] = {
-      { "start_state",       required_argument, 0, 'A' },
-      { "end_state",         required_argument, 0, 'Z' },
-      { "bp_dist",           required_argument, 0, 'D' },
-      { "max_dist",          required_argument, 0, 'N' },
-      { "epsilon",           required_argument, 0, 'O' },
-      { "fully_connected",   no_argument,       0, 'F' },
-      { "transition_matrix", no_argument,       0, 'T' },
-      { "single_bp_only",    no_argument,       0, 'X' },
-      { "energy_based",      no_argument,       0, 'E' },
-      { "hastings",          no_argument,       0, 'H' },
-      { "rate_matrix",       no_argument,       0, 'R' },
-      { "verbose",           no_argument,       0, 'V' },
-      { 0,                   0,                 0,  0  }
-    };
+  for (i = 0; i < argc; ++i) {
+    argv_dup[i] = strdup(argv[i]);
+    #ifdef INPUT_DEBUG
+      printf("Duping arg %d: %s\n", i, argv_dup[i]);
+    #endif
+  }
+  
+  while (optind < argc) {
+    if ((c = getopt(argc, argv_dup, "A:Z:N:D:O:FTXEHRV")) != -1) {
+      #ifdef INPUT_DEBUG
+        printf("parse_klp_matrix_args: %c\n", c);
+      #endif
     
-    c = getopt_long(argc, argv, "A:Z:D:N:O:FTXEHRV", long_options, &option_index);
-    
-    if (c == -1) {
-      break;
-    }
-    
-    switch (c) {
-      case 0:
-        break;
+      switch (c) {
+        case 'F':
+          parameters->run_type = FULLY_CONNECTED_FLAG;
+          break;
         
-      case 'F':
-        parameters->run_type = FULLY_CONNECTED_FLAG;
-        break;
+        case 'T':
+          parameters->run_type = TRANSITION_INPUT_FLAG;
+          break;
         
-      case 'T':
-        parameters->run_type = TRANSITION_INPUT_FLAG;
-        break;
+        case 'X':
+          parameters->run_type = DIAG_MOVES_ONLY_FLAG;
+          break;
         
-      case 'X':
-        parameters->run_type = DIAG_MOVES_ONLY_FLAG;
-        break;
+        case 'E':
+          parameters->energy_based = 1;
+          break;
         
-      case 'E':
-        parameters->energy_based = 1;
-        break;
+        case 'H':
+          parameters->hastings = 1;
+          break;
         
-      case 'H':
-        parameters->hastings = 1;
-        break;
+        case 'R':
+          parameters->rate_matrix = 1;
+          break;
         
-      case 'R':
-        parameters->rate_matrix = 1;
-        break;
+        case 'V':
+          parameters->verbose = 1;
+          break;
         
-      case 'V':
-        parameters->verbose = 1;
-        break;
+        case 'A':
+          if (!sscanf(optarg, "%d", &parameters->start_state)) {
+            (*usage)();
+          } else if (parameters->start_state < 0) {
+            (*usage)();
+          }
         
-      case 'A':
-        if (!sscanf(optarg, "%d", &parameters->start_state)) {
-          (*usage)();
-        } else if (parameters->start_state < 0) {
-          (*usage)();
-        }
+          break;
         
-        break;
+        case 'Z':
+          if (!sscanf(optarg, "%d", &parameters->end_state)) {
+            (*usage)();
+          } else if (parameters->end_state < 0) {
+            (*usage)();
+          }
         
-      case 'Z':
-        if (!sscanf(optarg, "%d", &parameters->end_state)) {
-          (*usage)();
-        } else if (parameters->end_state < 0) {
-          (*usage)();
-        }
+          break;
         
-        break;
+        case 'N':
+          if (!sscanf(optarg, "%d", &parameters->max_dist)) {
+            (*usage)();
+          } else if (parameters->max_dist <= 0) {
+            (*usage)();
+          }
         
-      case 'N':
-        if (!sscanf(optarg, "%d", &parameters->max_dist)) {
-          (*usage)();
-        } else if (parameters->max_dist <= 0) {
-          (*usage)();
-        }
+          break;
         
-        break;
+        case 'D':
+          if (!sscanf(optarg, "%d", &parameters->bp_dist)) {
+            (*usage)();
+          } else if (parameters->bp_dist <= 0) {
+            (*usage)();
+          }
         
-      case 'D':
-        if (!sscanf(optarg, "%d", &parameters->bp_dist)) {
-          (*usage)();
-        } else if (parameters->bp_dist <= 0) {
-          (*usage)();
-        }
+          break;
         
-        break;
+        case 'O':
+          if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
+            (*usage)();
+          } else if (parameters->epsilon <= 1e-16) {
+            (*usage)();
+          }
         
-      case 'O':
-        if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
-          (*usage)();
-        } else if (parameters->epsilon <= 1e-16) {
-          (*usage)();
-        }
-        
-        break;
-        
-      case '?':
-        (*usage)();
-        
-      default:
-        (*usage)();
+          break;
+                
+        case '?':
+          #ifdef INPUT_DEBUG
+            printf("\tcase '?' with %c\n", optopt);
+          #endif
+          
+          switch (optopt) {
+            case 'A':
+            case 'Z':
+            case 'N':
+            case 'D':
+            case 'O':
+              fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+              (*usage)();
+          
+            default:
+              break;
+          }
+
+        default:
+          break;
+      }
+    } else {
+      optind++;
     }
   }
   
@@ -147,49 +156,49 @@ int klp_matrix_error_handling(const KLP_PARAMS parameters) {
   
   // Type of run check.
   if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) + RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG) + RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) != 1) {
-    fprintf(stderr, "Error: exactly one of -t, -x or -f must be provided!\n");
+    fprintf(stderr, "Error: exactly one of -T, -X or -F must be provided!\n");
     error++;
   }
   
   // Transition matrix input requirements.
   if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) && !(parameters.start_state >= 0 && parameters.end_state >= 0)) {
-    fprintf(stderr, "Error: if the -t flag is provided, -a and -z must be explicitly set!\n");
+    fprintf(stderr, "Error: if the -T flag is provided, -A and -Z must be explicitly set!\n");
     error++;
   }
   
   // Transition matrix input restrictions.
   if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) && (parameters.hastings || parameters.energy_based)) {
-    fprintf(stderr, "Error: if the -t flag is provided, -h and -e are not permitted!\n");
+    fprintf(stderr, "Error: if the -T flag is provided, -H and -E are not permitted!\n");
     error++;
   }
   
   // Fully connected graph restrictions.
   if (RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) && (parameters.hastings || parameters.energy_based)) {
-    fprintf(stderr, "Error: if the -f flag is provided, -h and -e are not permitted (or -a and -z without -d)!\n");
+    fprintf(stderr, "Error: if the -F flag is provided, -H and -E are not permitted (or -A and -Z without -D)!\n");
     error++;
   }
   
   // Extending k/l/p restrictions.
   if (parameters.max_dist && parameters.energy_based) {
-    fprintf(stderr, "Error: if the -n flag is provided, -e is not permitted!\n");
+    fprintf(stderr, "Error: if the -N flag is provided, -E is not permitted!\n");
     error++;
   }
   
   // If we're extending k/l/p we need to know how the user wants the zero-positions filled.
   if (parameters.max_dist && !parameters.epsilon) {
-    fprintf(stderr, "Error: if using the full grid (bounded by -n), -o needs to be specified for populating 0-probability positions!\n");
+    fprintf(stderr, "Error: if using the full grid (bounded by -N), -O needs to be specified for populating 0-probability positions!\n");
     error++;
   }
   
   // If we're willing the zero-positions, we need to know the bounding size.
   if (parameters.epsilon && !parameters.max_dist) {
-    fprintf(stderr, "Error: if using -o, the full grid (bounded by -n) needs to be specified for populating 0-probability positions!\n");
+    fprintf(stderr, "Error: if using -O, the full grid (bounded by -N) needs to be specified for populating 0-probability positions!\n");
     error++;
   }
   
   // MFPT will be 0.
   if (parameters.start_state == parameters.end_state && parameters.start_state >= 0) {
-    fprintf(stderr, "Error: if the -a and -z flags are identical the MFPT is 0!\n");
+    fprintf(stderr, "Error: if the -A and -Z flags are identical the MFPT is 0!\n");
     error++;
   }
   
@@ -251,5 +260,5 @@ void klp_matrix_flags() {
   fprintf(stderr, "-T\t(t)ransition matrix input,  default is disabled. If this flag is provided, the input is expected to be a transition probability matrix, rather than a 2D energy grid. In this case, the first two columns in the CSV file are row-order indices into the transition probability matrix, and the third (final) column is the transition probability of that cell.\n");
   fprintf(stderr, "-V\tverbose,                    default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n");
   fprintf(stderr, "-X\tsingle basepair moves,      default is enabled. If this flag is provided, the input must be in the form of an energy grid, and only diagonally adjacent moves are permitted. This option makes the assumption that the input is *not* a transition probability matrix already, and the input energy grid already satisfies the triangle inequality / parity condition.\n");
-  fprintf(stderr, "-Z\tend state,                  default is -1 (inferred from input data as the first row in the CSV whose entry in the second column is 0). If provided, should indicate the 0-indexed line in the input CSV file representing the end state.\n\n");
+  fprintf(stderr, "-Z\tend state,                  default is -1 (inferred from input data as the first row in the CSV whose entry in the second column is 0). If provided, should indicate the 0-indexed line in the input CSV file representing the end state.\n");
 }
