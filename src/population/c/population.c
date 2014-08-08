@@ -23,6 +23,7 @@ int main(int argc, char** argv) {
   int i, num_structures = 0;
   
   klp_params = init_klp_matrix_params();
+  klp_params.rate_matrix = 1;
   parameters = init_population_params();
   parse_klp_matrix_args(&klp_params, argc, argv, &population_usage);
   parse_population_args(&klp_params, &parameters, argc, argv, &population_usage);
@@ -73,6 +74,18 @@ int main(int argc, char** argv) {
         TIMING(start, stop, "subopt initialization")
         gettimeofday(&start, NULL);
       }
+      
+      transition_matrix = convert_structures_to_transition_matrix(all_structures, num_structures);
+      
+      #ifdef INSANE_DEBUG
+        print_matrix("transition_matrix", transition_matrix.matrix, transition_matrix.row_length);
+      #endif
+        
+      if (parameters.benchmark) {
+        gettimeofday(&stop, NULL);
+        TIMING(start, stop, "convert_structures_to_transition_matrix")
+        gettimeofday(&start, NULL);
+      }
     }
   }
   
@@ -85,17 +98,6 @@ int main(int argc, char** argv) {
       gettimeofday(&start, NULL);
     }
   } else {
-    transition_matrix = convert_structures_to_transition_matrix(all_structures, num_structures);
-#ifdef INSANE_DEBUG
-    print_matrix("transition_matrix", transition_matrix.matrix, transition_matrix.row_length);
-#endif
-    
-    if (parameters.benchmark) {
-      gettimeofday(&stop, NULL);
-      TIMING(start, stop, "convert_structures_to_transition_matrix")
-      gettimeofday(&start, NULL);
-    }
-    
     eigensystem = convert_transition_matrix_to_eigenvectors(transition_matrix);
     
     if (parameters.benchmark) {

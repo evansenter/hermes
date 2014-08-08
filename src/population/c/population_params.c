@@ -300,18 +300,35 @@ int population_error_handling(const KLP_PARAMS klp_params, const POPULATION_PARA
 
 void debug_population_parameters(const POPULATION_PARAMS parameters) {
   printf("RNAeq parameters\n");
-  printf("(c) input_file\t\t\t%s\n",            parameters.input_file);
-  printf("(s) sequence\t\t\t%s\n",              parameters.sequence);
-  printf("(k) start_structure\t\t%s\n",         parameters.sequence != NULL && parameters.start_structure == NULL ? "empty" : parameters.start_structure);
-  printf("(l) end_structure\t\t%s\n",           parameters.sequence != NULL && parameters.end_structure == NULL ? "mfe" : parameters.end_structure);
-  printf("(f) filename\t\t\t%s\n",              parameters.filename);
-  printf("(r) serialize\t\t\t%d\n",             parameters.serialize);
-  printf("(t) temperature\t\t\t%.1f\n",         parameters.temperature);
+  printf("(c) input_file\t\t\t%s\n", parameters.input_file);
+
+  if (parameters.sequence != NULL) {
+    printf("(s) sequence\t\t\t%s\n",              parameters.sequence);
+    printf("(k) start_structure\t\t%s\n",         parameters.sequence != NULL && parameters.start_structure == NULL ? "empty" : parameters.start_structure);
+    printf("(l) end_structure\t\t%s\n",           parameters.sequence != NULL && parameters.end_structure == NULL ? "mfe" : parameters.end_structure);
+    printf("(t) temperature\t\t\t%.1f\n",         parameters.temperature);
+    printf("(o) lonely_bp\t\t\t%s\n",             parameters.lonely_bp ? "Yes" : "No");
+    printf("(m) energy_cap\t\t\t%.1f kcal/mol\n", parameters.energy_cap ? parameters.energy_cap : 10000);
+  } else {
+    printf("(s) sequence\t\t\t%s\n",      "N/A");
+    printf("(k) start_structure\t\t%s\n", "N/A");
+    printf("(l) end_structure\t\t%s\n",   "N/A");
+    printf("(t) temperature\t\t\t%s\n",   "N/A");
+    printf("(o) lonely_bp\t\t\t%s\n",     "N/A");
+    printf("(m) energy_cap\t\t\t%s\n",    "N/A");
+  }
+
+  if (parameters.filename != NULL) {
+    printf("(f) filename\t\t\t%s\n",  parameters.filename);
+    printf("(r) serialize\t\t\t%s\n", (parameters.serialize == -1 ? "writing" : (parameters.serialize == 1 ? "reading" : "unset")));
+  } else {
+    printf("(f) filename\t\t\t%s\n",  "N/A");
+    printf("(r) serialize\t\t\t%s\n", "N/A");
+  }
+
   printf("(i) start_time\t\t\t%.2e\n",          parameters.start_time);
   printf("(j) end_time\t\t\t%.2e\n",            parameters.end_time);
   printf("(p) step_size\t\t\t%.2e\n",           parameters.step_size);
-  printf("(o) lonely_bp\t\t\t%s\n",             parameters.lonely_bp ? "Yes" : "No");
-  printf("(m) energy_cap\t\t\t%.1f kcal/mol\n", parameters.energy_cap ? parameters.energy_cap : 10000);
   printf("(q) equilibrium\t\t\t%s\n",           parameters.equilibrium ? "Yes" : "No");
   printf("(e) epsilon\t\t\t%.2e\n",             parameters.epsilon);
   printf("(d) delta\t\t\t%.2e\n",               parameters.delta);
