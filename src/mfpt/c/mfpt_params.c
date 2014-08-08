@@ -12,6 +12,7 @@ MFPT_PARAMS init_mfpt_params() {
     .input_file    = NULL,
     .all_mfpt      = 0,
     .input         = 1,
+    .benchmark     = 0,
     .verbose       = 0
   };
   return parameters;
@@ -21,7 +22,7 @@ void parse_mfpt_args(KLP_PARAMS* klp_params, MFPT_PARAMS* parameters, int argc, 
   int c;
   opterr = 0;
   
-  while ((c = getopt(argc, argv, "lvc:")) != -1) {
+  while ((c = getopt(argc, argv, "lbvc:")) != -1) {
     #ifdef INPUT_DEBUG
       printf("parse_mfpt_args: %c\n", c);
     #endif
@@ -29,6 +30,10 @@ void parse_mfpt_args(KLP_PARAMS* klp_params, MFPT_PARAMS* parameters, int argc, 
     switch (c) {
       case 'l':
         parameters->all_mfpt = 1;
+        break;
+        
+      case 'b':
+        parameters->benchmark = 1;
         break;
         
       case 'v':
@@ -104,6 +109,7 @@ void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
   printf("RNAmfpt parameters\n");
   printf("(c) input_file\t\t\t%s\n", parameters.input_file);
   printf("(l) all_mfpt\t\t\t%s\n",   parameters.all_mfpt ? "Yes" : "No");
+  printf("(b) benchmark\t\t\t%s\n",  parameters.benchmark ? "Yes" : "No");
   
   printf("\n");
 }
@@ -122,6 +128,7 @@ void mfpt_usage() {
 }
 
 void mfpt_flags() {
+  fprintf(stderr, "-b\t(b)enchmarking,             default is disabled. When enabled, will print benchmarking times for internal function calls.\n");
   fprintf(stderr, "-c\t(C)SV input file,           this option is made available to abstain from providing the input CSV as the last command line argument.\n");
   fprintf(stderr, "-l\tprint a(l)l MFPT,           if this flag is provided, the program will print the MFPT for every non-end state to hit the end state, and then print the same beginning -> end MFPT that is printed without this flag. Indices for the MFPT correspond to 0-ordered indices in the transition probability matrix.\n");
   fprintf(stderr, "-v\tverbose,                    default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n");

@@ -9,7 +9,6 @@
 #include "shared/libklp_matrix_header.h"
 #include "shared/timers.h"
 
-
 int main(int argc, char** argv) {
   KLP_PARAMS klp_params;
   POPULATION_PARAMS parameters;
@@ -26,7 +25,7 @@ int main(int argc, char** argv) {
   parse_klp_matrix_args(&klp_params, argc, argv, &population_usage);
   parse_population_args(&klp_params, &parameters, argc, argv, &population_usage);
   
-  START_ALL_TIMING
+  START_ALL_TIMERS
   
   // If we're not deserializing an input binary eigensystem (which doesn't necessarily mean we're serializing something), we need to setup the eigensystem
   // from the user input.
@@ -79,21 +78,21 @@ int main(int argc, char** argv) {
   
   if (parameters.eigen_only) {
     print_eigenvalues(eigensystem);
-    STOP_TIMING("print_eigenvalues")
+    TIMING_WITHOUT_RESTART("print_eigenvalues")
   } else if (parameters.equilibrium) {
     print_equilibrium(eigensystem, klp_params, parameters);
-    STOP_TIMING("print_equilibrium")
+    TIMING_WITHOUT_RESTART("print_equilibrium")
   } else if (SERIALIZING(parameters)) {
     serialize_eigensystem(eigensystem, parameters);
-    STOP_TIMING("serialize_eigensystem")
+    TIMING_WITHOUT_RESTART("serialize_eigensystem")
   } else {
     print_population_proportion(eigensystem, klp_params, parameters);
-    STOP_TIMING("print_population_proportion")
+    TIMING_WITHOUT_RESTART("print_population_proportion")
   }
   
   free_eigensystem(eigensystem);
   
-  STOP_ALL_TIMING
+  STOP_REMAINING_TIMERS
   
   return 0;
 }

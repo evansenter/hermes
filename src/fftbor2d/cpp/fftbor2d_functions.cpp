@@ -21,7 +21,6 @@
 #define ROOT_POW(i, pow, n) (data.roots_of_unity[((i) * (pow)) % (n)])
 #define PRINT_COMPLEX(i, complex) printf("%d: %+f %+fi\n", i, complex[i].real(), complex[i].imag())
 
-// #define SILENCE_OUTPUT  1
 // #define FFTBOR_DEBUG    1
 // #define TWIDDLE_DEBUG   1
 // #define MEASURE_TWIDDLE 1

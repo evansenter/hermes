@@ -276,8 +276,8 @@ void debug_fftbor2d_parameters(const FFTBOR2D_PARAMS parameters) {
   printf("    format\t\t\t%c\n",        parameters.format);
   printf("(t) temperature\t\t\t%.1f\n", temperature);
   printf("(p) precision\t\t\t%d\n",     parameters.precision);
-  printf("(b) benchmark\t\t\t%s\n",     parameters.benchmark ? "Yes" : "No");
   printf("(e) energy_file\t\t\t%s\n",   parameters.energy_file);
+  printf("(b) benchmark\t\t\t%s\n",     parameters.benchmark ? "Yes" : "No");
   
   printf("\n");
 }

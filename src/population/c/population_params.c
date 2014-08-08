@@ -355,7 +355,7 @@ void population_usage() {
 }
 
 void population_flags() {
-  fprintf(stderr, "-b\t(b)enchmarking,        default is disabled. When enabled, RNAeq will print benchmarking times for internal function calls.\n");
+  fprintf(stderr, "-b\t(b)enchmarking,        default is disabled. When enabled, will print benchmarking times for internal function calls.\n");
   fprintf(stderr, "-c\t(C)SV input file,      this option is made available to abstain from providing the input CSV as the last command line argument.\n");
   fprintf(stderr, "-d\t(d)elta range,         default is disabled. When provided, this value specifies the delta-size required for the population to be approaching equilibrium. This position is used as a starting point for a more fine-grained scan using the -e and -w values.\n");
   fprintf(stderr, "-e\t(e)psilon,             default is disabled. When provided, we will output the time at which the equilibrium stable within -e for a window of size -w.\n");
