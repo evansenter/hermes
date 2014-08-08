@@ -9,29 +9,34 @@ echo "Testing FFTbor2D, expecting:
 2	5	+0.16642614	-0.31104020
 3	0	+0.70406341	-1.20000002"
 echo "Result:"
-../bin/FFTbor2D -s GGGAAACCC "........." "(((...)))"
+../bin/FFTbor2D -s -i GGGAAACCC -j "........." -k "(((...)))"
 
+echo
 echo "Testing RNAmfpt, expecting:
 +699.65148561"
 echo "Result:"
-../bin/RNAmfpt -c ../src/mfpt/example.csv -xh
+../bin/RNAmfpt -c ../src/mfpt/example.csv -XH
 
+echo
 echo "Testing RNAeq, expecting:
 +1.000000	+0.70407025	+0.10047166"
 echo "Result:"
 ../bin/RNAeq -o -s GGGAAACCC -l "(((...)))" -i 0 -j 1 -p 1
 
+echo
 echo "Testing FFTmfpt, expecting:
 6786.738209"
 echo "Result:"
-../bin/FFTmfpt --fftbor2d-i GGGAAACCC --fftbor2d-j "........." --fftbor2d-k "(((...)))" --mfpt-x --mfpt-h
+../bin/FFTmfpt --fftbor2d-i GGGAAACCC --fftbor2d-j "........." --fftbor2d-k "(((...)))" --mfpt-X --mfpt-H
 
+echo
 echo "Testing FFTeq, expecting:
 +3.000000	+0.33271632	+0.03369467"
 echo "Result:"
 ../bin/FFTeq --fftbor2d-i GGGGGCCCCC --fftbor2d-j ".........." --fftbor2d-k "(((....)))" --population-i 2 --population-j 3 --population-p 1
 
+echo
 echo "Testing RateEq, expecting:
 3.235000"
 echo "Result:"
-../bin/RateEq --mfpt-c ../ext/population_from_rate_matrix/all_structures_for_gggaaaccc__19_5_rate_move_without_hastings.csv --population-a 19 --population-z 5 --population-q
+../bin/RateEq --mfpt-c ../ext/population_from_rate_matrix/all_structures_for_gggaaaccc__19_5_rate_move_without_hastings.csv --population-A 19 --population-Z 5 --population-q

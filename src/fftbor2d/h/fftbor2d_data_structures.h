@@ -7,6 +7,7 @@
 typedef std::complex<double> dcomplex;
 
 typedef struct { // Variables are sorted by the order they get instantiated, do not change (structs suck in C++).
+  char* input_file;
   char* sequence;
   char* structure_1;
   char* structure_2;

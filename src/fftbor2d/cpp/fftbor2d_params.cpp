@@ -16,6 +16,7 @@
 
 FFTBOR2D_PARAMS init_fftbor2d_params() {
   FFTBOR2D_PARAMS parameters = {
+    NULL,                                  // filename
     NULL,                                  // sequence
     NULL,                                  // structure_1
     NULL,                                  // structure_2
@@ -42,7 +43,7 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, voi
   opterr = 0;
   
   while (optind < argc) {
-    if ((c = getopt(argc, argv, "vbmsct:e:i:j:k:p:")) != -1) {
+    if ((c = getopt(argc, argv, "vbmsct:e:f:i:j:k:p:")) != -1) {
       #ifdef INPUT_DEBUG
         printf("parse_mfpt_args: %c\n", c);
       #endif
@@ -89,6 +90,10 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, voi
           break;
         
         
+        case 'f':
+          parameters.input_file = strdup(optarg);
+          break;
+        
         case 'i':
           parameters.sequence   = strdup(optarg);
           parameters.seq_length = strlen(parameters.sequence);
@@ -128,13 +133,11 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, voi
     }
   }
   
-  if (parameters.sequence == NULL || parameters.structure_1 == NULL || parameters.structure_2 == NULL) {
-    if (optind == argc) {
-      (*usage)();
-    } else {
-      parse_fftbor2d_sequence_data(argc, argv, optind, parameters, &fftbor2d_usage);
-    }
+  if (parameters.input_file != NULL) {
+    parse_fftbor2d_data_from_file(parameters, &fftbor2d_usage);
   }
+  
+  
   
   if (parameters.verbose) {
     debug_fftbor2d_parameters(parameters);
@@ -147,80 +150,72 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, voi
   optind = 1;
 }
 
-void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARAMS& parameters, void (*usage)()) {
-  int i, char_index = 0;
+void parse_fftbor2d_data_from_file(FFTBOR2D_PARAMS& parameters, void (*usage)()) {
+  int char_index = 0;
   FILE* file;
   char line[MAX_LENGTH];
-  file = fopen(argv[argp], "r");
   
-  if (file == NULL) {
-    /* Input is not a file */
-    /* argv[argp] should be sequence and argv[argp + 1], argv[argp + 2] should be structures */
-    if (argc <= argp + 2) {
-      (*usage)();
-    }
-    
-    parameters.seq_length  = strlen(argv[argp]);
-    parameters.sequence    = (char*)calloc(parameters.seq_length + 1, sizeof(char));
-    parameters.structure_1 = (char*)calloc(parameters.seq_length + 1, sizeof(char));
-    parameters.structure_2 = (char*)calloc(parameters.seq_length + 1, sizeof(char));
-    sscanf(argv[argp++], "%s", parameters.sequence);
-    sscanf(argv[argp++], "%s", parameters.structure_1);
-    sscanf(argv[argp],   "%s", parameters.structure_2);
-  } else {
-    /* Input is a file */
-    if (fgets(line, sizeof(line), file) == NULL) {
-      fprintf(stderr, "There was an error reading file\n");
-      exit(0);
-    }
-    
-    while (*line == '*' || *line == '\0' || *line == '>') {
-      if (fgets(line, sizeof(line), file) == NULL) {
-        break;
-      }
-    }
-    
-    if (line == NULL) {
-      (*usage)();
-    }
-    
-    // This was a tricky bug to catch, fgets (perhaps obviously) reads a line in, including \n character,
-    // which is different from terminating character \0, making data.seq_length off by one.
-    while (line[char_index] != '\0' && char_index < MAX_LENGTH) {
-      if (line[char_index] == '\n') {
-        line[char_index] = '\0';
-      }
-      
-      char_index++;
-    }
-    
-    parameters.seq_length  = strlen(line);
-    parameters.sequence    = (char*)calloc(parameters.seq_length + 1, sizeof(char));
-    parameters.structure_1 = (char*)calloc(parameters.seq_length + 1, sizeof(char));
-    parameters.structure_2 = (char*)calloc(parameters.seq_length + 1, sizeof(char));
-    sscanf(line, "%s", parameters.sequence);
-    
-    if (fgets(line, sizeof(line), file) == NULL) {
-      fprintf(stderr, "There was an error reading file\n");
-      exit(0);
-    }
-    
-    sscanf(line, "%s", parameters.structure_1);
-    
-    if (fgets(line, sizeof(line), file) == NULL) {
-      fprintf(stderr, "There was an error reading file\n");
-      exit(0);
-    }
-    
-    sscanf(line, "%s", parameters.structure_2);
-    fclose(file);
+  if (access(parameters.input_file, R_OK) == -1) {
+    fprintf(stderr, "Error: can't read from file %s.\n", parameters.input_file);
+    (*usage)();
   }
+  
+  file = fopen(parameters.input_file, "r");
+  
+  if (fgets(line, sizeof(line), file) == NULL) {
+    fprintf(stderr, "Error: There was an error while reading file %s.\n", parameters.input_file);
+    (*usage)();
+  }
+  
+  while (*line == '*' || *line == '\0' || *line == '>') {
+    if (fgets(line, sizeof(line), file) == NULL) {
+      break;
+    }
+  }
+  
+  if (line == NULL) {
+    (*usage)();
+  }
+  
+  // This was a tricky bug to catch, fgets (perhaps obviously) reads a line in, including \n character,
+  // which is different from terminating character \0, making data.seq_length off by one.
+  while (line[char_index] != '\0' && char_index < MAX_LENGTH) {
+    if (line[char_index] == '\n') {
+      line[char_index] = '\0';
+    }
+    
+    char_index++;
+  }
+  
+  parameters.seq_length  = strlen(line);
+  parameters.sequence    = (char*)calloc(parameters.seq_length + 1, sizeof(char));
+  parameters.structure_1 = (char*)calloc(parameters.seq_length + 1, sizeof(char));
+  parameters.structure_2 = (char*)calloc(parameters.seq_length + 1, sizeof(char));
+  sscanf(line, "%s", parameters.sequence);
+  
+  if (fgets(line, sizeof(line), file) == NULL) {
+    fprintf(stderr, "Error: There was an error while reading file %s.\n", parameters.input_file);
+    (*usage)();
+  }
+  
+  sscanf(line, "%s", parameters.structure_1);
+  
+  if (fgets(line, sizeof(line), file) == NULL) {
+    fprintf(stderr, "Error: There was an error while reading file %s.\n", parameters.input_file);
+    (*usage)();
+  }
+  
+  sscanf(line, "%s", parameters.structure_2);
+  fclose(file);
   
   parameters.sequence[parameters.seq_length]    = '\0';
   parameters.structure_1[parameters.seq_length] = '\0';
   parameters.structure_2[parameters.seq_length] = '\0';
+}
+
+void sanitize_sequence_and_structure_parameters(FFTBOR2D_PARAMS& parameters) {
+  int i;
   
-  /* Convert RNA sequence to uppercase and make sure there are no Ts in sequence (replace by U). */
   for (i = 0; i < parameters.seq_length; ++i) {
     parameters.sequence[i] = toupper(parameters.sequence[i]);
     
@@ -233,19 +228,24 @@ void parse_fftbor2d_sequence_data(int argc, char** argv, int argp, FFTBOR2D_PARA
 int fftbor2d_error_handling(const FFTBOR2D_PARAMS parameters) {
   int error = 0;
   
-  if (!TRIEQUALS(strlen(parameters.sequence), strlen(parameters.structure_1), strlen(parameters.structure_2))) {
-    fprintf(
-      stderr,
-      "(%d) %s\n(%d) %s\n(%d) %s\n",
-      (int)strlen(parameters.sequence),
-      parameters.sequence,
-      (int)strlen(parameters.structure_1),
-      parameters.structure_1,
-      (int)strlen(parameters.structure_2),
-      parameters.structure_2
-    );
-    fprintf(stderr, "Length of RNA sequence and structures must be equal.\n");
+  if (TRIEQUALS(parameters.input_file, parameters.sequence, NULL)) {
+    fprintf(stderr, "Error: either an input file must be specified with -f or the sequence and structures via -i, -j, -k.\n");
     error++;
+  } else {
+    if (!TRIEQUALS(strlen(parameters.sequence), strlen(parameters.structure_1), strlen(parameters.structure_2))) {
+      fprintf(
+        stderr,
+        "(%d) %s\n(%d) %s\n(%d) %s\n",
+        (int)strlen(parameters.sequence),
+        parameters.sequence,
+        (int)strlen(parameters.structure_1),
+        parameters.structure_1,
+        (int)strlen(parameters.structure_2),
+        parameters.structure_2
+      );
+      fprintf(stderr, "Error: length of RNA sequence and structures must be equal.\n");
+      error++;
+    }
   }
   
   if (error) {
@@ -257,6 +257,7 @@ int fftbor2d_error_handling(const FFTBOR2D_PARAMS parameters) {
 
 void debug_fftbor2d_parameters(const FFTBOR2D_PARAMS parameters) {
   printf("FFTbor2D parameters:\n");
+  printf("(f) filename\t\t\t%s\n",      parameters.input_file != NULL ? parameters.input_file : "N/A");
   printf("(i) sequence\t\t\t%s\n",      parameters.sequence);
   printf("(j) structure_1\t\t\t%s\n",   parameters.structure_1);
   printf("(k) structure_2\t\t\t%s\n",   parameters.structure_2);

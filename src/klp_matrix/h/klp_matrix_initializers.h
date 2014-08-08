@@ -8,7 +8,7 @@ void free_klp_matrix(KLP_MATRIX);
 void print_klp_matrix(const KLP_MATRIX);
 TRANSITION_MATRIX init_transition_matrix(int, char);
 void free_transition_matrix(TRANSITION_MATRIX);
-void print_transition_matrix(const KLP_MATRIX, const TRANSITION_MATRIX);
+void print_transition_matrix(const TRANSITION_MATRIX);
 void print_transition_matrix_with_klp_positions(const KLP_MATRIX, const TRANSITION_MATRIX);
 
 #endif
