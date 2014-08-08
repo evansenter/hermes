@@ -113,9 +113,6 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
             case 'O':
               fprintf(stderr, "Option -%c requires an argument.\n", optopt);
               (*usage)();
-          
-            default:
-              break;
           }
           
           break;
@@ -143,25 +140,25 @@ int klp_matrix_error_handling(const KLP_PARAMS parameters) {
   int error = 0;
   
   // Type of run check.
-  if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) + RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG) + RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) != 1) {
+  if (RUN_TYPE(parameters.run_type, TRANSITION_INPUT_FLAG) + RUN_TYPE(parameters.run_type, DIAG_MOVES_ONLY_FLAG) + RUN_TYPE(parameters.run_type, FULLY_CONNECTED_FLAG) != 1) {
     fprintf(stderr, "Error: exactly one of -T, -X or -F must be provided!\n");
     error++;
   }
   
   // Transition matrix input requirements.
-  if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) && !(parameters.start_state >= 0 && parameters.end_state >= 0)) {
+  if (RUN_TYPE(parameters.run_type, TRANSITION_INPUT_FLAG) && !(parameters.start_state >= 0 && parameters.end_state >= 0)) {
     fprintf(stderr, "Error: if the -T flag is provided, -A and -Z must be explicitly set!\n");
     error++;
   }
   
   // Transition matrix input restrictions.
-  if (RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) && (parameters.hastings || parameters.energy_based)) {
+  if (RUN_TYPE(parameters.run_type, TRANSITION_INPUT_FLAG) && (parameters.hastings || parameters.energy_based)) {
     fprintf(stderr, "Error: if the -T flag is provided, -H and -E are not permitted!\n");
     error++;
   }
   
   // Fully connected graph restrictions.
-  if (RUN_TYPE(parameters, FULLY_CONNECTED_FLAG) && (parameters.hastings || parameters.energy_based)) {
+  if (RUN_TYPE(parameters.run_type, FULLY_CONNECTED_FLAG) && (parameters.hastings || parameters.energy_based)) {
     fprintf(stderr, "Error: if the -F flag is provided, -H and -E are not permitted (or -A and -Z without -D)!\n");
     error++;
   }
@@ -201,9 +198,9 @@ void debug_klp_matrix_parameters(const KLP_PARAMS parameters) {
   char* buffer = calloc(128, sizeof(char));
   
   printf("CSV parsing parameters:\n");
-  printf("(F) fully_connected\t\t%s\n",       RUN_TYPE(parameters, FULLY_CONNECTED_FLAG)  ? "Yes" : "No");
-  printf("(T) transition_matrix_input\t%s\n", RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) ? "Yes" : "No");
-  printf("(X) single_bp_moves_only\t%s\n",    RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG)  ? "Yes" : "No");
+  printf("(F) fully_connected\t\t%s\n",       RUN_TYPE(parameters.run_type, FULLY_CONNECTED_FLAG)  ? "Yes" : "No");
+  printf("(T) transition_matrix_input\t%s\n", RUN_TYPE(parameters.run_type, TRANSITION_INPUT_FLAG) ? "Yes" : "No");
+  printf("(X) single_bp_moves_only\t%s\n",    RUN_TYPE(parameters.run_type, DIAG_MOVES_ONLY_FLAG)  ? "Yes" : "No");
   printf("(E) energy_based\t\t%s\n",          parameters.energy_based                     ? "Yes" : "No");
   printf("(H) hastings\t\t\t%s\n",            parameters.hastings                         ? "Yes" : "No");
   printf("(R) rate_matrix\t\t\t%s\n",         parameters.rate_matrix                      ? "Yes" : "No");

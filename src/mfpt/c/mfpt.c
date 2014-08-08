@@ -19,22 +19,15 @@ int main(int argc, char** argv) {
   
   START_ALL_TIMERS
   
-  klp_matrix = klp_matrix_from_file(parameters.input_file, !klp_params.energy_based, &mfpt_usage);
+  klp_matrix = klp_matrix_from_file(parameters.input_file, klp_params, &mfpt_usage);
   TIMING("klp_matrix_from_file")
     
 #ifdef SUPER_HEAVY_DEBUG
   print_klp_matrix(klp_matrix);
 #endif
   
-  if (RUN_TYPE(klp_params, TRANSITION_INPUT_FLAG)) {
-    // We already have a transition matrix, this is the easy case. Just need to find MFPT.
-    transition_matrix = transition_matrix_from_klp_matrix(&klp_matrix, MATRIX_TYPE(klp_params));
-    TIMING("transition_matrix_from_klp_matrix")
-  } else {
-    // We have an energy grid, this requires converting the energy grid into a transition matrix data structure before finding MFPT.
-    transition_matrix = convert_klp_matrix_to_transition_matrix(&klp_matrix, &klp_params);
-    TIMING("convert_klp_matrix_to_transition_matrix")
-  }
+  transition_matrix = transition_matrix_from_klp_matrix_and_params(&klp_params, &klp_matrix);
+  TIMING("transition_matrix_from_klp_matrix_and_params")
   
 #if SUPER_HEAVY_DEBUG
   print_transition_matrix_with_klp_positions(klp_matrix, transition_matrix);

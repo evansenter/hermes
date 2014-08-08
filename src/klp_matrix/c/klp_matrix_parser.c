@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include "klp_matrix_parser.h"
 #include "klp_matrix_initializers.h"
+#include "klp_matrix_functions.h"
 
-KLP_MATRIX klp_matrix_from_file(const char* input_file, short force_probabilities, void (*usage)()) {
+KLP_MATRIX klp_matrix_from_file(const char* input_file, const KLP_PARAMS klp_params, void (*usage)()) {
   int line_count;
   KLP_MATRIX klp_matrix;
   
@@ -15,9 +16,19 @@ KLP_MATRIX klp_matrix_from_file(const char* input_file, short force_probabilitie
   }
   
   klp_matrix = init_klp_matrix(line_count);
-  populate_arrays(&klp_matrix, input_file, force_probabilities);
+  populate_arrays(&klp_matrix, input_file, klp_params);
   
   return klp_matrix;
+}
+
+TRANSITION_MATRIX transition_matrix_from_klp_matrix_and_params(KLP_PARAMS* klp_params, KLP_MATRIX* klp_matrix) {
+  if (RUN_TYPE(klp_params->run_type, TRANSITION_INPUT_FLAG)) {
+    // We already have a transition matrix, this is the easy case.
+    return transition_matrix_from_klp_matrix(klp_matrix, MATRIX_TYPE(klp_params->rate_matrix));
+  } else {
+    // We have an energy grid, this requires converting the energy grid into a transition matrix data structure.
+    return convert_klp_matrix_to_transition_matrix(klp_matrix, klp_params);
+  }
 }
 
 TRANSITION_MATRIX transition_matrix_from_klp_matrix(KLP_MATRIX* klp_matrix, char matrix_type) {
@@ -60,7 +71,7 @@ int count_lines(const char* file_path) {
   return line_count;
 }
 
-void populate_arrays(KLP_MATRIX* klp_matrix, const char* input_file, short force_probabilities) {
+void populate_arrays(KLP_MATRIX* klp_matrix, const char* input_file, const KLP_PARAMS klp_params) {
   int i = 0;
   FILE* file = fopen(input_file, "r");
   char* token;
@@ -74,7 +85,10 @@ void populate_arrays(KLP_MATRIX* klp_matrix, const char* input_file, short force
     token = strtok(NULL, ",");
     klp_matrix->p[i] = atof(token);
     
-    if (force_probabilities && (klp_matrix->p[i] < 0 || klp_matrix->p[i] > 1)) {
+    if (
+      (klp_params.energy_based && !(RUN_TYPE(klp_params.run_type, TRANSITION_INPUT_FLAG) && klp_params.rate_matrix)) && 
+      (klp_matrix->p[i] < 0 || klp_matrix->p[i] > 1)
+    ) {
       fprintf(stderr, "Error: line number %d (0-indexed) in the input doesn't satisfy 0 <= probability (%+1.2f) <= 1. Did you forget the -e flag?\n\n", i, klp_matrix->p[i]);
       abort();
     }

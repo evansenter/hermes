@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
   parse_mfpt_args(&mfpt_params, params[0].argc, params[0].argv, &population_from_rate_matrix_usage);
   
   klp_matrix        = klp_matrix_from_file(mfpt_params.input_file, 0, &population_from_rate_matrix_usage);
-  transition_matrix = transition_matrix_from_klp_matrix(&klp_matrix, MATRIX_TYPE(mfpt_params));
+  transition_matrix = transition_matrix_from_klp_matrix(&klp_matrix, MATRIX_TYPE(mfpt_params.rate_matrix));
   
   population_params = init_population_params();
   

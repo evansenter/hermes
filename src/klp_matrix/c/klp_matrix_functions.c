@@ -284,7 +284,7 @@ double* populate_number_of_adjacent_moves(const KLP_MATRIX klp_matrix, const KLP
   number_of_adjacent_moves = malloc(klp_matrix.length * sizeof(double));
   
   for (i = 0; i < klp_matrix.length; ++i) {
-    number_of_adjacent_moves[i] = RUN_TYPE(klp_params, DIAG_MOVES_ONLY_FLAG) ? (double)number_of_permissible_single_bp_moves(klp_matrix, i) : (double)(klp_matrix.length - 1);
+    number_of_adjacent_moves[i] = RUN_TYPE(klp_params.run_type, DIAG_MOVES_ONLY_FLAG) ? (double)number_of_permissible_single_bp_moves(klp_matrix, i) : (double)(klp_matrix.length - 1);
   }
   
   return number_of_adjacent_moves;
@@ -316,14 +316,14 @@ TRANSITION_MATRIX populate_transition_matrix_from_stationary_matrix(const KLP_MA
   double row_sum;
   TRANSITION_MATRIX transition_matrix;
   
-  transition_matrix = init_transition_matrix(klp_matrix.length, MATRIX_TYPE(klp_params));
+  transition_matrix = init_transition_matrix(klp_matrix.length, MATRIX_TYPE(klp_params.rate_matrix));
   
   for (i = 0; i < transition_matrix.row_length; ++i) {
     row_sum = 0.;
     
     for (j = 0; j < transition_matrix.row_length; ++j) {
       if (i != j) {
-        if (RUN_TYPE(klp_params, FULLY_CONNECTED_FLAG) || (RUN_TYPE(klp_params, DIAG_MOVES_ONLY_FLAG) && ONE_BP_MOVE(i, j))) {
+        if (RUN_TYPE(klp_params.run_type, FULLY_CONNECTED_FLAG) || (RUN_TYPE(klp_params.run_type, DIAG_MOVES_ONLY_FLAG) && ONE_BP_MOVE(i, j))) {
           if (NONZERO_TO_NONZERO_PROB(i, j)) {
             T_ROW_ORDER(transition_matrix, i, j) = \
                                                    probability_function(klp_matrix, number_of_adjacent_moves, i, j, klp_params.rate_matrix);

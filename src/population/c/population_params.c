@@ -41,158 +41,159 @@ void parse_population_args(KLP_PARAMS* klp_params, POPULATION_PARAMS* parameters
   int c;
   opterr = 0;
   
-  while ((c = getopt(argc, argv, "ogbhnvqa:z:c:s:k:l:i:j:p:e::d:w:t:m:r:f:")) != -1) {
-    #ifdef INPUT_DEBUG
-      printf("parse_mfpt_args: %c\n", c);
-    #endif
-      
-    switch (c) {
-      case 'o':
-        parameters->lonely_bp = 1;
-        break;
-        
-      case 'g':
-        parameters->eigen_only = 1;
-        break;
-        
-      case 'b':
-        parameters->benchmark = 1;
-        break;
-        
-      case 'h':
-        parameters->all_subpop_for_eq = 1;
-        break;
-        
-      case 'n':
-        parameters->soft_bounds = 0;
-        break;
-        
-      case 'v':
-        parameters->verbose = 1;
-        break;
-        
-      case 'q':
-        parameters->equilibrium = 1;
-        break;
-        
-      case 'c':
-        parameters->input_file = strdup(optarg);
-        break;
-        
-      case 's':
-        parameters->sequence = strdup(optarg);
-        break;
-        
-      case 'k':
-        parameters->start_structure = strdup(optarg);
-        break;
-        
-      case 'l':
-        parameters->end_structure = strdup(optarg);
-        break;
-                
-      case 'i':
-        if (!sscanf(optarg, "%lf", &parameters->start_time)) {
-          (*usage)();
-        }
-        
-        break;
-        
-      case 'j':
-        if (!sscanf(optarg, "%lf", &parameters->end_time)) {
-          (*usage)();
-        }
-        
-        break;
-        
-      case 'p':
-        if (!sscanf(optarg, "%lf", &parameters->step_size)) {
-          (*usage)();
-        }
-        
-        break;
-        
-      case 'e':
-        if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
-          (*usage)();
-        }
-        
-        parameters->equilibrium = 1;
-        break;
-        
-      case 'd':
-        if (!sscanf(optarg, "%lf", &parameters->delta)) {
-          (*usage)();
-        }
-        
-        break;
-        
-      case 'w':
-        if (!sscanf(optarg, "%d", &parameters->window_size)) {
-          (*usage)();
-        }
-        
-        break;
-        
-      case 't':
-        if (!sscanf(optarg, "%lf", &parameters->temperature)) {
-          (*usage)();
-        }
-        
-        break;
-        
-      case 'm':
-        if (!sscanf(optarg, "%lf", &parameters->energy_cap)) {
-          (*usage)();
-        }
-        
-        break;
-        
-      case 'r':
-        if (!sscanf(optarg, "%d", &parameters->serialize)) {
-          (*usage)();
-        } else if ((int)abs(parameters->serialize) != 1) {
-          (*usage)();
-        }
-        
-        break;
-        
-      case 'f':
-        parameters->filename = strdup(optarg);
-        break;
-        
-      case '?':
-        #ifdef INPUT_DEBUG
-          printf("\tcase '?' with %c\n", optopt);
-        #endif
-      
-        switch (optopt) {
-          case 'a':
-          case 'z':
-          case 's':
-          case 'k':
-          case 'l':
-          case 'e':
-          case 'd':
-          case 'w':
-          case 'i':
-          case 'j':
-          case 'p':
-          case 't':
-          case 'c':
-          case 'r':
-          case 'f':
-            fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-            break;
+  while (optind < argc) {
+    if ((c = getopt(argc, argv, "ogbhnvqa:z:c:s:k:l:i:j:p:e::d:w:t:m:r:f:")) != -1) {
+      #ifdef INPUT_DEBUG
+        printf("parse_mfpt_args: %c\n", c);
+      #endif
+  
+      switch (c) {
+        case 'o':
+          parameters->lonely_bp = 1;
+          break;
+    
+        case 'g':
+          parameters->eigen_only = 1;
+          break;
+    
+        case 'b':
+          parameters->benchmark = 1;
+          break;
+    
+        case 'h':
+          parameters->all_subpop_for_eq = 1;
+          break;
+    
+        case 'n':
+          parameters->soft_bounds = 0;
+          break;
+    
+        case 'v':
+          parameters->verbose = 1;
+          break;
+    
+        case 'q':
+          parameters->equilibrium = 1;
+          break;
+    
+        case 'c':
+          parameters->input_file = strdup(optarg);
+          break;
+    
+        case 's':
+          parameters->sequence = strdup(optarg);
+          break;
+    
+        case 'k':
+          parameters->start_structure = strdup(optarg);
+          break;
+    
+        case 'l':
+          parameters->end_structure = strdup(optarg);
+          break;
             
-          default:
-            break;
-        }
-        
-        break;
-        
-      default:
-        (*usage)();
+        case 'i':
+          if (!sscanf(optarg, "%lf", &parameters->start_time)) {
+            (*usage)();
+          }
+    
+          break;
+    
+        case 'j':
+          if (!sscanf(optarg, "%lf", &parameters->end_time)) {
+            (*usage)();
+          }
+    
+          break;
+    
+        case 'p':
+          if (!sscanf(optarg, "%lf", &parameters->step_size)) {
+            (*usage)();
+          }
+    
+          break;
+    
+        case 'e':
+          if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
+            (*usage)();
+          }
+    
+          parameters->equilibrium = 1;
+          break;
+    
+        case 'd':
+          if (!sscanf(optarg, "%lf", &parameters->delta)) {
+            (*usage)();
+          }
+    
+          break;
+    
+        case 'w':
+          if (!sscanf(optarg, "%d", &parameters->window_size)) {
+            (*usage)();
+          }
+    
+          break;
+    
+        case 't':
+          if (!sscanf(optarg, "%lf", &parameters->temperature)) {
+            (*usage)();
+          }
+    
+          break;
+    
+        case 'm':
+          if (!sscanf(optarg, "%lf", &parameters->energy_cap)) {
+            (*usage)();
+          }
+    
+          break;
+    
+        case 'r':
+          if (!sscanf(optarg, "%d", &parameters->serialize)) {
+            (*usage)();
+          } else if ((int)abs(parameters->serialize) != 1) {
+            (*usage)();
+          }
+    
+          break;
+    
+        case 'f':
+          parameters->filename = strdup(optarg);
+          break;
+    
+        case '?':
+          #ifdef INPUT_DEBUG
+            printf("\tcase '?' with %c\n", optopt);
+          #endif
+  
+          switch (optopt) {
+            case 'a':
+            case 'z':
+            case 's':
+            case 'k':
+            case 'l':
+            case 'e':
+            case 'd':
+            case 'w':
+            case 'i':
+            case 'j':
+            case 'p':
+            case 't':
+            case 'c':
+            case 'r':
+            case 'f':
+              fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+              (*usage)();
+          }
+    
+          break;
+    
+        default:
+          (*usage)();
+      }
+    } else {
+      optind++;
     }
   }
   

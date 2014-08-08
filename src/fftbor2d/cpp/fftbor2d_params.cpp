@@ -39,103 +39,92 @@ void free_fftbor2d_params(FFTBOR2D_PARAMS parameters) {
 
 void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, void (*usage)()) {
   int c;
+  opterr = 0;
   
-  while ((c = getopt(argc, argv, "VvBbMmSsCcT:t:E:e:I:i:J:j:K:k:P:p:")) != -1) {
-    switch (c) {
-      case 'V':
-      case 'v':
-        parameters.verbose = 1;
-        break;
+  while (optind < argc) {
+    if ((c = getopt(argc, argv, "vbmsct:e:i:j:k:p:")) != -1) {
+      #ifdef INPUT_DEBUG
+        printf("parse_mfpt_args: %c\n", c);
+      #endif
+      
+      switch (c) {
+        case 'v':
+          parameters.verbose = 1;
+          break;
         
-      case 'B':
-      case 'b':
-        parameters.benchmark = 1;
-        break;
+        case 'b':
+          parameters.benchmark = 1;
+          break;
         
-      case 'M':
-      case 'm':
-        parameters.format = MATRIX_FLAG;
-        break;
+        case 'm':
+          parameters.format = MATRIX_FLAG;
+          break;
         
-      case 'S':
-      case 's':
-        parameters.format = SIMPLE_FLAG;
-        break;
+        case 's':
+          parameters.format = SIMPLE_FLAG;
+          break;
         
-      case 'C':
-      case 'c':
-        parameters.format = CSV_FLAG;
-        break;
+        case 'c':
+          parameters.format = CSV_FLAG;
+          break;
         
-      case 'T':
-      case 't':
-        if (!sscanf(optarg, "%lf", &temperature)) {
+        case 't':
+          if (!sscanf(optarg, "%lf", &temperature)) {
+            (*usage)();
+          }
+        
+          break;
+        
+        case 'p':
+          if (!sscanf(optarg, "%d", &parameters.precision)) {
+            (*usage)();
+          } else if (parameters.precision < 0 || parameters.precision > std::numeric_limits<double>::digits) {
+            (*usage)();
+          }
+        
+          break;
+        
+        case 'e':
+          parameters.energy_file = strdup(optarg);
+          break;
+        
+        
+        case 'i':
+          parameters.sequence   = strdup(optarg);
+          parameters.seq_length = strlen(parameters.sequence);
+          break;
+        
+        case 'j':
+          parameters.structure_1 = strdup(optarg);
+          break;
+        
+        case 'k':
+          parameters.structure_2 = strdup(optarg);
+          break;
+        
+        case '?':
+          #ifdef INPUT_DEBUG
+            printf("\tcase '?' with %c\n", optopt);
+          #endif
+  
+          switch (optopt) {
+            case 't':
+            case 'p':
+            case 'e':
+            case 'i':
+            case 'j':
+            case 'k':
+              fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+              (*usage)();
+          }
+          
+          break;
+        
+        default:
           (*usage)();
-        }
-        
-        break;
-        
-      case 'P':
-      case 'p':
-        if (!sscanf(optarg, "%d", &parameters.precision)) {
-          (*usage)();
-        } else if (parameters.precision < 0 || parameters.precision > std::numeric_limits<double>::digits) {
-          (*usage)();
-        }
-        
-        break;
-        
-      case 'E':
-      case 'e':
-        parameters.energy_file = strdup(optarg);
-        break;
-        
-        
-      case 'I':
-      case 'i':
-        parameters.sequence   = strdup(optarg);
-        parameters.seq_length = strlen(parameters.sequence);
-        break;
-        
-      case 'J':
-      case 'j':
-        parameters.structure_1 = strdup(optarg);
-        break;
-        
-      case 'K':
-      case 'k':
-        parameters.structure_2 = strdup(optarg);
-        break;
-        
-      case '?':
-        switch (optopt) {
-          case 'T':
-          case 't':
-          case 'P':
-          case 'p':
-          case 'E':
-          case 'e':
-          case 'I':
-          case 'i':
-          case 'J':
-          case 'j':
-          case 'K':
-          case 'k':
-            fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-            break;
-            
-          default:
-            if (isprint(optopt)) {
-              fprintf(stderr, "Unknown option `-%c'.\n", optopt);
-            } else {
-              fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
-            }
-        }
-        
-        (*usage)();
-        
-      default:
-        (*usage)();
+      }
+    } else {
+      optind++;
     }
   }
   
@@ -298,15 +287,15 @@ void fftbor2d_usage() {
 }
 
 void fftbor2d_flags() {
-  fprintf(stderr, "\t-B/b\t(b)enchmark,     default is off. If on, benchmarking data will print alongside normal results.\n");
-  fprintf(stderr, "\t-C/c\t(C)SV output,    default is disabled, presents output in CSV format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z).\n");
-  fprintf(stderr, "\t-E/e\t(e)nergyfile,    default is rna_turner2004.par in this current directory. Must be name of a file with all energy parameters (in same format as used in Vienna RNA). Energy file lookup first checks current directory, and then iterates through PATH shell variable until a matching file is found. If no file is found, default ViennaRNA parameters are used and a warning is presented to user. If -E switch is explicitly provided, that file is used in lieu of searching for rna_turner2004.par file.\n");
-  fprintf(stderr, "\t-I/i\tsequence,        The sequence to be used by FFTbor2D.\n");
-  fprintf(stderr, "\t-J/j\tstructure_1,     The first structure to use with FFTbor2D.\n");
-  fprintf(stderr, "\t-K/k\tstructure_2,     The second structure to use with FFTbor2D.\n");
-  fprintf(stderr, "\t-M/m\t(m)atrix format, default is disabled, presents output in a matrix format instead of a column format.\n");
-  fprintf(stderr, "\t-P/p\t(p)recision,     default is %d, indicates precision (base 2) of probabilities Z_k / Z to be returned (0-%d, 0 disables precision handling).\n", (int)ceil(log(pow(10., 8)) / log(2.)), std::numeric_limits<double>::digits);
-  fprintf(stderr, "\t-S/s\t(s)imple output, default is disabled, presents output in column format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z), -RTln(Z_{k,l})).\n");
-  fprintf(stderr, "\t-T/t\t(t)emperature,   default is 37 degrees Celsius.\n");
-  fprintf(stderr, "\t-V/v\t(v)erbose,       default is disabled, presents some debug information at runtime.\n\n");
+  fprintf(stderr, "\t-b\t(b)enchmark,     default is off. If on, benchmarking data will print alongside normal results.\n");
+  fprintf(stderr, "\t-c\t(C)SV output,    default is disabled, presents output in CSV format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z).\n");
+  fprintf(stderr, "\t-e\t(e)nergyfile,    default is rna_turner2004.par in this current directory. Must be name of a file with all energy parameters (in same format as used in Vienna RNA). Energy file lookup first checks current directory, and then iterates through PATH shell variable until a matching file is found. If no file is found, default ViennaRNA parameters are used and a warning is presented to user. If -E switch is explicitly provided, that file is used in lieu of searching for rna_turner2004.par file.\n");
+  fprintf(stderr, "\t-i\tsequence,        The sequence to be used by FFTbor2D.\n");
+  fprintf(stderr, "\t-j\tstructure_1,     The first structure to use with FFTbor2D.\n");
+  fprintf(stderr, "\t-k\tstructure_2,     The second structure to use with FFTbor2D.\n");
+  fprintf(stderr, "\t-m\t(m)atrix format, default is disabled, presents output in a matrix format instead of a column format.\n");
+  fprintf(stderr, "\t-p\t(p)recision,     default is %d, indicates precision (base 2) of probabilities Z_k / Z to be returned (0-%d, 0 disables precision handling).\n", (int)ceil(log(pow(10., 8)) / log(2.)), std::numeric_limits<double>::digits);
+  fprintf(stderr, "\t-s\t(s)imple output, default is disabled, presents output in column format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z), -RTln(Z_{k,l})).\n");
+  fprintf(stderr, "\t-t\t(t)emperature,   default is 37 degrees Celsius.\n");
+  fprintf(stderr, "\t-v\t(v)erbose,       default is disabled, presents some debug information at runtime.\n\n");
 }

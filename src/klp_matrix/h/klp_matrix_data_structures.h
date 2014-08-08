@@ -29,8 +29,8 @@ typedef struct {
 #define TRANSITION_INPUT_FLAG 'T'
 #define DIAG_MOVES_ONLY_FLAG 'X'
 #define FULLY_CONNECTED_FLAG 'F'
-#define RUN_TYPE(parameters, flag) (parameters.run_type == flag)
-#define MATRIX_TYPE(parameters) (parameters.rate_matrix ? 'R' : 'P')
+#define RUN_TYPE(run_type, flag) (run_type == flag)
+#define MATRIX_TYPE(rate_matrix) (rate_matrix ? 'R' : 'P')
 
 #define T_ROW_ORDER(m, i, j) ((m.matrix)[((i) * (m.row_length)) + (j)])
 #define T_COL_ORDER(m, i, j) ((m.matrix)[((j) * (m.row_length)) + (i)])
