@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
   // from the user input.
   if (!DESERIALIZING(parameters)) {
     if (parameters.input_file) {
-      klp_matrix        = klp_matrix_from_file(parameters.input_file, parameters.input && !klp_params.energy_based, &population_usage);
+      klp_matrix        = klp_matrix_from_file(parameters.input_file, !klp_params.energy_based, &population_usage);
       transition_matrix = convert_klp_matrix_to_transition_matrix(&klp_matrix, &klp_params);
       TIMING("csv initialization")
     } else if (parameters.sequence) {

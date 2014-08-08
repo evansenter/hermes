@@ -128,8 +128,8 @@ void mfpt_usage() {
 }
 
 void mfpt_flags() {
-  fprintf(stderr, "-b\t(b)enchmarking,             default is disabled. When enabled, will print benchmarking times for internal function calls.\n");
-  fprintf(stderr, "-c\t(C)SV input file,           this option is made available to abstain from providing the input CSV as the last command line argument.\n");
-  fprintf(stderr, "-l\tprint a(l)l MFPT,           if this flag is provided, the program will print the MFPT for every non-end state to hit the end state, and then print the same beginning -> end MFPT that is printed without this flag. Indices for the MFPT correspond to 0-ordered indices in the transition probability matrix.\n");
-  fprintf(stderr, "-v\tverbose,                    default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n");
+  fprintf(stderr, "\t-b\t(b)enchmarking,             default is disabled. When enabled, will print benchmarking times for internal function calls.\n");
+  fprintf(stderr, "\t-c\t(C)SV input file,           this option is made available to abstain from providing the input CSV as the last command line argument.\n");
+  fprintf(stderr, "\t-l\tprint a(l)l MFPT,           if this flag is provided, the program will print the MFPT for every non-end state to hit the end state, and then print the same beginning -> end MFPT that is printed without this flag. Indices for the MFPT correspond to 0-ordered indices in the transition probability matrix.\n");
+  fprintf(stderr, "\t-v\tverbose,                    default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n\n");
 }

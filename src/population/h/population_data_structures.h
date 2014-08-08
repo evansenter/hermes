@@ -5,7 +5,6 @@
 #include "vienna/externs.h"
 
 typedef struct {
-  short verbose;
   char* input_file;
   char* sequence;
   char* start_structure;
@@ -27,6 +26,7 @@ typedef struct {
   short eigen_only;
   short input;
   short benchmark;
+  short verbose;
 } POPULATION_PARAMS;
 
 typedef struct {

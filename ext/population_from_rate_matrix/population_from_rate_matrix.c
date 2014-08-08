@@ -24,8 +24,7 @@ int main(int argc, char** argv) {
   klp_matrix        = klp_matrix_from_file(mfpt_params.input_file, 0, &population_from_rate_matrix_usage);
   transition_matrix = transition_matrix_from_klp_matrix(&klp_matrix, MATRIX_TYPE(mfpt_params));
   
-  population_params       = init_population_params();
-  population_params.input = 0;
+  population_params = init_population_params();
   
   parse_population_args(&population_params, params[1].argc, params[1].argv, &population_from_rate_matrix_usage);
   

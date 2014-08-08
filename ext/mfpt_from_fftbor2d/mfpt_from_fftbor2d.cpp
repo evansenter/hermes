@@ -3,6 +3,7 @@
 #include <string.h>
 #include "shared/libmulti_param_header.h"
 #include "shared/libfftbor2d_header.h"
+#include "shared/libklp_matrix_header.h"
 #include "shared/libmfpt_header.h"
 
 KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA);
@@ -11,13 +12,14 @@ void mfpt_from_fftbor2d_usage();
 char* subparams[] = { "fftbor2d", "mfpt" };
 
 int main(int argc, char** argv) {
-  PARAM_CONTAINER* params;
-  FFTBOR2D_PARAMS fftbor2d_params;
-  FFTBOR2D_DATA fftbor2d_data;
-  KLP_MATRIX klp_matrix;
-  MFPT_PARAMS mfpt_params;
+  PARAM_CONTAINER*  params;
+  FFTBOR2D_PARAMS   fftbor2d_params;
+  KLP_PARAMS        klp_params;
+  MFPT_PARAMS       mfpt_params;
+  FFTBOR2D_DATA     fftbor2d_data;
+  KLP_MATRIX        klp_matrix;
   TRANSITION_MATRIX transition_matrix;
-  double mfpt;
+  double            mfpt;
   
   params = split_args(argc, argv, subparams, 2);
   
@@ -25,17 +27,19 @@ int main(int argc, char** argv) {
   parse_fftbor2d_args(fftbor2d_params, params[0].argc, params[0].argv, &mfpt_from_fftbor2d_usage);
   fftbor2d_data = fftbor2d_from_params(fftbor2d_params);
   
-  mfpt_params          = init_mfpt_params();
-  mfpt_params.input    = 0;
-  mfpt_params.epsilon  = 1e-8;
-  mfpt_params.max_dist = fftbor2d_data.row_length;
-  mfpt_params.bp_dist  = fftbor2d_data.bp_dist;
+  klp_params          = init_klp_matrix_params();
+  klp_params.epsilon  = 1e-8;
+  klp_params.max_dist = fftbor2d_data.row_length;
+  klp_params.bp_dist  = fftbor2d_data.bp_dist;
+  parse_klp_matrix_args(&klp_params, params[1].argc, params[1].argv, &mfpt_from_fftbor2d_usage);
   
-  parse_mfpt_args(&mfpt_params, params[1].argc, params[1].argv, &mfpt_from_fftbor2d_usage);
+  mfpt_params       = init_mfpt_params();
+  mfpt_params.input = 0;
+  parse_mfpt_args(&klp_params, &mfpt_params, params[1].argc, params[1].argv, &mfpt_from_fftbor2d_usage);
   
   klp_matrix        = convert_fftbor2d_output_to_klp_matrix(fftbor2d_data);
-  transition_matrix = convert_klp_matrix_to_transition_matrix(&klp_matrix, &mfpt_params);
-  mfpt              = compute_mfpt(transition_matrix, mfpt_params);
+  transition_matrix = convert_klp_matrix_to_transition_matrix(&klp_matrix, &klp_params);
+  mfpt              = compute_mfpt(transition_matrix, klp_params, mfpt_params);
   
   printf("%f\n", mfpt);
   
@@ -60,7 +64,8 @@ KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA fftbor2d_da
 void mfpt_from_fftbor2d_usage() {
   fprintf(stderr, "FFTmfpt --fftbor2d-i <sequence> --fftbor2d-j <structure_1> --fftbor2d-k <structure_2> [one of --mfpt-x or --mfpt-f] [additional options]\n\n");
   print_valid_multi_params_prefixes(subparams, 2);
-  print_available_subflags("FFTbor2D", subparams[0], &fftbor2d_flags);
-  print_available_subflags("RNAmfpt", subparams[1], &mfpt_flags);
+  print_available_subflags("FFTbor2D",          subparams[0], &fftbor2d_flags);
+  print_available_subflags("transition matrix", subparams[1], &klp_matrix_flags);
+  print_available_subflags("RNAmfpt",           subparams[1], &mfpt_flags);
   abort();
 }

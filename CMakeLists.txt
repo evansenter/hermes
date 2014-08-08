@@ -83,7 +83,7 @@ add_subdirectory(src/fftbor2d)
 add_subdirectory(src/mfpt)
 add_subdirectory(src/population)
 
-# add_subdirectory(ext/mfpt_from_fftbor2d)
+add_subdirectory(ext/mfpt_from_fftbor2d)
 # add_subdirectory(ext/population_from_fftbor2d)
 # add_subdirectory(ext/population_from_rate_matrix)
 

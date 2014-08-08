@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
   
   START_ALL_TIMERS
   
-  klp_matrix = klp_matrix_from_file(parameters.input_file, parameters.input && !klp_params.energy_based, &mfpt_usage);
+  klp_matrix = klp_matrix_from_file(parameters.input_file, !klp_params.energy_based, &mfpt_usage);
   TIMING("klp_matrix_from_file")
     
 #ifdef SUPER_HEAVY_DEBUG

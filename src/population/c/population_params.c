@@ -11,7 +11,6 @@
 
 POPULATION_PARAMS init_population_params() {
   POPULATION_PARAMS parameters = {
-    .verbose           = 0,
     .input_file        = NULL,
     .sequence          = NULL,
     .start_structure   = NULL,
@@ -32,7 +31,8 @@ POPULATION_PARAMS init_population_params() {
     .energy_cap        = 0,
     .eigen_only        = 0,
     .input             = 1,
-    .benchmark         = 0
+    .benchmark         = 0,
+    .verbose           = 0
   };
   return parameters;
 }
@@ -355,25 +355,25 @@ void population_usage() {
 }
 
 void population_flags() {
-  fprintf(stderr, "-b\t(b)enchmarking,        default is disabled. When enabled, will print benchmarking times for internal function calls.\n");
-  fprintf(stderr, "-c\t(C)SV input file,      this option is made available to abstain from providing the input CSV as the last command line argument.\n");
-  fprintf(stderr, "-d\t(d)elta range,         default is disabled. When provided, this value specifies the delta-size required for the population to be approaching equilibrium. This position is used as a starting point for a more fine-grained scan using the -e and -w values.\n");
-  fprintf(stderr, "-e\t(e)psilon,             default is disabled. When provided, we will output the time at which the equilibrium stable within -e for a window of size -w.\n");
-  fprintf(stderr, "-f\tbin (f)ilename,        Provided in conjunction with the -r flag to specify the read / write file for serializing the eigensystem.\n");
-  fprintf(stderr, "-g\tei(g)envalues only,    default is disabled. When enabled, RNAeq will only generate the eigenvalues for the transition rate matrix.\n");
-  fprintf(stderr, "-h\tall subpop. in eq.,    default is disabled. When provided alongside the -q flag, the equilibrium time is estimated for when *all* subpopulations approach equilibrium, rather than when just the start-to-end state curve (-a to -z) doesn't deviate more than epsilon (-e) within the window size (-w).\n");
-  fprintf(stderr, "-i\tstart time,            natural log of the starting time for computing population proportion.\n");
-  fprintf(stderr, "-j\tend time,              natural log of the ending time for computing population proportion.\n");
-  fprintf(stderr, "-k\tstarting structure,    structure for which the probability at time 0 is equal to 1. If not provided, the empty structure is used / inferred.\n");
-  fprintf(stderr, "-l\tending structure,      structure of interest for detailed population proportion values. If not provided, the MFE structure is used / inferred.\n");
-  fprintf(stderr, "-m\tenergy cap,            default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
-  fprintf(stderr, "-n\t(n)o soft bounds,      default is disabled. When enabled, the population proportion / equilibrium time will not use soft bounds computed with the -d delta value, and instead will compute population proportion / equilibrium over the entire timespan (timespan can be adjusted with -i and -j).\n");
-  fprintf(stderr, "-o\tl(o)nely basepairs,    default is disabled. When enabled, RNAsubopt will sample structures containing lonely base pairs.\n");
-  fprintf(stderr, "-p\tste(p) size,           natrual log of the step size for computing population proportion (start_time < start_time + step_size <= end_time).\n");
-  fprintf(stderr, "-q\te(q)uilibrium,         Compute the equilibrium time for the target state. Uses an approximation technique that looks at occupancy deviation within a sliding window, parameterized by -e and -w.\n");
-  fprintf(stderr, "-r\tse(r)ialize direction, default is disabled. If passed with the value '1', then the eigensystem and its inversion will be serialized to the file specified by the -f flag. If passed with the value '-1', the file specified by the -f flag will be deserialized and used for computing the data of interest.\n");
-  fprintf(stderr, "-s\t(s)equence,            sequence of interest for computing population proportions.\n");
-  fprintf(stderr, "-t\t(t)emperature,         temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
-  fprintf(stderr, "-v\t(v)erbose,             default is disabled, presents some debug information at runtime.\n\n");
-  fprintf(stderr, "-w\t(w)indow size,         default is 5. Specifies the window size (exclusive) for predicting equilibrium. Equilibrium is considered as having been achieved when all indices (i + 1)..(i + window_size - 1) are within epsilon (-e) of the population proportion at time i.\n");
+  fprintf(stderr, "\t-b\t(b)enchmarking,        default is disabled. When enabled, will print benchmarking times for internal function calls.\n");
+  fprintf(stderr, "\t-c\t(C)SV input file,      this option is made available to abstain from providing the input CSV as the last command line argument.\n");
+  fprintf(stderr, "\t-d\t(d)elta range,         default is disabled. When provided, this value specifies the delta-size required for the population to be approaching equilibrium. This position is used as a starting point for a more fine-grained scan using the -e and -w values.\n");
+  fprintf(stderr, "\t-e\t(e)psilon,             default is disabled. When provided, we will output the time at which the equilibrium stable within -e for a window of size -w.\n");
+  fprintf(stderr, "\t-f\tbin (f)ilename,        Provided in conjunction with the -r flag to specify the read / write file for serializing the eigensystem.\n");
+  fprintf(stderr, "\t-g\tei(g)envalues only,    default is disabled. When enabled, RNAeq will only generate the eigenvalues for the transition rate matrix.\n");
+  fprintf(stderr, "\t-h\tall subpop. in eq.,    default is disabled. When provided alongside the -q flag, the equilibrium time is estimated for when *all* subpopulations approach equilibrium, rather than when just the start-to-end state curve (-a to -z) doesn't deviate more than epsilon (-e) within the window size (-w).\n");
+  fprintf(stderr, "\t-i\tstart time,            natural log of the starting time for computing population proportion.\n");
+  fprintf(stderr, "\t-j\tend time,              natural log of the ending time for computing population proportion.\n");
+  fprintf(stderr, "\t-k\tstarting structure,    structure for which the probability at time 0 is equal to 1. If not provided, the empty structure is used / inferred.\n");
+  fprintf(stderr, "\t-l\tending structure,      structure of interest for detailed population proportion values. If not provided, the MFE structure is used / inferred.\n");
+  fprintf(stderr, "\t-m\tenergy cap,            default is disabled. When provided, RNAsubopt will only sample structures within energy_cap kcal/mol of the MFE structure.\n");
+  fprintf(stderr, "\t-n\t(n)o soft bounds,      default is disabled. When enabled, the population proportion / equilibrium time will not use soft bounds computed with the -d delta value, and instead will compute population proportion / equilibrium over the entire timespan (timespan can be adjusted with -i and -j).\n");
+  fprintf(stderr, "\t-o\tl(o)nely basepairs,    default is disabled. When enabled, RNAsubopt will sample structures containing lonely base pairs.\n");
+  fprintf(stderr, "\t-p\tste(p) size,           natrual log of the step size for computing population proportion (start_time < start_time + step_size <= end_time).\n");
+  fprintf(stderr, "\t-q\te(q)uilibrium,         Compute the equilibrium time for the target state. Uses an approximation technique that looks at occupancy deviation within a sliding window, parameterized by -e and -w.\n");
+  fprintf(stderr, "\t-r\tse(r)ialize direction, default is disabled. If passed with the value '1', then the eigensystem and its inversion will be serialized to the file specified by the -f flag. If passed with the value '-1', the file specified by the -f flag will be deserialized and used for computing the data of interest.\n");
+  fprintf(stderr, "\t-s\t(s)equence,            sequence of interest for computing population proportions.\n");
+  fprintf(stderr, "\t-t\t(t)emperature,         temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
+  fprintf(stderr, "\t-v\t(v)erbose,             default is disabled, presents some debug information at runtime.\n\n");
+  fprintf(stderr, "\t-w\t(w)indow size,         default is 5. Specifies the window size (exclusive) for predicting equilibrium. Equilibrium is considered as having been achieved when all indices (i + 1)..(i + window_size - 1) are within epsilon (-e) of the population proportion at time i.\n\n");
 }
