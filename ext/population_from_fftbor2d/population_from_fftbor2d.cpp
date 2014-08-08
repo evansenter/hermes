@@ -3,53 +3,47 @@
 #include <string.h>
 #include "shared/libmulti_param_header.h"
 #include "shared/libfftbor2d_header.h"
-#include "shared/libmfpt_header.h"
+#include "shared/libklp_matrix_header.h"
 #include "shared/libpopulation_header.h"
 
 KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA);
 void population_from_fftbor2d_usage();
 
-char* subparams[] = { "fftbor2d", "mfpt", "population" };
+char* subparams[] = { "fftbor2d", "population" };
 
 int main(int argc, char** argv) {
-  PARAM_CONTAINER* params;
-  FFTBOR2D_PARAMS fftbor2d_params;
-  FFTBOR2D_DATA fftbor2d_data;
-  KLP_MATRIX klp_matrix;
-  MFPT_PARAMS mfpt_params;
+  PARAM_CONTAINER*  params;
+  FFTBOR2D_PARAMS   fftbor2d_params;
+  KLP_PARAMS        klp_params;
   POPULATION_PARAMS population_params;
+  FFTBOR2D_DATA     fftbor2d_data;
+  KLP_MATRIX        klp_matrix;
   TRANSITION_MATRIX transition_matrix;
   
-  
-  params = split_args(argc, argv, subparams, 3);
+  params = split_args(argc, argv, subparams, 2);
   
   fftbor2d_params = init_fftbor2d_params();
   parse_fftbor2d_args(fftbor2d_params, params[0].argc, params[0].argv, &population_from_fftbor2d_usage);
   fftbor2d_data = fftbor2d_from_params(fftbor2d_params);
   
-  mfpt_params             = init_mfpt_params();
-  mfpt_params.input       = 0;
-  mfpt_params.rate_matrix = 1;
-  mfpt_params.epsilon     = 1e-8;
-  mfpt_params.max_dist    = fftbor2d_data.row_length;
-  mfpt_params.bp_dist     = fftbor2d_data.bp_dist;
-  
-  parse_mfpt_args(&mfpt_params, params[1].argc, params[1].argv, &population_from_fftbor2d_usage);
+  klp_params             = init_klp_matrix_params();
+  klp_params.rate_matrix = 1;
+  klp_params.epsilon     = 1e-8;
+  klp_params.max_dist    = fftbor2d_data.row_length;
+  klp_params.bp_dist     = fftbor2d_data.bp_dist;
+  parse_klp_matrix_args(&klp_params, params[1].argc, params[1].argv, &population_from_fftbor2d_usage);
   
   klp_matrix        = convert_fftbor2d_output_to_klp_matrix(fftbor2d_data);
-  transition_matrix = convert_klp_matrix_to_transition_matrix(&klp_matrix, &mfpt_params);
+  transition_matrix = convert_klp_matrix_to_transition_matrix(&klp_matrix, &klp_params);
   
   population_params                 = init_population_params();
-  population_params.input           = 0;
   population_params.sequence        = fftbor2d_data.sequence;
   population_params.start_structure = fftbor2d_data.structure_1;
   population_params.end_structure   = fftbor2d_data.structure_2;
-  population_params.start_index     = mfpt_params.start_state;
-  population_params.end_index       = mfpt_params.end_state;
+  population_params.temperature     = temperature;
+  parse_population_args(&klp_params, &population_params, params[1].argc, params[1].argv, &population_from_fftbor2d_usage);
   
-  parse_population_args(&population_params, params[2].argc, params[2].argv, &population_from_fftbor2d_usage);
-  
-  population_from_row_ordered_transition_matrix(population_params, transition_matrix);
+  population_from_row_ordered_transition_matrix(klp_params, population_params, transition_matrix);
   
   return 0;
 }
@@ -71,9 +65,9 @@ KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA fftbor2d_da
 
 void population_from_fftbor2d_usage() {
   fprintf(stderr, "FFTeq --fftbor2d-i <sequence> --fftbor2d-j <structure_1> --fftbor2d-k <structure_2> [additional options]\n\n");
-  print_valid_multi_params_prefixes(subparams, 3);
-  print_available_subflags("FFTbor2D", subparams[0], &fftbor2d_flags);
-  print_available_subflags("RNAmfpt", subparams[1], &mfpt_flags);
-  print_available_subflags("RNAeq", subparams[2], &population_flags);
+  print_valid_multi_params_prefixes(subparams, 2);
+  print_available_subflags("FFTbor2D",          subparams[0], &fftbor2d_flags);
+  print_available_subflags("transition matrix", subparams[1], &klp_matrix_flags);
+  print_available_subflags("RNAeq",             subparams[1], &population_flags);
   abort();
 }

@@ -267,16 +267,16 @@ int fftbor2d_error_handling(const FFTBOR2D_PARAMS parameters) {
 }
 
 void debug_fftbor2d_parameters(const FFTBOR2D_PARAMS parameters) {
-  printf("FFTbor2D parameters\n");
+  printf("FFTbor2D parameters:\n");
   printf("(i) sequence\t\t\t%s\n",      parameters.sequence);
   printf("(j) structure_1\t\t\t%s\n",   parameters.structure_1);
   printf("(k) structure_2\t\t\t%s\n",   parameters.structure_2);
   printf("    seq_length\t\t\t%d\n",    parameters.seq_length);
   printf("    max_threads\t\t\t%d\n",   parameters.max_threads);
-  printf("    format\t\t\t%c\n",        parameters.format);
+  printf("    format\t\t\t%s\n",        HUMANIZED_FORMAT);
   printf("(t) temperature\t\t\t%.1f\n", temperature);
   printf("(p) precision\t\t\t%d\n",     parameters.precision);
-  printf("(e) energy_file\t\t\t%s\n",   parameters.energy_file);
+  printf("(e) energy_file\t\t\t%s\n",   parameters.energy_file != NULL ? parameters.energy_file : "not specified");
   printf("(b) benchmark\t\t\t%s\n",     parameters.benchmark ? "Yes" : "No");
   
   printf("\n");

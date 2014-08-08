@@ -106,7 +106,7 @@ int mfpt_error_handling(const KLP_PARAMS klp_params, const MFPT_PARAMS parameter
 }
 
 void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
-  printf("RNAmfpt parameters\n");
+  printf("RNAmfpt parameters:\n");
   printf("(c) input_file\t\t\t%s\n", parameters.input_file);
   printf("(l) all_mfpt\t\t\t%s\n",   parameters.all_mfpt ? "Yes" : "No");
   printf("(b) benchmark\t\t\t%s\n",  parameters.benchmark ? "Yes" : "No");

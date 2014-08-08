@@ -416,13 +416,13 @@ void print_output(const FFTBOR2D_PARAMS parameters, const FFTBOR2D_DATA data) {
   int i;
   int matrix_size = (int)pow((double)data.row_length, 2);
   
-  if (FORMAT(parameters, BASIC_FLAG)) {
+  if (FORMAT(BASIC_FLAG)) {
     printf("%s\n%s\n%s\n", parameters.sequence, parameters.structure_1, parameters.structure_2);
     printf("%d,%d\n", data.bp_dist, data.row_length);
     printf("k\tl\tp(Z_{k,l}/Z)\t-RTln(Z_{k,l})\n");
   }
   
-  if (FORMAT(parameters, MATRIX_FLAG)) {
+  if (FORMAT(MATRIX_FLAG)) {
     for (i = 0; i < matrix_size; ++i) {
       if (i && !(i % data.row_length)) {
         printf("\n");
@@ -433,7 +433,7 @@ void print_output(const FFTBOR2D_PARAMS parameters, const FFTBOR2D_DATA data) {
     }
     
     printf("\n");
-  } else if (FORMAT(parameters, CSV_FLAG)) {
+  } else if (FORMAT(CSV_FLAG)) {
     for (i = 0; i < matrix_size; ++i) {
       if (data.probabilities[i] > 0) {
         printf("%d,%d,", i / data.row_length, i % data.row_length);

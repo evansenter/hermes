@@ -200,7 +200,7 @@ int klp_matrix_error_handling(const KLP_PARAMS parameters) {
 void debug_klp_matrix_parameters(const KLP_PARAMS parameters) {
   char* buffer = calloc(128, sizeof(char));
   
-  printf("CSV parsing parameters\n");
+  printf("CSV parsing parameters:\n");
   printf("(F) fully_connected\t\t%s\n",       RUN_TYPE(parameters, FULLY_CONNECTED_FLAG)  ? "Yes" : "No");
   printf("(T) transition_matrix_input\t%s\n", RUN_TYPE(parameters, TRANSITION_INPUT_FLAG) ? "Yes" : "No");
   printf("(X) single_bp_moves_only\t%s\n",    RUN_TYPE(parameters, DIAG_MOVES_ONLY_FLAG)  ? "Yes" : "No");

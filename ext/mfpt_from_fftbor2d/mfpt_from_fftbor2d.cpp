@@ -62,7 +62,7 @@ KLP_MATRIX convert_fftbor2d_output_to_klp_matrix(const FFTBOR2D_DATA fftbor2d_da
 }
 
 void mfpt_from_fftbor2d_usage() {
-  fprintf(stderr, "FFTmfpt --fftbor2d-i <sequence> --fftbor2d-j <structure_1> --fftbor2d-k <structure_2> [one of --mfpt-x or --mfpt-f] [additional options]\n\n");
+  fprintf(stderr, "FFTmfpt --fftbor2d-i <sequence> --fftbor2d-j <structure_1> --fftbor2d-k <structure_2> [additional options]\n\n");
   print_valid_multi_params_prefixes(subparams, 2);
   print_available_subflags("FFTbor2D",          subparams[0], &fftbor2d_flags);
   print_available_subflags("transition matrix", subparams[1], &klp_matrix_flags);

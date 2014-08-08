@@ -299,8 +299,8 @@ int population_error_handling(const KLP_PARAMS klp_params, const POPULATION_PARA
 }
 
 void debug_population_parameters(const POPULATION_PARAMS parameters) {
-  printf("RNAeq parameters\n");
-  printf("(c) input_file\t\t\t%s\n", parameters.input_file);
+  printf("RNAeq parameters:\n");
+  printf("(c) input_file\t\t\t%s\n", parameters.input_file != NULL ? parameters.input_file : "N/A");
 
   if (parameters.sequence != NULL) {
     printf("(s) sequence\t\t\t%s\n",              parameters.sequence);
@@ -308,7 +308,13 @@ void debug_population_parameters(const POPULATION_PARAMS parameters) {
     printf("(l) end_structure\t\t%s\n",           parameters.sequence != NULL && parameters.end_structure == NULL ? "mfe" : parameters.end_structure);
     printf("(t) temperature\t\t\t%.1f\n",         parameters.temperature);
     printf("(o) lonely_bp\t\t\t%s\n",             parameters.lonely_bp ? "Yes" : "No");
-    printf("(m) energy_cap\t\t\t%.1f kcal/mol\n", parameters.energy_cap ? parameters.energy_cap : 10000);
+    
+    if (parameters.energy_cap > 0) {
+      printf("(m) energy_cap\t\t\t%.1f kcal/mol\n", parameters.energy_cap ? parameters.energy_cap : 10000);
+    } else {
+      printf("(m) energy_cap\t\t\tN/A\n");
+    }
+    
   } else {
     printf("(s) sequence\t\t\t%s\n",      "N/A");
     printf("(k) start_structure\t\t%s\n", "N/A");

@@ -23,7 +23,12 @@ typedef struct { // Variables are sorted by the order they get instantiated, do 
 #define SIMPLE_FLAG 'S'
 #define MATRIX_FLAG 'M'
 #define CSV_FLAG 'C'
-#define FORMAT(parameters, flag) (parameters.format == flag)
+#define FORMAT(flag) (parameters.format == flag)
+#define HUMANIZED_FORMAT                                      \
+  (parameters.format == 'B' ? "basic (with headers)" :        \
+    ((parameters.format == 'S' ? "simple (without headers)" : \
+      ((parameters.format == 'M' ? "matrix" :                 \
+        ((parameters.format == 'C' ? "CSV" : "N/A")))))))
 
 typedef struct { // Variables are sorted by the order they get instantiated, do not change.
   char*     sequence;
