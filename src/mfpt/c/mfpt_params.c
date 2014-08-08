@@ -17,8 +17,9 @@ MFPT_PARAMS init_mfpt_params() {
   return parameters;
 }
 
-void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
+void parse_mfpt_args(KLP_PARAMS* klp_params, MFPT_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
   int c;
+  opterr = 0;
   
   while ((c = getopt(argc, argv, "lvc:")) != -1) {
     #ifdef INPUT_DEBUG
@@ -59,18 +60,23 @@ void parse_mfpt_args(MFPT_PARAMS* parameters, int argc, char** argv, void (*usag
     }
   }
   
+  #ifdef INPUT_DEBUG
+    printf("Done parsing.\n\n");
+  #endif
+  
   if (parameters->verbose) {
+    debug_klp_matrix_parameters(*klp_params);
     debug_mfpt_parameters(*parameters);
   }
   
-  if (mfpt_error_handling(*parameters)) {
+  if (mfpt_error_handling(*klp_params, *parameters)) {
     (*usage)();
   }
   
   optind = 1;
 }
 
-int mfpt_error_handling(const MFPT_PARAMS parameters) {
+int mfpt_error_handling(const KLP_PARAMS klp_params, const MFPT_PARAMS parameters) {
   int error = 0;
   
   if (parameters.input) {

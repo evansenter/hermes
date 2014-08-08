@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
   klp_params = init_klp_matrix_params();
   parameters = init_mfpt_params();
   parse_klp_matrix_args(&klp_params, argc, argv, &mfpt_usage);
-  parse_mfpt_args(&parameters, argc, argv, &mfpt_usage);
+  parse_mfpt_args(&klp_params, &parameters, argc, argv, &mfpt_usage);
   
   klp_matrix = klp_matrix_from_file(parameters.input_file, parameters.input && !klp_params.energy_based, &mfpt_usage);
 #ifdef SUPER_HEAVY_DEBUG

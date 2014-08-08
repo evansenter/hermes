@@ -15,27 +15,17 @@ KLP_PARAMS init_klp_matrix_params() {
     .run_type      = DIAG_MOVES_ONLY_FLAG,
     .energy_based  = 0,
     .hastings      = 0,
-    .rate_matrix   = 0,
-    .verbose       = 0
+    .rate_matrix   = 0
   };
   return parameters;
 }
 
 void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
-  int c, i;
-  optind          = 1;
-  opterr          = 0;
-  char** argv_dup = malloc(argc * sizeof(char*));
-  
-  for (i = 0; i < argc; ++i) {
-    argv_dup[i] = strdup(argv[i]);
-    #ifdef INPUT_DEBUG
-      printf("Duping arg %d: %s\n", i, argv_dup[i]);
-    #endif
-  }
-  
+  int c;
+  opterr = 0;
+
   while (optind < argc) {
-    if ((c = getopt(argc, argv_dup, "A:Z:N:D:O:FTXEHRV")) != -1) {
+    if ((c = getopt(argc, argv, "A:Z:N:D:O:FTXEHR")) != -1) {
       #ifdef INPUT_DEBUG
         printf("parse_klp_matrix_args: %c\n", c);
       #endif
@@ -63,10 +53,6 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
         
         case 'R':
           parameters->rate_matrix = 1;
-          break;
-        
-        case 'V':
-          parameters->verbose = 1;
           break;
         
         case 'A':
@@ -131,18 +117,20 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
             default:
               break;
           }
+          
+          break;
 
         default:
-          break;
+          (*usage)();
       }
     } else {
       optind++;
     }
   }
   
-  if (parameters->verbose) {
-    debug_klp_matrix_parameters(*parameters);
-  }
+  #ifdef INPUT_DEBUG
+    printf("Done parsing.\n\n");
+  #endif
   
   if (klp_matrix_error_handling(*parameters)) {
     (*usage)();
@@ -258,7 +246,6 @@ void klp_matrix_flags() {
   fprintf(stderr, "-O\tepsil(o)n,                  if the graph is going to be populated with all possible moves (via the -n flag), this will inflate all 0-probability positions.\n");
   fprintf(stderr, "-R\t(r)ate matrix,              default is disabled. If this flag is provided, the transition rate matrix is computed rather than the transition probability matrix.\n");
   fprintf(stderr, "-T\t(t)ransition matrix input,  default is disabled. If this flag is provided, the input is expected to be a transition probability matrix, rather than a 2D energy grid. In this case, the first two columns in the CSV file are row-order indices into the transition probability matrix, and the third (final) column is the transition probability of that cell.\n");
-  fprintf(stderr, "-V\tverbose,                    default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n");
   fprintf(stderr, "-X\tsingle basepair moves,      default is enabled. If this flag is provided, the input must be in the form of an energy grid, and only diagonally adjacent moves are permitted. This option makes the assumption that the input is *not* a transition probability matrix already, and the input energy grid already satisfies the triangle inequality / parity condition.\n");
   fprintf(stderr, "-Z\tend state,                  default is -1 (inferred from input data as the first row in the CSV whose entry in the second column is 0). If provided, should indicate the 0-indexed line in the input CSV file representing the end state.\n");
 }

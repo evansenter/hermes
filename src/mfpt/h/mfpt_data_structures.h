@@ -10,6 +10,4 @@ typedef struct {
 
 #include "shared/libklp_matrix_header.h"
 
-typedef double(*transition_probability)(const KLP_MATRIX, const double*, int, int, short);
-
 #endif

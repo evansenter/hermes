@@ -6,6 +6,8 @@
 #include <ctype.h>
 #include "population_constants.h"
 #include "population_params.h"
+#include "shared/libklp_matrix_header.h"
+#include "shared/constants.h"
 
 POPULATION_PARAMS init_population_params() {
   POPULATION_PARAMS parameters = {
@@ -15,8 +17,6 @@ POPULATION_PARAMS init_population_params() {
     .start_structure   = NULL,
     .end_structure     = NULL,
     .filename          = NULL,
-    .start_index       = -1,
-    .end_index         = -1,
     .serialize         = 0,
     .temperature       = 37.,
     .start_time        = -10,
@@ -37,10 +37,15 @@ POPULATION_PARAMS init_population_params() {
   return parameters;
 }
 
-void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
+void parse_population_args(KLP_PARAMS* klp_params, POPULATION_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
   int c;
+  opterr = 0;
   
   while ((c = getopt(argc, argv, "ogbhnvqa:z:c:s:k:l:i:j:p:e::d:w:t:m:r:f:")) != -1) {
+    #ifdef INPUT_DEBUG
+      printf("parse_mfpt_args: %c\n", c);
+    #endif
+      
     switch (c) {
       case 'o':
         parameters->lonely_bp = 1;
@@ -85,21 +90,7 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
       case 'l':
         parameters->end_structure = strdup(optarg);
         break;
-        
-      case 'a':
-        if (!sscanf(optarg, "%d", &parameters->start_index)) {
-          (*usage)();
-        }
-        
-        break;
-        
-      case 'z':
-        if (!sscanf(optarg, "%d", &parameters->end_index)) {
-          (*usage)();
-        }
-        
-        break;
-        
+                
       case 'i':
         if (!sscanf(optarg, "%lf", &parameters->start_time)) {
           (*usage)();
@@ -171,6 +162,10 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
         break;
         
       case '?':
+        #ifdef INPUT_DEBUG
+          printf("\tcase '?' with %c\n", optopt);
+        #endif
+      
         switch (optopt) {
           case 'a':
           case 'z':
@@ -191,43 +186,56 @@ void parse_population_args(POPULATION_PARAMS* parameters, int argc, char** argv,
             break;
             
           default:
-            if (isprint(optopt)) {
-              fprintf(stderr, "Unknown option `-%c'.\n", optopt);
-            } else {
-              fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
-            }
+            break;
         }
         
-        (*usage)();
+        break;
         
       default:
         (*usage)();
     }
   }
   
+  #ifdef INPUT_DEBUG
+    printf("Done parsing.\n\n");
+  #endif
+  
   if (parameters->verbose) {
+    debug_klp_matrix_parameters(*klp_params);
     debug_population_parameters(*parameters);
   }
   
-  if (population_error_handling(*parameters)) {
+  if (population_error_handling(*klp_params, *parameters)) {
     (*usage)();
   }
   
   optind = 1;
 }
 
-int population_error_handling(const POPULATION_PARAMS parameters) {
+int population_error_handling(const KLP_PARAMS klp_params, const POPULATION_PARAMS parameters) {
   int error = 0;
   
   if (parameters.input) {
-    if (parameters.sequence != NULL && parameters.start_structure != NULL && strlen(parameters.sequence) != strlen(parameters.start_structure)) {
-      fprintf(stderr, "Error: the starting structure is not the same length as the provided sequence.\n");
+    if (((parameters.input_file == NULL) ^ (parameters.sequence == NULL)) != 1) {
+      fprintf(stderr, "Error: Either an input file must be specified with -c or an input sequence with -s.\n");
       error++;
     }
     
-    if (parameters.sequence != NULL && parameters.end_structure != NULL && strlen(parameters.sequence) != strlen(parameters.end_structure)) {
-      fprintf(stderr, "Error: the ending structure is not the same length as the provided sequence.\n");
+    if (parameters.input_file != NULL && access(parameters.input_file, R_OK) == -1) {
+      fprintf(stderr, "Error: can't read from file %s.\n", parameters.input_file);
       error++;
+    }
+    
+    if (parameters.sequence != NULL) {
+      if (parameters.start_structure != NULL && strlen(parameters.sequence) != strlen(parameters.start_structure)) {
+        fprintf(stderr, "Error: the starting structure is not the same length as the provided sequence.\n");
+        error++;
+      }
+    
+      if (parameters.end_structure != NULL && strlen(parameters.sequence) != strlen(parameters.end_structure)) {
+        fprintf(stderr, "Error: the ending structure is not the same length as the provided sequence.\n");
+        error++;
+      }
     }
   }
   
@@ -251,8 +259,8 @@ int population_error_handling(const POPULATION_PARAMS parameters) {
     error++;
   }
   
-  if (parameters.serialize == -1 && (parameters.start_index < 0 || parameters.end_index < 0)) {
-    fprintf(stderr, "Error: if you're deserializing, the start and end indices (-a, -z) in the serialized transition matrix must be provided.\n");
+  if (parameters.serialize == -1 && (klp_params.start_state < 0 || klp_params.end_state < 0)) {
+    fprintf(stderr, "Error: if you're deserializing, the start and end indices (-A, -Z) in the serialized transition matrix must be provided.\n");
     error++;
   }
   
@@ -294,11 +302,9 @@ void debug_population_parameters(const POPULATION_PARAMS parameters) {
   printf("RNAeq parameters\n");
   printf("(c) input_file\t\t\t%s\n",            parameters.input_file);
   printf("(s) sequence\t\t\t%s\n",              parameters.sequence);
-  printf("(k) start_structure\t\t%s\n",         parameters.start_structure == NULL && parameters.start_index < 0 ? "empty" : parameters.start_structure);
-  printf("(l) end_structure\t\t%s\n",           parameters.end_structure == NULL && parameters.end_index < 0 ? "mfe" : parameters.end_structure);
+  printf("(k) start_structure\t\t%s\n",         parameters.sequence != NULL && parameters.start_structure == NULL ? "empty" : parameters.start_structure);
+  printf("(l) end_structure\t\t%s\n",           parameters.sequence != NULL && parameters.end_structure == NULL ? "mfe" : parameters.end_structure);
   printf("(f) filename\t\t\t%s\n",              parameters.filename);
-  printf("(a) start_index\t\t\t%d\n",           parameters.start_index);
-  printf("(z) end_index\t\t\t%d\n",             parameters.end_index);
   printf("(r) serialize\t\t\t%d\n",             parameters.serialize);
   printf("(t) temperature\t\t\t%.1f\n",         parameters.temperature);
   printf("(i) start_time\t\t\t%.2e\n",          parameters.start_time);
@@ -326,12 +332,12 @@ void population_usage() {
   fprintf(stderr, "k_n,l_n,p_n\n\n");
   fprintf(stderr, "RNAeq [options] -s sequence\n\n");
   fprintf(stderr, "Options include the following:\n");
+  klp_matrix_flags();
   population_flags();
   abort();
 }
 
 void population_flags() {
-  fprintf(stderr, "-a\tstart state,           default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the starting structure (see options for -k).\n");
   fprintf(stderr, "-b\t(b)enchmarking,        default is disabled. When enabled, RNAeq will print benchmarking times for internal function calls.\n");
   fprintf(stderr, "-c\t(C)SV input file,      this option is made available to abstain from providing the input CSV as the last command line argument.\n");
   fprintf(stderr, "-d\t(d)elta range,         default is disabled. When provided, this value specifies the delta-size required for the population to be approaching equilibrium. This position is used as a starting point for a more fine-grained scan using the -e and -w values.\n");
@@ -353,5 +359,4 @@ void population_flags() {
   fprintf(stderr, "-t\t(t)emperature,         temperature at which suboptimal structures are generated. This value is passed to (and only used by) ViennaRNA's RNAsubopt.\n");
   fprintf(stderr, "-v\t(v)erbose,             default is disabled, presents some debug information at runtime.\n\n");
   fprintf(stderr, "-w\t(w)indow size,         default is 5. Specifies the window size (exclusive) for predicting equilibrium. Equilibrium is considered as having been achieved when all indices (i + 1)..(i + window_size - 1) are within epsilon (-e) of the population proportion at time i.\n");
-  fprintf(stderr, "-z\tend state,             default is inferred. If provided, should indicate the 0-indexed position in the transition matrix corresponding to the ending structure (see options for -l).\n\n");
 }

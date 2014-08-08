@@ -11,11 +11,11 @@
 #include "population_initializers.h"
 #include "population_functions.h"
 
-void population_from_row_ordered_transition_matrix(const POPULATION_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
+void population_from_row_ordered_transition_matrix(const KLP_PARAMS klp_params, const POPULATION_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
   if (parameters.equilibrium) {
-    equilibrium_from_row_ordered_transition_matrix(parameters, row_transition_matrix);
+    equilibrium_from_row_ordered_transition_matrix(klp_params, parameters, row_transition_matrix);
   } else {
-    population_proportion_from_row_ordered_transition_matrix(parameters, row_transition_matrix);
+    population_proportion_from_row_ordered_transition_matrix(klp_params, parameters, row_transition_matrix);
   }
 }
 
@@ -30,19 +30,19 @@ EIGENSYSTEM eigensystem_from_row_ordered_transition_matrix(TRANSITION_MATRIX row
   return eigensystem;
 }
 
-void population_proportion_from_row_ordered_transition_matrix(const POPULATION_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
+void population_proportion_from_row_ordered_transition_matrix(const KLP_PARAMS klp_params, const POPULATION_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
   EIGENSYSTEM eigensystem;
   
   eigensystem = eigensystem_from_row_ordered_transition_matrix(row_transition_matrix);
   
-  print_population_proportion(eigensystem, parameters);
+  print_population_proportion(eigensystem, klp_params, parameters);
 }
 
-void equilibrium_from_row_ordered_transition_matrix(POPULATION_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
+void equilibrium_from_row_ordered_transition_matrix(const KLP_PARAMS klp_params, const POPULATION_PARAMS parameters, TRANSITION_MATRIX row_transition_matrix) {
   EIGENSYSTEM eigensystem;
   
   eigensystem = eigensystem_from_row_ordered_transition_matrix(row_transition_matrix);
-  print_equilibrium(eigensystem, parameters);
+  print_equilibrium(eigensystem, klp_params, parameters);
   
 }
 
@@ -130,17 +130,17 @@ void invert_matrix(EIGENSYSTEM* eigensystem) {
   gsl_permutation_free(permutation);
 }
 
-double probability_at_logtime(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, double timepoint, int start_index, int target_index) {
+double probability_at_logtime(const EIGENSYSTEM eigensystem, const KLP_PARAMS klp_params, double timepoint, int start_index, int target_index) {
   // This function is hard-wired to only consider the kinetics for folding from a distribution where p_{0}(start_index) == 1.
   int i;
   double cumulative_probability = 0;
   
-  if (parameters.start_index < 0 || parameters.end_index < 0) {
-    if (parameters.start_index < 0) {
+  if (klp_params.start_state < 0 || klp_params.end_state < 0) {
+    if (klp_params.start_state < 0) {
       fprintf(stderr, "Error: the starting structure could not be found. Usually this means that you did not specify an explicit starting structure so the empty structure was used, but the energy band was not wide enough for RNAsubopt to sample it.\n");
     }
     
-    if (parameters.end_index < 0) {
+    if (klp_params.end_state < 0) {
       fprintf(stderr, "Error: the ending structure could not be found. Usually this means that you did explicitly provided a suboptimal ending structure, but the energy band was not wide enough for RNAsubopt to sample it.\n");
     }
     
@@ -157,19 +157,19 @@ double probability_at_logtime(const EIGENSYSTEM eigensystem, const POPULATION_PA
   return cumulative_probability;
 }
 
-void find_key_structure_indices_in_structure_list(POPULATION_PARAMS* parameters, const SOLUTION* all_structures, int num_structures) {
+void find_key_structure_indices_in_structure_list(KLP_PARAMS* klp_params, const POPULATION_PARAMS parameters, const SOLUTION* all_structures, int num_structures) {
   int i;
   
   for (i = 0; i < num_structures; ++i) {
-    if (parameters->start_index == -1) {
-      if (!strcmp(parameters->start_structure, all_structures[i].structure)) {
-        parameters->start_index = i;
+    if (klp_params->start_state == -1) {
+      if (!strcmp(parameters.start_structure, all_structures[i].structure)) {
+        klp_params->start_state = i;
       }
     }
     
-    if (parameters->end_index == -1) {
-      if (!strcmp(parameters->end_structure, all_structures[i].structure)) {
-        parameters->end_index = i;
+    if (klp_params->end_state == -1) {
+      if (!strcmp(parameters.end_structure, all_structures[i].structure)) {
+        klp_params->end_state = i;
       }
     }
   }
@@ -265,17 +265,17 @@ SOLUTION* sample_structures(const POPULATION_PARAMS parameters) {
   return subopt_par(parameters.sequence, parameters.start_structure, vienna_params, energy_cap, 0, 0, NULL);
 }
 
-double estimate_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
+double estimate_equilibrium(const EIGENSYSTEM eigensystem, const KLP_PARAMS klp_params, const POPULATION_PARAMS parameters) {
   int i, everything_in_equilibrium = 0;
   double equilibrium_time;
   
-  equilibrium_time = soft_bound_for_population_proportion(eigensystem, parameters, parameters.end_index, parameters.end_time, 1);
+  equilibrium_time = soft_bound_for_population_proportion(eigensystem, klp_params, parameters, klp_params.end_state, parameters.end_time, 1);
   
 #ifdef INSANE_DEBUG
   printf("equilibrium_time: %f\n", equilibrium_time);
 #endif
   
-  while (equilibrium_time >= parameters.start_time && index_in_equilibrium_within_window(eigensystem, parameters, parameters.end_index, equilibrium_time)) {
+  while (equilibrium_time >= parameters.start_time && index_in_equilibrium_within_window(eigensystem, klp_params, parameters, klp_params.end_state, equilibrium_time)) {
     equilibrium_time -= parameters.step_size;
   }
   
@@ -291,10 +291,10 @@ double estimate_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARA
         everything_in_equilibrium = 1;
         
         for (i = 0; i < eigensystem.length && everything_in_equilibrium; ++i) {
-          everything_in_equilibrium = index_in_equilibrium_within_window(eigensystem, parameters, i, equilibrium_time);
+          everything_in_equilibrium = index_in_equilibrium_within_window(eigensystem, klp_params, parameters, i, equilibrium_time);
         }
       } else {
-        everything_in_equilibrium = index_in_equilibrium_within_window(eigensystem, parameters, parameters.end_index, equilibrium_time);
+        everything_in_equilibrium = index_in_equilibrium_within_window(eigensystem, klp_params, parameters, klp_params.end_state, equilibrium_time);
       }
       
       if (everything_in_equilibrium) {
@@ -308,17 +308,17 @@ double estimate_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARA
   }
 }
 
-double soft_bound_for_population_proportion(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, int eigensystem_index, double final_time, int sign) {
+double soft_bound_for_population_proportion(const EIGENSYSTEM eigensystem, const KLP_PARAMS klp_params, const POPULATION_PARAMS parameters, int eigensystem_index, double final_time, int sign) {
   double current_probability, final_probability, current_time, temp_time, last_time = final_time;
   
   if (parameters.soft_bounds) {
     last_time           = final_time;
     current_time        = parameters.start_time + (parameters.end_time - parameters.start_time) / 2.0;
-    current_probability = probability_at_logtime(eigensystem, parameters, current_time, parameters.start_index, eigensystem_index);
-    final_probability   = probability_at_logtime(eigensystem, parameters, final_time, parameters.start_index, eigensystem_index);
+    current_probability = probability_at_logtime(eigensystem, klp_params, current_time, klp_params.start_state, eigensystem_index);
+    final_probability   = probability_at_logtime(eigensystem, klp_params, final_time, klp_params.start_state, eigensystem_index);
     
     while (fabs(current_time - last_time) > parameters.step_size) {
-      current_probability = probability_at_logtime(eigensystem, parameters, current_time, parameters.start_index, eigensystem_index);
+      current_probability = probability_at_logtime(eigensystem, klp_params, current_time, klp_params.start_state, eigensystem_index);
       
 #ifdef INSANE_DEBUG
       printf("current_time: %+f, last_time: %+f, p(current): %f, p(target): %f\n", current_time, last_time, current_probability, final_probability);
@@ -345,24 +345,24 @@ double soft_bound_for_population_proportion(const EIGENSYSTEM eigensystem, const
   }
 }
 
-int index_in_equilibrium_within_window(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters, int eigensystem_index, double logtime) {
+int index_in_equilibrium_within_window(const EIGENSYSTEM eigensystem, const KLP_PARAMS klp_params, const POPULATION_PARAMS parameters, int eigensystem_index, double logtime) {
   int i;
   double current_proportion, future_proportion;
   
   current_proportion = probability_at_logtime(
                          eigensystem,
-                         parameters,
+                         klp_params,
                          logtime,
-                         parameters.start_index,
+                         klp_params.start_state,
                          eigensystem_index
                        );
                        
   for (i = 1; i < parameters.window_size; ++i) {
     future_proportion = probability_at_logtime(
                           eigensystem,
-                          parameters,
+                          klp_params,
                           logtime + parameters.step_size * i,
-                          parameters.start_index,
+                          klp_params.start_state,
                           eigensystem_index
                         );
                         
@@ -385,10 +385,10 @@ int index_in_equilibrium_within_window(const EIGENSYSTEM eigensystem, const POPU
   return 1;
 }
 
-void print_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
+void print_equilibrium(const EIGENSYSTEM eigensystem, const KLP_PARAMS klp_params, const POPULATION_PARAMS parameters) {
   double equilibrium_time;
   
-  equilibrium_time = estimate_equilibrium(eigensystem, parameters);
+  equilibrium_time = estimate_equilibrium(eigensystem, klp_params, parameters);
   
   if (equilibrium_time == NEG_INF(parameters)) {
     printf("-Infinity\n");
@@ -399,18 +399,18 @@ void print_equilibrium(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS pa
   }
 }
 
-void print_population_proportion(const EIGENSYSTEM eigensystem, const POPULATION_PARAMS parameters) {
+void print_population_proportion(const EIGENSYSTEM eigensystem, const KLP_PARAMS klp_params, const POPULATION_PARAMS parameters) {
   double current_time, soft_left_bound, soft_right_bound;
   
-  soft_left_bound  = soft_bound_for_population_proportion(eigensystem, parameters, parameters.start_index, parameters.start_time, -1);
-  soft_right_bound = soft_bound_for_population_proportion(eigensystem, parameters, parameters.end_index, parameters.end_time, 1);
+  soft_left_bound  = soft_bound_for_population_proportion(eigensystem, klp_params, parameters, klp_params.start_state, parameters.start_time, -1);
+  soft_right_bound = soft_bound_for_population_proportion(eigensystem, klp_params, parameters, klp_params.end_state, parameters.end_time, 1);
   
   for (current_time = soft_left_bound; current_time <= soft_right_bound; current_time += parameters.step_size) {
     printf(
       "%+f\t%+.8f\t%+.8f\n",
       current_time,
-      probability_at_logtime(eigensystem, parameters, current_time, parameters.start_index, parameters.end_index),
-      probability_at_logtime(eigensystem, parameters, current_time, parameters.start_index, parameters.start_index)
+      probability_at_logtime(eigensystem, klp_params, current_time, klp_params.start_state, klp_params.end_state),
+      probability_at_logtime(eigensystem, klp_params, current_time, klp_params.start_state, klp_params.start_state)
     );
   }
 }

@@ -1,6 +1,7 @@
 #ifndef POPULATION_DATA_STRUCTURES_H
 #define POPULATION_DATA_STRUCTURES_H
 
+#include "shared/libklp_matrix_header.h"
 #include "vienna/externs.h"
 
 typedef struct {
@@ -10,8 +11,6 @@ typedef struct {
   char* start_structure;
   char* end_structure;
   char* filename;
-  int start_index;
-  int end_index;
   int serialize;
   double temperature;
   double start_time;
