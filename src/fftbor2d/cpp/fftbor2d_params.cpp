@@ -43,7 +43,7 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, voi
   opterr = 0;
   
   while (optind < argc) {
-    if ((c = getopt(argc, argv, "vbmsct:e:f:i:j:k:p:")) != -1) {
+    if ((c = getopt(argc, argv, "+vbmsct:e:f:i:j:k:p:")) != -1) {
       #ifdef INPUT_DEBUG
         printf("parse_mfpt_args: %c\n", c);
       #endif
