@@ -273,30 +273,31 @@ void debug_fftbor2d_parameters(const FFTBOR2D_PARAMS parameters) {
 }
 
 void fftbor2d_usage() {
-  fprintf(stderr, "FFTbor2D [options] sequence structure_1 structure_2\n\n");
-  fprintf(stderr, "FFTbor2D [options] -i sequence -j structure_1 -k structure_2\n\n");
-  fprintf(stderr, "FFTbor2D [options] filename\n");
-  fprintf(stderr, "where filename is a file of format:\n");
-  fprintf(stderr, "\t>comment (optional line)\n");
-  fprintf(stderr, "\tsequence (max length: %d)\n", MAX_LENGTH);
-  fprintf(stderr, "\tsecondary structure (1)\n");
-  fprintf(stderr, "\tsecondary structure (2)\n\n");
+  fprintf(stderr, "FFTbor2D [options] -i sequence -j structure_1 -k structure_2\n");
+  fprintf(stderr, "FFTbor2D [options] -f filename\n\n");
+  fprintf(stderr, "...where filename is a file of format:\n\n");
+  fprintf(stderr, ">comment (optional line)\n");
+  fprintf(stderr, "sequence (max length: %d)\n", MAX_LENGTH);
+  fprintf(stderr, "secondary structure (1)\n");
+  fprintf(stderr, "secondary structure (2)\n\n");
   fprintf(stderr, "Options include the following:\n");
+  fprintf(stderr, "------------------------------\n\n");
   fftbor2d_flags();
-  fprintf(stderr, "Note: output formatting flags (C/c, M/m, S/s) are mutually exclusive. If more than one is provided, *only* last flag will be honored.\n");
+  fprintf(stderr, "Note: output formatting flags (-c, -m, -s) are mutually exclusive. If more than one is provided, *only* last flag will be honored.\n");
   abort();
 }
 
 void fftbor2d_flags() {
-  fprintf(stderr, "\t-b\t(b)enchmark,     default is off. If on, benchmarking data will print alongside normal results.\n");
-  fprintf(stderr, "\t-c\t(C)SV output,    default is disabled, presents output in CSV format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z).\n");
-  fprintf(stderr, "\t-e\t(e)nergyfile,    default is rna_turner2004.par in this current directory. Must be name of a file with all energy parameters (in same format as used in Vienna RNA). Energy file lookup first checks current directory, and then iterates through PATH shell variable until a matching file is found. If no file is found, default ViennaRNA parameters are used and a warning is presented to user. If -E switch is explicitly provided, that file is used in lieu of searching for rna_turner2004.par file.\n");
-  fprintf(stderr, "\t-i\tsequence,        The sequence to be used by FFTbor2D.\n");
-  fprintf(stderr, "\t-j\tstructure_1,     The first structure to use with FFTbor2D.\n");
-  fprintf(stderr, "\t-k\tstructure_2,     The second structure to use with FFTbor2D.\n");
-  fprintf(stderr, "\t-m\t(m)atrix format, default is disabled, presents output in a matrix format instead of a column format.\n");
-  fprintf(stderr, "\t-p\t(p)recision,     default is %d, indicates precision (base 2) of probabilities Z_k / Z to be returned (0-%d, 0 disables precision handling).\n", (int)ceil(log(pow(10., 8)) / log(2.)), std::numeric_limits<double>::digits);
-  fprintf(stderr, "\t-s\t(s)imple output, default is disabled, presents output in column format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z), -RTln(Z_{k,l})).\n");
-  fprintf(stderr, "\t-t\t(t)emperature,   default is 37 degrees Celsius.\n");
-  fprintf(stderr, "\t-v\t(v)erbose,       default is disabled, presents some debug information at runtime.\n\n");
+  fprintf(stderr, "\t-b\t(b)enchmark,                default is off. If on, benchmarking data will print alongside normal results.\n");
+  fprintf(stderr, "\t-f\t(f)ilename,                 .fa-like file containing optional comment (prefixed by >), sequence and two structures, all separated by newlines. Used in lieu of -i, -j, -k.\n");
+  fprintf(stderr, "\t-c\t(c)SV output,               default is disabled, presents output in CSV format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z).\n");
+  fprintf(stderr, "\t-e\t(e)nergyfile,               default is rna_turner2004.par in this current directory. Must be name of a file with all energy parameters (in same format as used in Vienna RNA). Energy file lookup first checks current directory, and then iterates through PATH shell variable until a matching file is found. If no file is found, default ViennaRNA parameters are used and a warning is presented to user. If -E switch is explicitly provided, that file is used in lieu of searching for rna_turner2004.par file.\n");
+  fprintf(stderr, "\t-i\tsequence,                   The sequence to be used by FFTbor2D.\n");
+  fprintf(stderr, "\t-j\tstructure_1,                The first structure to use with FFTbor2D.\n");
+  fprintf(stderr, "\t-k\tstructure_2,                The second structure to use with FFTbor2D.\n");
+  fprintf(stderr, "\t-m\t(m)atrix format,            default is disabled, presents output in a matrix format instead of a column format.\n");
+  fprintf(stderr, "\t-p\t(p)recision,                default is %d, indicates precision (base 2) of probabilities Z_k / Z to be returned (0-%d, 0 disables precision handling).\n", (int)ceil(log(pow(10., 8)) / log(2.)), std::numeric_limits<double>::digits);
+  fprintf(stderr, "\t-s\t(s)imple output,            default is disabled, presents output in column format, for non-zero entries only with no header output (columns are: k, l, p(Z_{k,l}/Z), -RTln(Z_{k,l})).\n");
+  fprintf(stderr, "\t-t\t(t)emperature,              default is 37 degrees Celsius.\n");
+  fprintf(stderr, "\t-v\t(v)erbose,                  default is disabled, presents some debug information at runtime.\n\n");
 }
