@@ -117,11 +117,13 @@ void debug_mfpt_parameters(const MFPT_PARAMS parameters) {
 
 void mfpt_usage() {
   fprintf(stderr, "RNAmfpt [options] -c input_csv\n\n");
-  fprintf(stderr, "where input_csv is a CSV file (with *no* header) of the format:\n");
-  fprintf(stderr, "k_0,l_0,p_0\n");
+  fprintf(stderr, "...where input_csv is a CSV file (with *no* header) of the format:\n\n");
+  fprintf(stderr, "k_0,l_0,p(k_0,l_0)\n");
   fprintf(stderr, "...,...,...\n");
-  fprintf(stderr, "k_n,l_n,p_n\n\n");
+  fprintf(stderr, "k_n,l_n,p(k_n,l_n)\n\n");
+  fprintf(stderr, "...with k representing row indices, l representing column indices and p representing the corresponding value at position (k, l) in a row-ordered matrix.\n\n");
   fprintf(stderr, "Options include the following:\n");
+  fprintf(stderr, "------------------------------\n\n");
   klp_matrix_flags();
   mfpt_flags();
   fprintf(stderr, "Program returns -1 (resp. -2) if the start state (resp. end state) probability is 0. -3 is returned if the distance between the two input structures could not be inferred from the input data (usually also means that one of the states has a 0-probability). Otherwise returns the MFPT as predicted by matrix inversion.\n");
@@ -130,7 +132,7 @@ void mfpt_usage() {
 
 void mfpt_flags() {
   fprintf(stderr, "\t-b\t(b)enchmarking,             default is disabled. When enabled, will print benchmarking times for internal function calls.\n");
-  fprintf(stderr, "\t-c\t(C)SV input file,           this option is made available to abstain from providing the input CSV as the last command line argument.\n");
+  fprintf(stderr, "\t-c\t(c)SV input file,           this option is made available to abstain from providing the input CSV as the last command line argument.\n");
   fprintf(stderr, "\t-l\tprint a(l)l MFPT,           if this flag is provided, the program will print the MFPT for every non-end state to hit the end state, and then print the same beginning -> end MFPT that is printed without this flag. Indices for the MFPT correspond to 0-ordered indices in the transition probability matrix.\n");
-  fprintf(stderr, "\t-v\tverbose,                    default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n\n");
+  fprintf(stderr, "\t-v\t(v)erbose,                  default is disabled. If this flag is provided, light debug data will be printed. To enable heavy debugging, use the flags in mfpt_constants.h\n\n");
 }
