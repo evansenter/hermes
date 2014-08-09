@@ -42,7 +42,7 @@ void parse_population_args(KLP_PARAMS* klp_params, POPULATION_PARAMS* parameters
   opterr = 0;
   
   while (optind < argc) {
-    if ((c = getopt(argc, argv, "ogbhnvqa:z:c:s:k:l:i:j:p:e::d:w:t:m:r:f:")) != -1) {
+    if ((c = getopt(argc, argv, "+ogbhnvqa:z:c:s:k:l:i:j:p:e::d:w:t:m:r:f:")) != -1) {
       #ifdef INPUT_DEBUG
         printf("parse_mfpt_args: %c\n", c);
       #endif

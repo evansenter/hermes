@@ -25,7 +25,7 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
   opterr = 0;
 
   while (optind < argc) {
-    if ((c = getopt(argc, argv, "A:Z:N:D:O:FTXEHR")) != -1) {
+    if ((c = getopt(argc, argv, "+A:Z:N:D:O:FTXEHR")) != -1) {
       #ifdef INPUT_DEBUG
         printf("parse_klp_matrix_args: %c\n", c);
       #endif
