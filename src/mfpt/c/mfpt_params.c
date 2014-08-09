@@ -23,7 +23,7 @@ void parse_mfpt_args(KLP_PARAMS* klp_params, MFPT_PARAMS* parameters, int argc, 
   opterr = 0;
   
   while (optind < argc) {
-    if ((c = getopt(argc, argv, "lbvc:")) != -1) {
+    if ((c = getopt(argc, argv, "+lbvc:")) != -1) {
       #ifdef INPUT_DEBUG
         printf("parse_mfpt_args: %c\n", c);
       #endif
