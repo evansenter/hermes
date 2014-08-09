@@ -21,11 +21,16 @@ KLP_PARAMS init_klp_matrix_params() {
 }
 
 void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
-  int c;
-  opterr = 0;
+  int c, i;
+  opterr          = 0;  
+  char** argv_dup = malloc(argc * sizeof(char*));
+    
+  for (i = 0; i < argc; ++i) {
+    argv_dup[i] = strdup(argv[i]);
+  }
 
   while (optind < argc) {
-    if ((c = getopt(argc, argv, "A:Z:N:D:O:FTXEHR")) != -1) {
+    if ((c = getopt(argc, argv_dup, "A:Z:N:D:O:FTXEHR")) != -1) {
       #ifdef INPUT_DEBUG
         printf("parse_klp_matrix_args: %c\n", c);
       #endif
@@ -124,6 +129,11 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
       optind++;
     }
   }
+  
+  for (i = 0; i < argc; ++i) {
+    free(argv_dup[i]);
+  }
+  free(argv_dup);
   
   #ifdef INPUT_DEBUG
     printf("Done parsing.\n\n");
