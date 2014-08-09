@@ -30,6 +30,8 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
   }
 
   while (optind < argc) {
+    printf("Parsing option index %d\n", optind);
+    
     if ((c = getopt(argc, argv_dup, "A:Z:N:D:O:FTXEHR")) != -1) {
       #ifdef INPUT_DEBUG
         printf("parse_klp_matrix_args: %c\n", c);
@@ -120,6 +122,7 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
               (*usage)();
           }
           
+          printf("optopt: %c, optarg %s\n", optopt, optarg);
           break;
 
         default:
