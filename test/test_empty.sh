@@ -14,6 +14,3 @@ echo "Testing FFTmfpt:"
 
 echo "Testing FFTeq:"
 ../bin/FFTeq
-
-echo "Testing RateEq:"
-../bin/RateEq

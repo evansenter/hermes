@@ -24,6 +24,12 @@ echo "Result:"
 ../bin/RNAeq -o -s GGGAAACCC -l "(((...)))" -i 0 -j 1 -p 1
 
 echo
+echo "Testing RNAeq, expecting:
+3.235000"
+echo "Result:"
+../bin/RNAeq -c ../src/population/all_structures_for_gggaaaccc__19_5_rate_move_without_hastings.csv -A 19 -Z 5 -qTR
+
+echo
 echo "Testing FFTmfpt, expecting:
 6786.738209"
 echo "Result:"
@@ -34,9 +40,3 @@ echo "Testing FFTeq, expecting:
 +3.000000	+0.33271632	+0.03369467"
 echo "Result:"
 ../bin/FFTeq --fftbor2d-i GGGGGCCCCC --fftbor2d-j ".........." --fftbor2d-k "(((....)))" --population-i 2 --population-j 3 --population-p 1
-
-echo
-echo "Testing RateEq, expecting:
-3.235000"
-echo "Result:"
-../bin/RateEq --mfpt-c ../ext/population_from_rate_matrix/all_structures_for_gggaaaccc__19_5_rate_move_without_hastings.csv --population-A 19 --population-Z 5 --population-q

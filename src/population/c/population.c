@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
   if (!DESERIALIZING(parameters)) {
     if (parameters.input_file) {
       klp_matrix        = klp_matrix_from_file(parameters.input_file, klp_params, &population_usage);
-      transition_matrix = transition_matrix_from_klp_matrix_and_params(&klp_params, &klp_matrix);
+      transition_matrix = transpose_matrix(transition_matrix_from_klp_matrix_and_params(&klp_params, &klp_matrix));
       TIMING("csv initialization")
     } else if (parameters.sequence) {
       ensure_key_structures_and_energies_assigned(&parameters);

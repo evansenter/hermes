@@ -75,14 +75,14 @@ void parse_mfpt_args(KLP_PARAMS* klp_params, MFPT_PARAMS* parameters, int argc, 
     debug_mfpt_parameters(*parameters);
   }
   
-  if (mfpt_error_handling(*klp_params, *parameters)) {
+  if (mfpt_error_handling(*parameters)) {
     (*usage)();
   }
   
   optind = 1;
 }
 
-int mfpt_error_handling(const KLP_PARAMS klp_params, const MFPT_PARAMS parameters) {
+int mfpt_error_handling(const MFPT_PARAMS parameters) {
   int error = 0;
   
   if (parameters.input) {
