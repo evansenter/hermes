@@ -50,13 +50,11 @@ void free_transition_matrix(TRANSITION_MATRIX transition_matrix) {
 
 void print_transition_matrix(const TRANSITION_MATRIX transition_matrix) {
   int i, j;
-  printf("Transition matrix:\n");
-  printf("(from)\t(to)\tp(to | from)\n");
   
   for (i = 0; i < transition_matrix.row_length; ++i) {
     for (j = 0; j < transition_matrix.row_length; ++j) {
       printf(
-        "%d\t=>\t%d\t%.8f\n",
+        "%d,%d,%.8f\n",
         i,
         j,
         T_ROW_ORDER(transition_matrix, i, j)
@@ -69,7 +67,7 @@ void print_transition_matrix(const TRANSITION_MATRIX transition_matrix) {
 
 void print_transition_matrix_with_klp_positions(const KLP_MATRIX klp_matrix, const TRANSITION_MATRIX transition_matrix) {
   int i, j;
-  printf("Transition matrix:\n");
+  
   printf("(from)\t(to)\tp(to | from)\n");
   
   for (i = 0; i < klp_matrix.length; ++i) {
