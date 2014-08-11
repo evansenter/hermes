@@ -17,11 +17,10 @@ int main(int argc, char** argv) {
   TRANSITION_MATRIX transition_matrix;
   EIGENSYSTEM eigensystem;
   
-  int i, num_structures = 0;
-  
-  klp_params = init_klp_matrix_params();
+  int i, num_structures  = 0;
+  klp_params             = init_klp_matrix_params();
   klp_params.rate_matrix = 1;
-  parameters = init_population_params();
+  parameters             = init_population_params();
   parse_klp_matrix_args(&klp_params, argc, argv, &population_usage);
   parse_population_args(&klp_params, &parameters, argc, argv, &population_usage);
   

@@ -22,12 +22,21 @@ KLP_MATRIX klp_matrix_from_file(const char* input_file, const KLP_PARAMS klp_par
 }
 
 TRANSITION_MATRIX transition_matrix_from_klp_matrix_and_params(KLP_PARAMS* klp_params, KLP_MATRIX* klp_matrix) {
+  TRANSITION_MATRIX transition_matrix;
+  
   if (RUN_TYPE(klp_params->run_type, TRANSITION_INPUT_FLAG)) {
     // We already have a transition matrix, this is the easy case.
-    return transition_matrix_from_klp_matrix(klp_matrix, MATRIX_TYPE(klp_params->rate_matrix));
+    transition_matrix = transition_matrix_from_klp_matrix(klp_matrix, MATRIX_TYPE(klp_params->rate_matrix));
   } else {
     // We have an energy grid, this requires converting the energy grid into a transition matrix data structure.
-    return convert_klp_matrix_to_transition_matrix(klp_matrix, klp_params);
+    transition_matrix = convert_klp_matrix_to_transition_matrix(klp_matrix, klp_params);
+  }
+  
+  if (klp_params->output_only) {
+    print_transition_matrix(transition_matrix);
+    exit(0);
+  } else {
+    return transition_matrix;
   }
 }
 

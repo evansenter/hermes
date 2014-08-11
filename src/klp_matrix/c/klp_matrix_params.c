@@ -15,7 +15,8 @@ KLP_PARAMS init_klp_matrix_params() {
     .run_type      = DIAG_MOVES_ONLY_FLAG,
     .energy_based  = 0,
     .hastings      = 0,
-    .rate_matrix   = 0
+    .rate_matrix   = 0,
+    .output_only   = 0
   };
   return parameters;
 }
@@ -25,7 +26,7 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
   opterr = 0;
 
   while (optind < argc) {
-    if ((c = getopt(argc, argv, "+A:Z:N:D:O:FTXEHR")) != -1) {
+    if ((c = getopt(argc, argv, "+A:Z:N:D:O:FTXEHRU")) != -1) {
       #ifdef INPUT_DEBUG
         printf("parse_klp_matrix_args: %c\n", c);
       #endif
@@ -53,6 +54,10 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
         
         case 'R':
           parameters->rate_matrix = 1;
+          break;
+        
+        case 'U':
+          parameters->output_only = 1;
           break;
         
         case 'A':
@@ -201,9 +206,10 @@ void debug_klp_matrix_parameters(const KLP_PARAMS parameters) {
   printf("(F) fully_connected\t\t%s\n",       RUN_TYPE(parameters.run_type, FULLY_CONNECTED_FLAG)  ? "Yes" : "No");
   printf("(T) transition_matrix_input\t%s\n", RUN_TYPE(parameters.run_type, TRANSITION_INPUT_FLAG) ? "Yes" : "No");
   printf("(X) single_bp_moves_only\t%s\n",    RUN_TYPE(parameters.run_type, DIAG_MOVES_ONLY_FLAG)  ? "Yes" : "No");
-  printf("(E) energy_based\t\t%s\n",          parameters.energy_based                     ? "Yes" : "No");
-  printf("(H) hastings\t\t\t%s\n",            parameters.hastings                         ? "Yes" : "No");
-  printf("(R) rate_matrix\t\t\t%s\n",         parameters.rate_matrix                      ? "Yes" : "No");
+  printf("(E) energy_based\t\t%s\n",          parameters.energy_based                              ? "Yes" : "No");
+  printf("(H) hastings\t\t\t%s\n",            parameters.hastings                                  ? "Yes" : "No");
+  printf("(R) rate_matrix\t\t\t%s\n",         parameters.rate_matrix                               ? "Yes" : "No");
+  printf("(U) output_only\t\t\t%s\n",         parameters.output_only                               ? "Yes" : "No");
   
   memset(buffer, ' ', 128 * sizeof(char));
   sprintf(buffer, "%d", parameters.start_state);
@@ -244,5 +250,6 @@ void klp_matrix_flags() {
   fprintf(stderr, "\t-H\t(H)astings adjustment,      default is disabled. If this flag is provided, the input must be in the form of an energy grid, and only diagonally adjacent moves are permitted (in the all-to-all transition case, N(X) / N(Y) == 1). Calculating N(X) and N(Y) will respect grid boundaries and the triangle equality, and the basepair distance between the two structures for kinetics is inferred from the energy grid.\n");
   fprintf(stderr, "\t-E\t(E)nergy-based transitions, default is disabled. If this flag is provided, the transition from state a to b will be calculated as (min(1, exp(-(E_b - E_a) / RT)) / n) rather than (min(1, p_b / p_a) / n).\n");
   fprintf(stderr, "\t-X\tsingle basepair moves,      default is enabled. If this flag is provided, the input must be in the form of an energy grid, and only diagonally adjacent moves are permitted. This option makes the assumption that the input is *not* a transition probability matrix already, and the input energy grid already satisfies the triangle inequality / parity condition.\n");
-  fprintf(stderr, "\t-F\t(F)ully connected,          if the graph is fully connected we permit transitions between arbitrary positions in the 2D grid.\n\n");
+  fprintf(stderr, "\t-F\t(F)ully connected,          if the graph is fully connected we permit transitions between arbitrary positions in the 2D grid.\n");
+  fprintf(stderr, "\t-U\to(U)tput only,              if enabled, the code will only output the generated transition matrix, rather than compute any downstream functions with it. Output format is identical to the CSV input format, in row-order.\n\n");
 }
