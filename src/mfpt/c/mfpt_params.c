@@ -24,40 +24,40 @@ void parse_mfpt_args(KLP_PARAMS* klp_params, MFPT_PARAMS* parameters, int argc, 
   
   while (optind < argc) {
     if ((c = getopt(argc, argv, "+lbvc:")) != -1) {
-      #ifdef INPUT_DEBUG
-        printf("parse_mfpt_args: %c\n", c);
-      #endif
-
+#ifdef INPUT_DEBUG
+      printf("parse_mfpt_args: %c\n", c);
+#endif
+      
       switch (c) {
         case 'l':
           parameters->all_mfpt = 1;
           break;
-    
+          
         case 'b':
           parameters->benchmark = 1;
           break;
-    
+          
         case 'v':
           parameters->verbose = 1;
           break;
-    
+          
         case 'c':
           parameters->input_file = strdup(optarg);
           break;
-    
+          
         case '?':
-          #ifdef INPUT_DEBUG
-            printf("\tcase '?' with %c\n", optopt);
-          #endif
-  
+#ifdef INPUT_DEBUG
+          printf("\tcase '?' with %c\n", optopt);
+#endif
+          
           switch (optopt) {
             case 'c':
               fprintf(stderr, "Option -%c requires an argument.\n", optopt);
               (*usage)();
           }
-    
+          
           break;
-    
+          
         default:
           (*usage)();
       }
@@ -66,9 +66,9 @@ void parse_mfpt_args(KLP_PARAMS* klp_params, MFPT_PARAMS* parameters, int argc, 
     }
   }
   
-  #ifdef INPUT_DEBUG
-    printf("Done parsing.\n\n");
-  #endif
+#ifdef INPUT_DEBUG
+  printf("Done parsing.\n\n");
+#endif
   
   if (parameters->verbose) {
     debug_klp_matrix_parameters(*klp_params);

@@ -24,91 +24,91 @@ KLP_PARAMS init_klp_matrix_params() {
 void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (*usage)()) {
   int c;
   opterr = 0;
-
+  
   while (optind < argc) {
     if ((c = getopt(argc, argv, "+A:Z:N:D:O:FTXEHRU")) != -1) {
-      #ifdef INPUT_DEBUG
-        printf("parse_klp_matrix_args: %c\n", c);
-      #endif
-    
+#ifdef INPUT_DEBUG
+      printf("parse_klp_matrix_args: %c\n", c);
+#endif
+      
       switch (c) {
         case 'F':
           parameters->run_type = FULLY_CONNECTED_FLAG;
           break;
-        
+          
         case 'T':
           parameters->run_type = TRANSITION_INPUT_FLAG;
           break;
-        
+          
         case 'X':
           parameters->run_type = DIAG_MOVES_ONLY_FLAG;
           break;
-        
+          
         case 'E':
           parameters->energy_based = 1;
           break;
-        
+          
         case 'H':
           parameters->hastings = 1;
           break;
-        
+          
         case 'R':
           parameters->rate_matrix = 1;
           break;
-        
+          
         case 'U':
           parameters->output_only = 1;
           break;
-        
+          
         case 'A':
           if (!sscanf(optarg, "%d", &parameters->start_state)) {
             (*usage)();
           } else if (parameters->start_state < 0) {
             (*usage)();
           }
-        
+          
           break;
-        
+          
         case 'Z':
           if (!sscanf(optarg, "%d", &parameters->end_state)) {
             (*usage)();
           } else if (parameters->end_state < 0) {
             (*usage)();
           }
-        
+          
           break;
-        
+          
         case 'N':
           if (!sscanf(optarg, "%d", &parameters->max_dist)) {
             (*usage)();
           } else if (parameters->max_dist <= 0) {
             (*usage)();
           }
-        
+          
           break;
-        
+          
         case 'D':
           if (!sscanf(optarg, "%d", &parameters->bp_dist)) {
             (*usage)();
           } else if (parameters->bp_dist <= 0) {
             (*usage)();
           }
-        
+          
           break;
-        
+          
         case 'O':
           if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
             (*usage)();
           } else if (parameters->epsilon <= 1e-16) {
             (*usage)();
           }
-        
+          
           break;
-                
+          
         case '?':
-          #ifdef INPUT_DEBUG
-            printf("\tcase '?' with %c\n", optopt);
-          #endif
+#ifdef INPUT_DEBUG
+          printf("\tcase '?' with %c\n", optopt);
+#endif
           
           switch (optopt) {
             case 'A':
@@ -121,7 +121,7 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
           }
           
           break;
-
+          
         default:
           (*usage)();
       }
@@ -130,9 +130,9 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
     }
   }
   
-  #ifdef INPUT_DEBUG
-    printf("Done parsing.\n\n");
-  #endif
+#ifdef INPUT_DEBUG
+  printf("Done parsing.\n\n");
+#endif
   
   if (klp_matrix_error_handling(*parameters)) {
     (*usage)();

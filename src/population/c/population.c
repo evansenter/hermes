@@ -36,25 +36,26 @@ int main(int argc, char** argv) {
     } else if (parameters.sequence) {
       ensure_key_structures_and_energies_assigned(&parameters);
       all_structures = sample_structures(parameters);
-    
+      
       while (all_structures[num_structures].structure != NULL) {
         num_structures++;
       }
-    
+      
       find_key_structure_indices_in_structure_list(&klp_params, parameters, all_structures, num_structures);
-    
+      
       if (parameters.verbose) {
         printf("sequence:\t%s\n",                      parameters.sequence);
         printf("start:\t\t%s\t%+.2f kcal/mol\t(%d)\n", all_structures[klp_params.start_state].structure, all_structures[klp_params.start_state].energy, klp_params.start_state);
         printf("stop:\t\t%s\t%+.2f kcal/mol\t(%d)\n",  all_structures[klp_params.end_state].structure, all_structures[klp_params.end_state].energy, klp_params.end_state);
         printf("num str:\t%d\n\n",                     num_structures);
-      
+        
         for (i = 0; i < num_structures; ++i) {
           printf("%d\t%s\t%+.2f\n", i, all_structures[i].structure, all_structures[i].energy);
         }
-      
+        
         printf("\n");
       }
+      
       TIMING("subopt initialization")
       
       transition_matrix = convert_structures_to_transition_matrix(all_structures, num_structures);

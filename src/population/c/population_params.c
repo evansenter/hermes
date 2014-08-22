@@ -11,28 +11,29 @@
 
 POPULATION_PARAMS init_population_params() {
   POPULATION_PARAMS parameters = {
-    .input_file        = NULL,
-    .sequence          = NULL,
-    .start_structure   = NULL,
-    .end_structure     = NULL,
-    .filename          = NULL,
-    .serialize         = 0,
-    .temperature       = 37.,
-    .start_time        = -10,
-    .end_time          = 10,
-    .step_size         = 1e-3,
-    .equilibrium       = 0,
-    .soft_bounds       = 1,
-    .epsilon           = 1e-4,
-    .delta             = 1e-3,
-    .window_size       = 5,
-    .all_subpop_for_eq = 0,
-    .lonely_bp         = 0,
-    .energy_cap        = 0,
-    .eigen_only        = 0,
-    .input             = 1,
-    .benchmark         = 0,
-    .verbose           = 0
+    .input_file         = NULL,
+    .sequence           = NULL,
+    .start_structure    = NULL,
+    .end_structure      = NULL,
+    .filename           = NULL,
+    .temperature        = 37.,
+    .start_time         = -10,
+    .end_time           = 10,
+    .step_size          = 1e-3,
+    .serialize          = 0,
+    .equilibrium        = 0,
+    .soft_bounds        = 1,
+    .epsilon            = 1e-4,
+    .delta              = 1e-3,
+    .window_size        = 5,
+    .num_subpop_to_show = -1,
+    .all_subpop_for_eq  = 0,
+    .lonely_bp          = 0,
+    .energy_cap         = 0,
+    .eigen_only         = 0,
+    .input              = 1,
+    .benchmark          = 0,
+    .verbose            = 0
   };
   return parameters;
 }
@@ -42,134 +43,140 @@ void parse_population_args(KLP_PARAMS* klp_params, POPULATION_PARAMS* parameters
   opterr = 0;
   
   while (optind < argc) {
-    if ((c = getopt(argc, argv, "+ogbhnvqa:z:c:s:k:l:i:j:p:e::d:w:t:m:r:f:")) != -1) {
-      #ifdef INPUT_DEBUG
-        printf("parse_mfpt_args: %c\n", c);
-      #endif
-  
+    if ((c = getopt(argc, argv, "+ogbhnvqa:c:s:k:l:i:j:p:e::d:w:t:m:r:f:")) != -1) {
+#ifdef INPUT_DEBUG
+      printf("parse_mfpt_args: %c\n", c);
+#endif
+      
       switch (c) {
         case 'o':
           parameters->lonely_bp = 1;
           break;
-    
+          
         case 'g':
           parameters->eigen_only = 1;
           break;
-    
+          
         case 'b':
           parameters->benchmark = 1;
           break;
-    
+          
         case 'h':
           parameters->all_subpop_for_eq = 1;
           break;
-    
+          
         case 'n':
           parameters->soft_bounds = 0;
           break;
-    
+          
         case 'v':
           parameters->verbose = 1;
           break;
-    
+          
         case 'q':
           parameters->equilibrium = 1;
           break;
-    
+          
         case 'c':
           parameters->input_file = strdup(optarg);
           break;
-    
+          
         case 's':
           parameters->sequence = strdup(optarg);
           break;
-    
+          
         case 'k':
           parameters->start_structure = strdup(optarg);
           break;
-    
+          
         case 'l':
           parameters->end_structure = strdup(optarg);
           break;
-            
+          
+        case 'a':
+          if (!sscanf(optarg, "%d", &parameters->num_subpop_to_show)) {
+            (*usage)();
+          }
+          
+          break;
+          
         case 'i':
           if (!sscanf(optarg, "%lf", &parameters->start_time)) {
             (*usage)();
           }
-    
+          
           break;
-    
+          
         case 'j':
           if (!sscanf(optarg, "%lf", &parameters->end_time)) {
             (*usage)();
           }
-    
+          
           break;
-    
+          
         case 'p':
           if (!sscanf(optarg, "%lf", &parameters->step_size)) {
             (*usage)();
           }
-    
+          
           break;
-    
+          
         case 'e':
           if (!sscanf(optarg, "%lf", &parameters->epsilon)) {
             (*usage)();
           }
-    
+          
           parameters->equilibrium = 1;
           break;
-    
+          
         case 'd':
           if (!sscanf(optarg, "%lf", &parameters->delta)) {
             (*usage)();
           }
-    
+          
           break;
-    
+          
         case 'w':
           if (!sscanf(optarg, "%d", &parameters->window_size)) {
             (*usage)();
           }
-    
+          
           break;
-    
+          
         case 't':
           if (!sscanf(optarg, "%lf", &parameters->temperature)) {
             (*usage)();
           }
-    
+          
           break;
-    
+          
         case 'm':
           if (!sscanf(optarg, "%lf", &parameters->energy_cap)) {
             (*usage)();
           }
-    
+          
           break;
-    
+          
         case 'r':
-          if (!sscanf(optarg, "%d", &parameters->serialize)) {
+          if (!sscanf(optarg, "%hd", &parameters->serialize)) {
             (*usage)();
           } else if ((int)abs(parameters->serialize) != 1) {
             (*usage)();
           }
-    
+          
           break;
-    
+          
         case 'f':
           parameters->filename = strdup(optarg);
           break;
-    
+          
         case '?':
-          #ifdef INPUT_DEBUG
-            printf("\tcase '?' with %c\n", optopt);
-          #endif
-  
+#ifdef INPUT_DEBUG
+          printf("\tcase '?' with %c\n", optopt);
+#endif
+          
           switch (optopt) {
             case 'a':
-            case 'z':
             case 's':
             case 'k':
             case 'l':
@@ -186,9 +193,9 @@ void parse_population_args(KLP_PARAMS* klp_params, POPULATION_PARAMS* parameters
               fprintf(stderr, "Option -%c requires an argument.\n", optopt);
               (*usage)();
           }
-    
+          
           break;
-    
+          
         default:
           (*usage)();
       }
@@ -197,9 +204,9 @@ void parse_population_args(KLP_PARAMS* klp_params, POPULATION_PARAMS* parameters
     }
   }
   
-  #ifdef INPUT_DEBUG
-    printf("Done parsing.\n\n");
-  #endif
+#ifdef INPUT_DEBUG
+  printf("Done parsing.\n\n");
+#endif
   
   if (parameters->verbose) {
     debug_klp_matrix_parameters(*klp_params);
@@ -232,12 +239,22 @@ int population_error_handling(const KLP_PARAMS klp_params, const POPULATION_PARA
         fprintf(stderr, "Error: the starting structure is not the same length as the provided sequence.\n");
         error++;
       }
-    
+      
       if (parameters.end_structure != NULL && strlen(parameters.sequence) != strlen(parameters.end_structure)) {
         fprintf(stderr, "Error: the ending structure is not the same length as the provided sequence.\n");
         error++;
       }
     }
+  }
+  
+  if (parameters.num_subpop_to_show < -1) {
+    fprintf(stderr, "Error: the number of subpopulations to show must be > 0 (for the top-k subpopulations) or 0 (for all subpopulations).\n");
+    error++;
+  }
+  
+  if (parameters.equilibrium && parameters.num_subpop_to_show >= 0 && parameters.all_subpop_for_eq) {
+    fprintf(stderr, "Error: requesting to show equilibrium time for multiple subpopulations while forcing all subpopulations to simultaneously be in equilibrium doesn't make sense.\n");
+    error++;
   }
   
   if (parameters.energy_cap < 0) {
@@ -302,13 +319,13 @@ int population_error_handling(const KLP_PARAMS klp_params, const POPULATION_PARA
 void debug_population_parameters(const POPULATION_PARAMS parameters) {
   printf("RNAeq parameters:\n");
   printf("(c) input_file\t\t\t%s\n", parameters.input_file != NULL ? parameters.input_file : "N/A");
-
+  
   if (parameters.sequence != NULL) {
-    printf("(s) sequence\t\t\t%s\n",              parameters.sequence);
-    printf("(k) start_structure\t\t%s\n",         parameters.sequence != NULL && parameters.start_structure == NULL ? "empty" : parameters.start_structure);
-    printf("(l) end_structure\t\t%s\n",           parameters.sequence != NULL && parameters.end_structure == NULL ? "mfe" : parameters.end_structure);
-    printf("(t) temperature\t\t\t%.1f\n",         parameters.temperature);
-    printf("(o) lonely_bp\t\t\t%s\n",             parameters.lonely_bp ? "Yes" : "No");
+    printf("(s) sequence\t\t\t%s\n",      parameters.sequence);
+    printf("(k) start_structure\t\t%s\n", parameters.sequence != NULL && parameters.start_structure == NULL ? "empty" : parameters.start_structure);
+    printf("(l) end_structure\t\t%s\n",   parameters.sequence != NULL && parameters.end_structure == NULL ? "mfe" : parameters.end_structure);
+    printf("(t) temperature\t\t\t%.1f\n", parameters.temperature);
+    printf("(o) lonely_bp\t\t\t%s\n",     parameters.lonely_bp ? "Yes" : "No");
     
     if (parameters.energy_cap > 0) {
       printf("(m) energy_cap\t\t\t%.1f kcal/mol\n", parameters.energy_cap ? parameters.energy_cap : 10000);
@@ -324,7 +341,7 @@ void debug_population_parameters(const POPULATION_PARAMS parameters) {
     printf("(o) lonely_bp\t\t\t%s\n",     "N/A");
     printf("(m) energy_cap\t\t\t%s\n",    "N/A");
   }
-
+  
   if (parameters.filename != NULL) {
     printf("(f) filename\t\t\t%s\n",  parameters.filename);
     printf("(r) serialize\t\t\t%s\n", (parameters.serialize == -1 ? "writing" : (parameters.serialize == 1 ? "reading" : "unset")));
@@ -332,18 +349,29 @@ void debug_population_parameters(const POPULATION_PARAMS parameters) {
     printf("(f) filename\t\t\t%s\n",  "N/A");
     printf("(r) serialize\t\t\t%s\n", "N/A");
   }
-
-  printf("(i) start_time\t\t\t%.2e\n",          parameters.start_time);
-  printf("(j) end_time\t\t\t%.2e\n",            parameters.end_time);
-  printf("(p) step_size\t\t\t%.2e\n",           parameters.step_size);
-  printf("(q) equilibrium\t\t\t%s\n",           parameters.equilibrium ? "Yes" : "No");
-  printf("(e) epsilon\t\t\t%.2e\n",             parameters.epsilon);
-  printf("(d) delta\t\t\t%.2e\n",               parameters.delta);
-  printf("(n) soft bounds\t\t\t%s\n",           parameters.soft_bounds ? "Yes" : "No");
-  printf("(h) all subpop.\t\t\t%s\n",           parameters.all_subpop_for_eq ? "Yes" : "No");
-  printf("(w) window size\t\t\t%d\n",           parameters.window_size);
-  printf("(g) eigen_only\t\t\t%s\n",            parameters.eigen_only ? "Yes" : "No");
-  printf("(b) benchmark\t\t\t%s\n",             parameters.benchmark ? "Yes" : "No");
+  
+  printf("(i) start_time\t\t\t%.2e\n",      parameters.start_time);
+  printf("(j) end_time\t\t\t%.2e\n",        parameters.end_time);
+  printf("(p) step_size\t\t\t%.2e\n",       parameters.step_size);
+  printf("(q) equilibrium\t\t\t%s\n",       parameters.equilibrium ? "Yes" : "No");
+  printf("(e) epsilon\t\t\t%.2e\n",         parameters.epsilon);
+  printf("(d) delta\t\t\t%.2e\n",           parameters.delta);
+  printf("(n) soft bounds\t\t\t%s\n",       parameters.soft_bounds ? "Yes" : "No");
+  
+  if (parameters.num_subpop_to_show != -1) {
+    if (parameters.num_subpop_to_show) {
+      printf("(a) all subpop. output\t\ttop %d\n", parameters.num_subpop_to_show);
+    } else {
+      printf("(a) all subpop. output\t\t%s\n", "all");
+    }
+  } else {
+    printf("(a) all subpop. output\t\t%s\n", "start / end state only");
+  }
+  
+  printf("(h) all subpop. for eq.\t\t%s\n", parameters.all_subpop_for_eq ? "Yes" : "No");
+  printf("(w) window size\t\t\t%d\n",       parameters.window_size);
+  printf("(g) eigen_only\t\t\t%s\n",        parameters.eigen_only ? "Yes" : "No");
+  printf("(b) benchmark\t\t\t%s\n",         parameters.benchmark ? "Yes" : "No");
   
   printf("\n");
 }
@@ -364,6 +392,7 @@ void population_usage() {
 }
 
 void population_flags() {
+  fprintf(stderr, "\t-a\t(a)ll subpop. output,       default is disabled. When enabled, the subsequent option argument indicates number of sub-populations to include in the output, sorted by decreasing popluation occupancy. If the option '0' is provided, all subpopulations are output.\n");
   fprintf(stderr, "\t-b\t(b)enchmarking,             default is disabled. When enabled, will print benchmarking times for internal function calls.\n");
   fprintf(stderr, "\t-c\t(c)SV input file,           this option is made available to abstain from providing the input CSV as the last command line argument.\n");
   fprintf(stderr, "\t-d\t(d)elta range,              default is disabled. When provided, this value specifies the delta-size required for the population to be approaching equilibrium. This position is used as a starting point for a more fine-grained scan using the -e and -w values.\n");

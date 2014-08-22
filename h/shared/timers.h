@@ -9,7 +9,7 @@
     gettimeofday(&full_start, NULL);                 \
     gettimeofday(&start, NULL);                      \
   }
-  
+
 #define STOP_REMAINING_TIMERS                    \
   if (parameters.benchmark) {              \
     gettimeofday(&full_stop, NULL);        \
@@ -22,7 +22,7 @@
     PRINT_TIMING(start, stop, task); \
     gettimeofday(&start, NULL);      \
   }
-  
+
 #define PRINT_TIMING(start, stop, task) \
   printf("[benchmarking] %8.2f\ttime in ms for %s\n", (double)(((stop.tv_sec * 1000000 + stop.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec)) / 1000.0), task);
 

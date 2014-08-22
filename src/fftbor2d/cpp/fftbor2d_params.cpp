@@ -44,74 +44,74 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, voi
   
   while (optind < argc) {
     if ((c = getopt(argc, argv, "+vbmsct:e:f:i:j:k:p:")) != -1) {
-      #ifdef INPUT_DEBUG
-        printf("parse_mfpt_args: %c\n", c);
-      #endif
+#ifdef INPUT_DEBUG
+      printf("parse_mfpt_args: %c\n", c);
+#endif
       
       switch (c) {
         case 'v':
           parameters.verbose = 1;
           break;
-        
+          
         case 'b':
           parameters.benchmark = 1;
           break;
-        
+          
         case 'm':
           parameters.format = MATRIX_FLAG;
           break;
-        
+          
         case 's':
           parameters.format = SIMPLE_FLAG;
           break;
-        
+          
         case 'c':
           parameters.format = CSV_FLAG;
           break;
-        
+          
         case 't':
           if (!sscanf(optarg, "%lf", &temperature)) {
             (*usage)();
           }
-        
+          
           break;
-        
+          
         case 'p':
           if (!sscanf(optarg, "%d", &parameters.precision)) {
             (*usage)();
           } else if (parameters.precision < 0 || parameters.precision > std::numeric_limits<double>::digits) {
             (*usage)();
           }
-        
+          
           break;
-        
+          
         case 'e':
           parameters.energy_file = strdup(optarg);
           break;
-        
-        
+          
+          
         case 'f':
           parameters.input_file = strdup(optarg);
           break;
-        
+          
         case 'i':
           parameters.sequence   = strdup(optarg);
           parameters.seq_length = strlen(parameters.sequence);
           break;
-        
+          
         case 'j':
           parameters.structure_1 = strdup(optarg);
           break;
-        
+          
         case 'k':
           parameters.structure_2 = strdup(optarg);
           break;
-        
+          
         case '?':
-          #ifdef INPUT_DEBUG
-            printf("\tcase '?' with %c\n", optopt);
-          #endif
-  
+#ifdef INPUT_DEBUG
+          printf("\tcase '?' with %c\n", optopt);
+#endif
+          
           switch (optopt) {
             case 't':
             case 'p':
@@ -124,7 +124,7 @@ void parse_fftbor2d_args(FFTBOR2D_PARAMS& parameters, int argc, char** argv, voi
           }
           
           break;
-        
+          
         default:
           (*usage)();
       }

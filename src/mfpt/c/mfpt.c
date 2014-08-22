@@ -21,22 +21,25 @@ int main(int argc, char** argv) {
   
   klp_matrix = klp_matrix_from_file(parameters.input_file, klp_params, &mfpt_usage);
   TIMING("klp_matrix_from_file")
-    
-#ifdef SUPER_HEAVY_DEBUG
+  
+#ifdef INSANE_DEBUG
   print_klp_matrix(klp_matrix);
 #endif
   
   transition_matrix = transition_matrix_from_klp_matrix_and_params(&klp_params, &klp_matrix);
   TIMING("transition_matrix_from_klp_matrix_and_params")
   
-#if SUPER_HEAVY_DEBUG
+#ifdef INSANE_DEBUG
   print_transition_matrix_with_klp_positions(klp_matrix, transition_matrix);
 #endif
   
   mfpt = compute_mfpt(transition_matrix, klp_params, parameters);
   TIMING("compute_mfpt")
-    
-  printf("%+.8f\n", mfpt);
+  
+  if (!parameters.all_mfpt) {
+    printf("%+.8f\n", mfpt);
+  }
+  
   free_transition_matrix(transition_matrix);
   free_klp_matrix(klp_matrix);
   

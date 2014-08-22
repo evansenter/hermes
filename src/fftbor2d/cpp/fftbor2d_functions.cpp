@@ -460,7 +460,7 @@ inline int j_paired_in(int i, int j, const int* base_pairs) {
 
 void populate_matrices(dcomplex* roots_of_unity, int num_roots) {
   int i;
-  #pragma omp parallel
+  #pragma omp parallel for private(i)
   
   for (i = 0; i < num_roots; ++i) {
     roots_of_unity[i] = dcomplex(cos(-2 * M_PI * i / num_roots), sin(-2 * M_PI * i / num_roots));

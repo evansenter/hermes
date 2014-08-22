@@ -95,7 +95,7 @@ void populate_arrays(KLP_MATRIX* klp_matrix, const char* input_file, const KLP_P
     klp_matrix->p[i] = atof(token);
     
     if (
-      (klp_params.energy_based && !(RUN_TYPE(klp_params.run_type, TRANSITION_INPUT_FLAG) && klp_params.rate_matrix)) && 
+      (klp_params.energy_based && !(RUN_TYPE(klp_params.run_type, TRANSITION_INPUT_FLAG) && klp_params.rate_matrix)) &&
       (klp_matrix->p[i] < 0 || klp_matrix->p[i] > 1)
     ) {
       fprintf(stderr, "Error: line number %d (0-indexed) in the input doesn't satisfy 0 <= probability (%+1.2f) <= 1. Did you forget the -e flag?\n\n", i, klp_matrix->p[i]);
