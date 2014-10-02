@@ -494,14 +494,6 @@ void print_equilibrium(const EIGENSYSTEM eigensystem, const KLP_PARAMS klp_param
       printf("%+.8f\n", equilibrium_time);
     }
   }
-  
-  // if (equilibrium_time == NEG_INF(parameters)) {
-  //   printf("-Infinity\n");
-  // } else if (equilibrium_time == POS_INF(parameters)) {
-  //   printf("Infinity\n");
-  // } else {
-  //   printf("%f\n", equilibrium_time);
-  // }
 }
 
 void print_population_proportion(const EIGENSYSTEM eigensystem, const KLP_PARAMS klp_params, const POPULATION_PARAMS parameters) {
