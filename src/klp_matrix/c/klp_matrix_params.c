@@ -7,16 +7,17 @@
 
 KLP_PARAMS init_klp_matrix_params() {
   KLP_PARAMS parameters = {
-    .start_state   = -1,
-    .end_state     = -1,
-    .bp_dist       = 0,
-    .max_dist      = 0,
-    .epsilon       = 0.,
-    .run_type      = DIAG_MOVES_ONLY_FLAG,
-    .energy_based  = 0,
-    .hastings      = 0,
-    .rate_matrix   = 0,
-    .output_only   = 0
+    .start_state    = -1,
+    .end_state      = -1,
+    .bp_dist        = 0,
+    .max_dist       = 0,
+    .epsilon        = 0.,
+    .run_type       = '!',
+    .energy_based   = 0,
+    .hastings       = 0,
+    .rate_matrix    = 0,
+    .output_only    = 0,
+    .run_type_count = 0
   };
   return parameters;
 }
@@ -34,14 +35,17 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
       switch (c) {
         case 'F':
           parameters->run_type = FULLY_CONNECTED_FLAG;
+          parameters->run_type_count++;
           break;
           
         case 'T':
           parameters->run_type = TRANSITION_INPUT_FLAG;
+          parameters->run_type_count++;
           break;
           
         case 'X':
           parameters->run_type = DIAG_MOVES_ONLY_FLAG;
+          parameters->run_type_count++;
           break;
           
         case 'E':
@@ -130,6 +134,10 @@ void parse_klp_matrix_args(KLP_PARAMS* parameters, int argc, char** argv, void (
     }
   }
   
+  if (parameters->run_type == '!') {
+    parameters->run_type = DIAG_MOVES_ONLY_FLAG;
+  }
+  
 #ifdef INPUT_DEBUG
   printf("Done parsing.\n\n");
 #endif
@@ -145,7 +153,7 @@ int klp_matrix_error_handling(const KLP_PARAMS parameters) {
   int error = 0;
   
   // Type of run check.
-  if (RUN_TYPE(parameters.run_type, TRANSITION_INPUT_FLAG) + RUN_TYPE(parameters.run_type, DIAG_MOVES_ONLY_FLAG) + RUN_TYPE(parameters.run_type, FULLY_CONNECTED_FLAG) != 1) {
+  if (parameters.run_type_count > 1) {
     fprintf(stderr, "Error: exactly one of -T, -X or -F must be provided!\n");
     error++;
   }

@@ -165,7 +165,7 @@ void evaluate_recursions(int root, FFTBOR2D_DATA& data, FFTBOR2D_THREADED_DATA& 
         // ****************************************************************************
 #ifdef DO_WORK
         // In a hairpin, [i + 1, j - 1] unpaired.
-        delta  = data.delta_table[data.num_base_pairs[0][i][j] + data.j_paired_to_0[i][j]][data.num_base_pairs[1][i][j] + data.j_paired_to_1[i][j]];
+        delta = data.delta_table[data.num_base_pairs[0][i][j] + data.j_paired_to_0[i][j]][data.num_base_pairs[1][i][j] + data.j_paired_to_1[i][j]];
         threaded_data.ZB[i][j] += threaded_data.root_to_power[delta] * data.EH[i][j];
 #ifdef STRUCTURE_COUNT
         threaded_data.ZB[j][i] += 1;
@@ -181,7 +181,7 @@ void evaluate_recursions(int root, FFTBOR2D_DATA& data, FFTBOR2D_THREADED_DATA& 
             if (data.can_base_pair[data.int_sequence[k]][data.int_sequence[l]]) {
 #ifdef DO_WORK
               // In interior loop / bulge / stack with (i, j) and (k, l), (i + 1, k - 1) and (l + 1, j - 1) are all unpaired.
-              delta  = data.delta_table[data.num_base_pairs[0][i][j] - data.num_base_pairs[0][k][l] + data.j_paired_to_0[i][j]][data.num_base_pairs[1][i][j] - data.num_base_pairs[1][k][l] + data.j_paired_to_1[i][j]];
+              delta = data.delta_table[data.num_base_pairs[0][i][j] - data.num_base_pairs[0][k][l] + data.j_paired_to_0[i][j]][data.num_base_pairs[1][i][j] - data.num_base_pairs[1][k][l] + data.j_paired_to_1[i][j]];
               threaded_data.ZB[i][j] += threaded_data.ZB[k][l] * threaded_data.root_to_power[delta] * data.EIL[i][j][position];
               position++;
 #ifdef STRUCTURE_COUNT
@@ -197,7 +197,7 @@ void evaluate_recursions(int root, FFTBOR2D_DATA& data, FFTBOR2D_THREADED_DATA& 
         for (k = i + MIN_PAIR_DIST + 3; k < j - MIN_PAIR_DIST - 1; ++k) {
 #ifdef DO_WORK
           // If (i, j) is the closing b.p. of a multiloop, and (k, l) is the rightmost base pair, there is at least one hairpin between (i + 1, k - 1)
-          delta  = data.delta_table[data.num_base_pairs[0][i][j] - data.num_base_pairs[0][i + 1][k - 1] - data.num_base_pairs[0][k][j - 1] + data.j_paired_to_0[i][j]][data.num_base_pairs[1][i][j] - data.num_base_pairs[1][i + 1][k - 1] - data.num_base_pairs[1][k][j - 1] + data.j_paired_to_1[i][j]];
+          delta = data.delta_table[data.num_base_pairs[0][i][j] - data.num_base_pairs[0][i + 1][k - 1] - data.num_base_pairs[0][k][j - 1] + data.j_paired_to_0[i][j]][data.num_base_pairs[1][i][j] - data.num_base_pairs[1][i + 1][k - 1] - data.num_base_pairs[1][k][j - 1] + data.j_paired_to_1[i][j]];
           threaded_data.ZB[i][j] += threaded_data.ZM[i + 1][k - 1] * threaded_data.ZM1[k][j - 1] * threaded_data.root_to_power[delta] * energy;
 #ifdef STRUCTURE_COUNT
           threaded_data.ZB[j][i] += threaded_data.ZM[k - 1][i + 1] * threaded_data.ZM1[j - 1][k];
@@ -213,7 +213,7 @@ void evaluate_recursions(int root, FFTBOR2D_DATA& data, FFTBOR2D_THREADED_DATA& 
         // k is the closing base pairing with i of a single component within the range [i, j]
         if (data.can_base_pair[data.int_sequence[i]][data.int_sequence[k]]) {
 #ifdef DO_WORK
-          delta  = data.delta_table[data.num_base_pairs[0][i][j] - data.num_base_pairs[0][i][k]][data.num_base_pairs[1][i][j] - data.num_base_pairs[1][i][k]];
+          delta = data.delta_table[data.num_base_pairs[0][i][j] - data.num_base_pairs[0][i][k]][data.num_base_pairs[1][i][j] - data.num_base_pairs[1][i][k]];
           threaded_data.ZM1[i][j] += threaded_data.ZB[i][k] * data.EM1[i][j][k];
 #ifdef STRUCTURE_COUNT
           threaded_data.ZM1[j][i] += threaded_data.ZB[k][i];
@@ -228,7 +228,7 @@ void evaluate_recursions(int root, FFTBOR2D_DATA& data, FFTBOR2D_THREADED_DATA& 
       for (k = i; k < j - MIN_PAIR_DIST; ++k) {
 #ifdef DO_WORK
         // Only one stem.
-        delta  = data.delta_table[data.num_base_pairs[0][i][j] - data.num_base_pairs[0][k][j]][data.num_base_pairs[1][i][j] - data.num_base_pairs[1][k][j]];
+        delta = data.delta_table[data.num_base_pairs[0][i][j] - data.num_base_pairs[0][k][j]][data.num_base_pairs[1][i][j] - data.num_base_pairs[1][k][j]];
         threaded_data.ZM[i][j] += threaded_data.ZM1[k][j] * threaded_data.root_to_power[delta] * data.EMA[i][k];
 #ifdef STRUCTURE_COUNT
         threaded_data.ZM[j][i] += threaded_data.ZM1[j][k];
@@ -238,7 +238,7 @@ void evaluate_recursions(int root, FFTBOR2D_DATA& data, FFTBOR2D_THREADED_DATA& 
         // More than one stem.
         if (k > i + MIN_PAIR_DIST + 1) { // (k > i + MIN_PAIR_DIST + 1) because i can pair with k - 1
 #ifdef DO_WORK
-          delta  = data.delta_table[data.num_base_pairs[0][i][j] - data.num_base_pairs[0][i][k - 1] - data.num_base_pairs[0][k][j]][data.num_base_pairs[1][i][j] - data.num_base_pairs[1][i][k - 1] - data.num_base_pairs[1][k][j]];
+          delta = data.delta_table[data.num_base_pairs[0][i][j] - data.num_base_pairs[0][i][k - 1] - data.num_base_pairs[0][k][j]][data.num_base_pairs[1][i][j] - data.num_base_pairs[1][i][k - 1] - data.num_base_pairs[1][k][j]];
           threaded_data.ZM[i][j] += threaded_data.ZM[i][k - 1] * threaded_data.ZM1[k][j] * threaded_data.root_to_power[delta] * data.EMB[j][k];
 #ifdef STRUCTURE_COUNT
           threaded_data.ZM[j][i] += threaded_data.ZM[k - 1][i] * threaded_data.ZM1[j][k];

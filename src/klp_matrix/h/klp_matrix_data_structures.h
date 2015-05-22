@@ -25,6 +25,7 @@ typedef struct {
   short hastings;
   short rate_matrix;
   short output_only;
+  short run_type_count;
 } KLP_PARAMS;
 
 #define TRANSITION_INPUT_FLAG 'T'
